@@ -1,0 +1,44 @@
+# IDEA files
+*.iml
+*.ipr
+*.iws
+# IDEA run configs are shared
+.idea/
+!.idea/runConfigurations/
+!.idea/runConfigurations/*
+# maven:
+target/
+overlays/
+# eclipse:
+.classpath
+.project
+.settings/
+# Logs:
+*.log
+*.out
+# git:
+*.orig
+# OS X
+.DS_Store
+# Emacs
+*~
+# Vagrant
+.vagrant/
+.vagrantuser
+# Grunt/NPM:
+# https://docs.npmjs.com/misc/faq#should-i-check-my-node_modules-folder-into-git
+node_modules/
+**/*-theme/node
+**/*/node/node
+**/*/node/npm
+**/*/node/npm.cmd
+node
+# Logs:
+*.log
+*.out
+.npm-debug.log
+# Sass:
+.sass-cache/
+*.css.map
+# Blobstore of local content-servers
+**/*/*-server-webapp/blobstore
