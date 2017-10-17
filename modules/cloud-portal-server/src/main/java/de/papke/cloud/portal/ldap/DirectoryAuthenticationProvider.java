@@ -15,37 +15,37 @@ import org.springframework.stereotype.Component;
 @Component
 public class DirectoryAuthenticationProvider implements AuthenticationProvider {
 
-	@Autowired
-	private DirectoryService directoryService;
+    @Autowired
+    private DirectoryService directoryService;
 
-	@Override
-	public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-		
-		Authentication auth = null;
+    @Override
+    public Authentication authenticate(Authentication authentication) throws AuthenticationException {
+        
+        Authentication auth = null;
 
-		// get username and password from authentication object
-		String username = (String) authentication.getPrincipal();
-		String password = (String) authentication.getCredentials();		
+        // get username and password from authentication object
+        String username = (String) authentication.getPrincipal();
+        String password = (String) authentication.getCredentials();        
 
-		// create granted authority list
-		List<GrantedAuthority> grantedAuthorityList = new ArrayList<>();
-		
-		// authenticate against directory server
-		if (directoryService.authenticate(username, password)) {
-			
-			List<String> groupList = directoryService.getGroupList(username);
-			for (String group : groupList) {
-				grantedAuthorityList.add(new SimpleGrantedAuthority(group));
-			}
-			
-			auth = new UsernamePasswordAuthenticationToken(username, password, grantedAuthorityList);
-		}
+        // create granted authority list
+        List<GrantedAuthority> grantedAuthorityList = new ArrayList<>();
+        
+        // authenticate against directory server
+        if (directoryService.authenticate(username, password)) {
+            
+            List<String> groupList = directoryService.getGroupList(username);
+            for (String group : groupList) {
+                grantedAuthorityList.add(new SimpleGrantedAuthority(group));
+            }
+            
+            auth = new UsernamePasswordAuthenticationToken(username, password, grantedAuthorityList);
+        }
 
-		return auth;
-	}
+        return auth;
+    }
 
-	@Override
-	public boolean supports(Class<?> arg0) {
-		return true;
-	}
+    @Override
+    public boolean supports(Class<?> arg0) {
+        return true;
+    }
 }
