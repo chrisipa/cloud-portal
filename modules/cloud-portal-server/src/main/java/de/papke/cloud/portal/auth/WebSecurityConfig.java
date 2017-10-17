@@ -1,12 +1,13 @@
 package de.papke.cloud.portal.auth;
 
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+
+import de.papke.cloud.portal.ldap.DirectoryAuthenticationProvider;
 
 /**
  * Web security config class for configurating the spring boot webapp.
@@ -14,24 +15,9 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
-
-    @Value("${ldap.protocol}")
-    private String ldapProtocol;
-
-    @Value("${ldap.host}")
-    private String ldapHost;
-
-    @Value("${ldap.port}")
-    private String ldapPort;
-
-    @Value("${ldap.base.dn}")
-    private String ldapBaseDn;
-
-    @Value("${ldap.user.search.filter}")
-    private String ldapUserSearchFilter;
-
-    @Value("${ldap.group.search.filter}")
-    private String ldapGroupSearchFilter;
+	
+	@Autowired
+	private DirectoryAuthenticationProvider directoryAuthenticationProvider;
 
     /**
      * Method for configuring the http security.
@@ -41,6 +27,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
      */
     @Override
     protected void configure(HttpSecurity http) throws Exception {
+    	
+    	// set directory authentication provider
+    	http
+    			.authenticationProvider(directoryAuthenticationProvider);
 
         // any request should be authenticated
         http
@@ -69,16 +59,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .sameOrigin()
                 .httpStrictTransportSecurity()
                 .disable();
-    }
-
-    @Override
-    public void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth
-                .ldapAuthentication()
-                .userSearchFilter(ldapUserSearchFilter)
-                .groupSearchFilter(ldapGroupSearchFilter)
-                .contextSource()
-                .url(ldapProtocol + "://" + ldapHost + ":" + ldapPort + "/" + ldapBaseDn);
     }
 
     /**
