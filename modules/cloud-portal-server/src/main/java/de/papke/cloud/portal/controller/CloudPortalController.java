@@ -1,7 +1,12 @@
 package de.papke.cloud.portal.controller;
 
 import java.io.IOException;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,9 +15,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
-import de.papke.cloud.portal.cloud.CloudProviderService;
 import de.papke.cloud.portal.model.Data;
+import de.papke.cloud.portal.terraform.TerraformService;
 
 /**
  * Created by chris on 16.10.17.
@@ -24,7 +30,7 @@ public class CloudPortalController {
 	private String applicationTitle;
 
 	@Autowired
-	private CloudProviderService cloudProviderService;
+	private TerraformService terraformService;
 
 	/**
 	 * Method for returning the model and view for the index page.
@@ -80,17 +86,15 @@ public class CloudPortalController {
 	 * @param model
 	 * @return
 	 */
-	@PostMapping(path = "/vm/provision")
-	public String vmProvision(Map<String, Object> model, @RequestParam Map<String, Object> variableMap) throws IOException {
+	@PostMapping(path = "/vm/provision", produces="text/plain")
+	@ResponseBody
+	public void vmProvision( @RequestParam Map<String, Object> variableMap, HttpServletResponse response) throws IOException {
 
-		// put data object into model
-		model.put("self", getData());
+		// get response output stream
+		OutputStream outputStream = response.getOutputStream();
 
-		// provisionVM
-		cloudProviderService.provisionVM(variableMap);
-
-		// return view name
-		return "vm-provision";
+		// provision VM
+		terraformService.provisionVM(variableMap, outputStream);
 	}    
 
 	private Data getData() {
@@ -102,7 +106,9 @@ public class CloudPortalController {
 		data.setApplicationTitle(applicationTitle);
 
 		// set cloud providers
-		data.setCloudProviderList(cloudProviderService.getProviderList());
+		List<String> cloudProviderList = new ArrayList<String>();
+		cloudProviderList.addAll(terraformService.getProviderDefaultsMap().keySet());
+		data.setCloudProviderList(cloudProviderList);
 
 		// get username
 		data.setUsername((String) SecurityContextHolder.getContext().getAuthentication().getPrincipal());

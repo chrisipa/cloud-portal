@@ -18,6 +18,9 @@
 
     <!-- Custom Theme JavaScript -->
     <script src="<c:url value="/static/dist/js/sb-admin-2.js" />"></script>
+    
+    <!-- Portal JavaScript -->
+    <script src="<c:url value="/static/dist/js/portal.js" />"></script>
 
 </body>
 
