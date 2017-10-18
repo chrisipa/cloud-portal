@@ -23,6 +23,9 @@
 
     <!-- Custom CSS -->
     <link href="<c:url value="/static/dist/css/sb-admin-2.css" />" rel="stylesheet">
+    
+    <!-- Portal CSS -->
+    <link href="<c:url value="/static/dist/css/portal.css" />" rel="stylesheet">
 
     <!-- Morris Charts CSS -->
     <link href="<c:url value="/static/vendor/morrisjs/morris.css" />" rel="stylesheet">
