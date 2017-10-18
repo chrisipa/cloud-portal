@@ -13,8 +13,8 @@
 		<div class="row">
 			<h1 class="page-header">Virtual Machines</h1>
 			<div class="col-lg-4">
-				<form method="post" action="<c:url value="/vm/provision" />" target="output"
-					role="form">
+				<form method="post" action="<c:url value="/vm/provision" />"
+					target="output" role="form" enctype="multipart/form-data">
 					<div class="form-group">
 						<label>Cloud Provider</label> <select class="form-control"
 							name="provider">
@@ -35,26 +35,26 @@
 						<p class="help-block">Hostname for virtual machine</p>
 					</div>
 					<div class="form-group">
-						<label>SSH Public Key File</label> <input class="form-control"
+						<label>SSH Public Key File</label> <input type="file"
 							name="ssh-public-key-file">
+					</div>
+					<p class="help-block">File with public key for SSH connections
+						to virtual machine</p>
+					<div class="form-group">
+						<label>SSH Private Key File</label> <input type="file"
+                            name="ssh-private-key-file">
 						<p class="help-block">File with public key for SSH connections
 							to virtual machine</p>
 					</div>
 					<div class="form-group">
-						<label>SSH Private Key File</label> <input class="form-control"
-							name="ssh-private-key-file">
-						<p class="help-block">File with public key for SSH connections
-							to virtual machine</p>
-					</div>
-					<div class="form-group">
-						<label>Bootstrap Script File</label> <input class="form-control"
-							name="bootstrap-script-file">
+						<label>Bootstrap Script File</label> <input type="file"
+                            name="bootstrap-script-file">
 						<p class="help-block">Script to execute after virtual machine
 							was created</p>
 					</div>
 
 					<input type="hidden" id="action" name="action" />
-					
+
 					<button type="submit" id="plan" class="btn btn-default">Plan</button>
 					<button type="submit" id="apply" class="btn btn-default">Apply</button>
 					<button type="reset" class="btn btn-default">Reset</button>
