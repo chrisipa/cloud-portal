@@ -62,10 +62,11 @@ resource "azurerm_public_ip" "pip" {
 }
 
 resource "azurerm_storage_account" "stor" {
-  name                = "${var.hostname}stor"
-  location            = "${var.location}"
-  resource_group_name = "${azurerm_resource_group.rg.name}"
-  account_type        = "${var.storage_account_type}"
+  name                     = "${var.hostname}stor"
+  location                 = "${var.location}"
+  resource_group_name      = "${azurerm_resource_group.rg.name}"
+  account_tier             = "${var.storage_account_tier}"
+  account_replication_type = "${var.storage_replication_type}"  
 }
 
 resource "azurerm_storage_container" "storc" {
@@ -107,7 +108,7 @@ resource "azurerm_virtual_machine" "vm" {
 
     ssh_keys = [{
       path     = "/home/${var.admin_username}/.ssh/authorized_keys"
-      key_data = "${var.ssh_public_key}"
+      key_data = "${file("${var.ssh_public_key_file}")}"
     }]
   }
 
@@ -116,12 +117,12 @@ resource "azurerm_virtual_machine" "vm" {
     agent = false  
     host = "${azurerm_public_ip.pip.fqdn}"
     user = "${var.admin_username}"      
-    private_key = "${var.ssh_private_key}"
+    private_key = "${file("${var.ssh_private_key_file}")}"
     timeout = "1m"      
   }
 
   provisioner "file" {
-    source      = "${var.bootstrap_script_path}"
+    source      = "${var.bootstrap_script_file}"
     destination = "/tmp/bootstrap.sh"                
   }
 

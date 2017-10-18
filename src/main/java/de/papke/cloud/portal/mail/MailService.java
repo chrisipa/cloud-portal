@@ -96,7 +96,8 @@ public class MailService {
      * @param to - mail recipient
      * @param variableMap - variable map for substitution
      */
-    public void send(String to, Map variableMap) {
+    @SuppressWarnings("rawtypes")
+	public void send(String to, Map variableMap) {
 
         // logging
         LOG.info("Sending mail from '{}' to address '{}' with subject '{}'", from, to, subject);
@@ -104,7 +105,8 @@ public class MailService {
         // create mime message preparator
         MimeMessagePreparator preparator = new MimeMessagePreparator() {
 
-            @Override
+            @SuppressWarnings("unchecked")
+			@Override
             public void prepare(MimeMessage mimeMessage) throws Exception {
 
                 // get mail text by substituting variables in mail template with velocity

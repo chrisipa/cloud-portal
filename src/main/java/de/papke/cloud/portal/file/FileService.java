@@ -26,27 +26,21 @@ public class FileService {
             File resource = new File(url.toURI());
             String resourceName = resource.getName();
             
-            String prefix = null;
-            String suffix = null;
-            
-            if (resourceName.contains(".")) {
-            	prefix = FilenameUtils.getPrefix(resourceName);
-            	suffix = FilenameUtils.getExtension(resourceName);
-            }
-            else {
-            	prefix = resourceName;
-            }
-            
-        	
             if (resource.isFile()) {
+            	String prefix = FilenameUtils.getPrefix(resourceName);
+            	String suffix = FilenameUtils.getExtension(resourceName);
             	tmpFile = File.createTempFile(prefix, suffix);	
             	FileUtils.copyFile(resource, tmpFile);
             }
             else {
+            	String prefix = resourceName;
             	Path tmpPath = Files.createTempDirectory(prefix);
             	tmpFile = new File(tmpPath.toUri());
             	FileUtils.copyDirectory(resource, tmpFile);
             }
+            
+            // set file executable
+            tmpFile.setExecutable(true);
         }
         catch (Exception e) {
             LOG.error(e.getMessage());

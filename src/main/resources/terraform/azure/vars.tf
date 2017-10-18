@@ -7,16 +7,16 @@ variable "name_prefix" {
   description = "unique part of the name to give to resources"
 }
 
-variable "ssh_public_key" {
-  description = "public key for ssh access"
+variable "ssh_public_key_file" {
+  description = "public key file for ssh access"
 }
 
-variable "ssh_private_key" {
-  description = "private key for ssh access"
+variable "ssh_private_key_file" {
+  description = "private key file for ssh access"
 }
 
-variable "bootstrap_script_path" {
-  description = "script to execute after vm has been created"
+variable "bootstrap_script_file" {
+  description = "bootstrap script file to execute after vm has been created"
 }
 
 # optional variables
@@ -35,9 +35,14 @@ variable "subnet_address_space" {
   default     = "10.0.10.0/24"
 }
 
-variable "storage_account_type" {
-  description = "type of storage account"
-  default     = "Standard_LRS"
+variable "storage_account_tier" {
+  description = "Storage account Tier for the cluster (e.g. Standard or Premium)"
+  default     = "Standard"
+}
+
+variable "storage_replication_type" {
+  description = "Storage account replication type for the cluster (e.g. LRS, GRS etc)"
+  default     = "LRS"
 }
 
 variable "vm_size" {
