@@ -3,6 +3,7 @@ package de.papke.cloud.portal.process;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.stream.IntStream;
 
 import org.apache.commons.exec.CommandLine;
@@ -22,6 +23,10 @@ public class ProcessExecutorService {
 	}
 	
 	public String execute(String command, File workingDirectory) {
+		return execute(command, workingDirectory, new ByteArrayOutputStream());
+	}
+	
+	public String execute(String command, File workingDirectory, OutputStream outputStream) {
 		
 		String output = null;
 		
@@ -42,7 +47,6 @@ public class ProcessExecutorService {
 	        executor.setExitValues(IntStream.range(0, 255).toArray());
 	
 	        // create output stream for command
-	        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 	        PumpStreamHandler streamHandler = new PumpStreamHandler(outputStream);
 	        executor.setStreamHandler(streamHandler);
 

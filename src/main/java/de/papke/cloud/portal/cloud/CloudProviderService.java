@@ -1,6 +1,7 @@
 package de.papke.cloud.portal.cloud;
 
 import java.io.File;
+import java.io.OutputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,11 +20,11 @@ import org.springframework.stereotype.Service;
 
 import de.papke.cloud.portal.file.FileService;
 import de.papke.cloud.portal.process.ProcessExecutorService;
-import de.papke.cloud.portal.velocity.VelocityService;
 
 /**
  * Created by chris on 16.10.17.
  */
+@SuppressWarnings("deprecation")
 @Service
 public class CloudProviderService {
 
@@ -58,10 +59,8 @@ public class CloudProviderService {
 		}
 	}
 
-	@SuppressWarnings("deprecation")
-	public String provisionVM(Map<String, Object> variableMap) {
+	public void provisionVM(Map<String, Object> variableMap, OutputStream outputStream) {
 		
-		String output = null;
 		File tmpFolder = null;
 		
 		try {
@@ -72,13 +71,16 @@ public class CloudProviderService {
 	
 				// copy terraform resources to filesystem
 				tmpFolder = fileService.copyResourceToFilesystem("terraform/" + provider);
+				
+				// execute command
+				processExecutorService.execute("terraform init", tmpFolder, outputStream);
 	
 				// build the command string
 				StrSubstitutor stringSubstitutor = new StrSubstitutor(variableMap);
 				String command = stringSubstitutor.replace(terraformCommand);
 	
 				// execute command
-				output = processExecutorService.execute(command, tmpFolder);
+				processExecutorService.execute(command, tmpFolder, outputStream);
 			}
 		}
 		catch (Exception e) {
@@ -94,8 +96,6 @@ public class CloudProviderService {
 				}
 			}
 		}
-
-		return output;
 	}
 
 	public List<String> getProviderList() {

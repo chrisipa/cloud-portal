@@ -1,7 +1,10 @@
 package de.papke.cloud.portal.controller;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Map;
+
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,6 +13,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import de.papke.cloud.portal.cloud.CloudProviderService;
 import de.papke.cloud.portal.model.Data;
@@ -80,17 +84,15 @@ public class CloudPortalController {
 	 * @param model
 	 * @return
 	 */
-	@PostMapping(path = "/vm/provision")
-	public String vmProvision(Map<String, Object> model, @RequestParam Map<String, Object> variableMap) throws IOException {
+	@PostMapping(path = "/vm/provision", produces="text/plain")
+	@ResponseBody
+	public void vmProvision( @RequestParam Map<String, Object> variableMap, HttpServletResponse response) throws IOException {
 
-		// put data object into model
-		model.put("self", getData());
+		// get response output stream
+		OutputStream outputStream = response.getOutputStream();
 
-		// provisionVM
-		cloudProviderService.provisionVM(variableMap);
-
-		// return view name
-		return "vm-provision";
+		// provision VM
+		cloudProviderService.provisionVM(variableMap, outputStream);
 	}    
 
 	private Data getData() {
