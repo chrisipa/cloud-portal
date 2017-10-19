@@ -23,14 +23,14 @@ resource "azurerm_network_security_group" "nsg" {
   resource_group_name = "${azurerm_resource_group.rg.name}"
 }
 
-resource "azurerm_network_security_rule" "rulessh" {
-  name                        = "${var.general-hostname-string}rulessh"
+resource "azurerm_network_security_rule" "ruleports" {
+  name                        = "${var.general-hostname-string}ruleports"
   priority                    = 100
   direction                   = "Inbound"
   access                      = "Allow"
   protocol                    = "Tcp"
   source_port_range           = "*"
-  destination_port_range      = "22"
+  destination_port_range      = "${var.network-incoming-port-range-string}"
   source_address_prefix       = "*"
   destination_address_prefix  = "*"
   resource_group_name         = "${azurerm_resource_group.rg.name}"

@@ -18,6 +18,11 @@ variable "network-subnet-address-space-string" {
   default     = "10.0.10.0/24"
 }
 
+variable "network-incoming-port-range-string" {
+  description = "The allowed port change for incoming connections."
+  default     = "1-1024"
+}
+
 variable "storage-account-tier-string" {
   description = "Storage account Tier for the cluster (e.g. Standard or Premium)."
   default     = "Standard"
