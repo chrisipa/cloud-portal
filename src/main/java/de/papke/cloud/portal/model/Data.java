@@ -1,6 +1,8 @@
 package de.papke.cloud.portal.model;
 
 import java.util.List;
+import java.util.Map;
+
 import de.papke.cloud.portal.terraform.Variable;
 
 /**
@@ -13,7 +15,7 @@ public class Data {
     private List<String> groupList; 
     private String cloudProvider;
     private List<String> cloudProviderList;
-    private List<Variable> cloudProviderDefaultsList;
+    private Map<String, List<Variable>> cloudProviderDefaultsMap;
 
     public String getApplicationTitle() {
         return applicationTitle;
@@ -55,11 +57,11 @@ public class Data {
         this.cloudProviderList = cloudProviderList;
     }
 
-	public List<Variable> getCloudProviderDefaultsList() {
-		return cloudProviderDefaultsList;
+	public Map<String, List<Variable>> getCloudProviderDefaultsMap() {
+		return cloudProviderDefaultsMap;
 	}
 
-	public void setCloudProviderDefaultsList(List<Variable> cloudProviderDefaultsList) {
-		this.cloudProviderDefaultsList = cloudProviderDefaultsList;
+	public void setCloudProviderDefaultsMap(Map<String, List<Variable>> cloudProviderDefaultsMap) {
+		this.cloudProviderDefaultsMap = cloudProviderDefaultsMap;
 	}
 }

@@ -14,13 +14,9 @@
                 <h1 class="page-header">Dashboard</h1>
                 <p>Welcome to the self service Cloud portal.</p>
             </div>
-            <!-- /.col-lg-12 -->
         </div>
-        <!-- /.row -->
     </div>
-    <!-- /#page-wrapper -->
-
+    
 </div>
-<!-- /#wrapper -->
 
 <jsp:include page="footer.jsp" />

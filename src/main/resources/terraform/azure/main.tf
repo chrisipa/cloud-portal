@@ -1,30 +1,30 @@
 resource "azurerm_resource_group" "rg" {
-  name     = "${var.general-name-prefix-string}-rg"
+  name     = "${var.general-hostname-string}-rg"
   location = "${var.general-location-string}"
 }
 
 resource "azurerm_virtual_network" "vnet" {
-  name                = "${var.general-name-prefix-string}vnet"
+  name                = "${var.general-hostname-string}vnet"
   location            = "${var.general-location-string}"
   address_space       = ["${var.network-vnet-address-space-string}"]
   resource_group_name = "${azurerm_resource_group.rg.name}"
 }
 
 resource "azurerm_subnet" "subnet" {
-  name                 = "${var.general-name-prefix-string}subnet"
+  name                 = "${var.general-hostname-string}subnet"
   virtual_network_name = "${azurerm_virtual_network.vnet.name}"
   resource_group_name  = "${azurerm_resource_group.rg.name}"
   address_prefix       = "${var.network-subnet-address-space-string}"
 }
 
 resource "azurerm_network_security_group" "nsg" {
-  name                = "${var.general-name-prefix-string}nsg"
+  name                = "${var.general-hostname-string}nsg"
   location            = "${var.general-location-string}"
   resource_group_name = "${azurerm_resource_group.rg.name}"
 }
 
 resource "azurerm_network_security_rule" "rulessh" {
-  name                        = "${var.general-name-prefix-string}rulessh"
+  name                        = "${var.general-hostname-string}rulessh"
   priority                    = 100
   direction                   = "Inbound"
   access                      = "Allow"
@@ -38,13 +38,13 @@ resource "azurerm_network_security_rule" "rulessh" {
 }
 
 resource "azurerm_network_interface" "nic" {
-  name                      = "${var.general-name-prefix-string}nic"
+  name                      = "${var.general-hostname-string}nic"
   location                  = "${var.general-location-string}"
   resource_group_name       = "${azurerm_resource_group.rg.name}"
   network_security_group_id = "${azurerm_network_security_group.nsg.id}"
 
   ip_configuration {
-    name                          = "${var.general-name-prefix-string}ipconfig"
+    name                          = "${var.general-hostname-string}ipconfig"
     subnet_id                     = "${azurerm_subnet.subnet.id}"
     private_ip_address_allocation = "dynamic"
     public_ip_address_id          = "${azurerm_public_ip.pip.id}"
@@ -54,7 +54,7 @@ resource "azurerm_network_interface" "nic" {
 }
 
 resource "azurerm_public_ip" "pip" {
-  name                         = "${var.general-name-prefix-string}-ip"
+  name                         = "${var.general-hostname-string}-ip"
   location                     = "${var.general-location-string}"
   resource_group_name          = "${azurerm_resource_group.rg.name}"
   public_ip_address_allocation = "dynamic"
@@ -70,14 +70,14 @@ resource "azurerm_storage_account" "stor" {
 }
 
 resource "azurerm_storage_container" "storc" {
-  name                  = "${var.general-name-prefix-string}-vhds"
+  name                  = "${var.general-hostname-string}-vhds"
   resource_group_name   = "${azurerm_resource_group.rg.name}"
   storage_account_name  = "${azurerm_storage_account.stor.name}"
   container_access_type = "private"
 }
 
 resource "azurerm_virtual_machine" "vm" {
-  name                  = "${var.general-name-prefix-string}vm"
+  name                  = "${var.general-hostname-string}vm"
   location              = "${var.general-location-string}"
   resource_group_name   = "${azurerm_resource_group.rg.name}"
   vm_size               = "${var.vm-size-string}"
@@ -91,8 +91,8 @@ resource "azurerm_virtual_machine" "vm" {
   }
 
   storage_os_disk {
-    name          = "${var.general-name-prefix-string}osdisk"
-    vhd_uri       = "${azurerm_storage_account.stor.primary_blob_endpoint}${azurerm_storage_container.storc.name}/${var.general-name-prefix-string}osdisk.vhd"
+    name          = "${var.general-hostname-string}osdisk"
+    vhd_uri       = "${azurerm_storage_account.stor.primary_blob_endpoint}${azurerm_storage_container.storc.name}/${var.general-hostname-string}osdisk.vhd"
     caching       = "ReadWrite"
     create_option = "FromImage"
   }
