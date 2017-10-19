@@ -12,7 +12,7 @@
 
 	<div id="page-wrapper">
 		<div class="row">
-			<h1 class="page-header">Virtual Machines</h1>
+			<h4 class="page-header">Virtual Machines</h4>
 			<div class="col-lg-3">
 				<form method="post"
 					action="<c:url value="/vm/provision/${self.cloudProvider}" />"

@@ -125,6 +125,8 @@ public class CloudPortalController {
 			@RequestParam("bootstrap-script-file") MultipartFile bootstrapScriptFileUpload,
 			HttpServletResponse response) {
 		
+		// TODO: Make file upload handling more generic
+		
 		File sshPublicKeyFile = null;
 		File sshPrivateKeyFile = null;
 		File bootstrapScriptFile = null;
