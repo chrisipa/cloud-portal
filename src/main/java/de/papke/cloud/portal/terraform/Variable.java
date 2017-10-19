@@ -2,6 +2,7 @@ package de.papke.cloud.portal.terraform;
 
 public class Variable {
 	
+	private String title = "";
 	private String name = "";
 	private String description = "";
 	private String defaultValue = "";
@@ -10,9 +11,17 @@ public class Variable {
 
 	@Override
 	public String toString() {
-		return "name=" + name + ", description=" + description + ", defaultValue=" + defaultValue;
+		return "title=" + title + ", name=" + name + ", description=" + description + ", defaultValue=" + defaultValue;
 	}
 	
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
 	public String getName() {
 		return name;
 	}

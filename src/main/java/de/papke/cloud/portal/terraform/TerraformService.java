@@ -13,7 +13,6 @@ import javax.annotation.PostConstruct;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.text.StrSubstitutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +25,6 @@ import de.papke.cloud.portal.process.ProcessExecutorService;
 /**
  * Created by chris on 16.10.17.
  */
-@SuppressWarnings("deprecation")
 @Service
 public class TerraformService {
 
@@ -38,12 +36,9 @@ public class TerraformService {
 	@Autowired
 	private FileService fileService;
 	
-	@Value("${terraform.init.command}")
-	private String initCommand;
+	@Value("${terraform.path}")
+	private String terraformPath;
 	
-	@Value("${terraform.execute.command}")
-	private String executeCommand;	
-
 	private Map<String, List<Variable>> providerDefaultsMap = new HashMap<>();
 
 	@PostConstruct
@@ -66,28 +61,35 @@ public class TerraformService {
 		}
 	}
 
-	public void provisionVM(Map<String, Object> variableMap, OutputStream outputStream) {
+	public void provisionVM(String provider, Map<String, Object> variableMap, OutputStream outputStream) {
 		
 		File tmpFolder = null;
 		
 		try {
 
-			String provider = (String) variableMap.get("provider");
-	
 			if (StringUtils.isNotEmpty(provider)) {
 	
 				// copy terraform resources to filesystem
 				tmpFolder = fileService.copyResourceToFilesystem("terraform/" + provider);
 				
 				// execute init command
+				String initCommand = buildInitCommand(terraformPath, "init");
 				processExecutorService.execute(initCommand, tmpFolder, outputStream);
 	
-				// build the command string
-				StrSubstitutor stringSubstitutor = new StrSubstitutor(variableMap);
-				String executeCommandReplace = stringSubstitutor.replace(executeCommand);
-	
-				// execute action command
-				processExecutorService.execute(executeCommandReplace, tmpFolder, outputStream);
+				// get action to execute
+				String action = (String) variableMap.get("action");
+				if (StringUtils.isNotEmpty(action)) {
+					
+					// remove action from map
+					variableMap.remove("action");
+					
+					// build the command string
+					String commandString = buildActionCommand(terraformPath, action, variableMap);
+					
+					// execute action command
+					processExecutorService.execute(commandString, tmpFolder, outputStream);
+				}
+				
 			}
 		}
 		catch (Exception e) {
@@ -103,6 +105,32 @@ public class TerraformService {
 				}
 			}
 		}
+	}
+	
+	private String buildInitCommand(String terraformPath, String action) {
+		return terraformPath + " " + action;
+	}
+	
+	private String buildActionCommand(String terraformPath, String action, Map<String, Object> variableMap) {
+		
+		StringBuffer commandStringBuffer = new StringBuffer();
+		commandStringBuffer.append(terraformPath);
+		commandStringBuffer.append(" ");
+		commandStringBuffer.append(action);
+				
+		for (String variableName : variableMap.keySet()) {
+			
+			String variableValue = (String) variableMap.get(variableName);
+			
+			commandStringBuffer.append(" ");
+			commandStringBuffer.append("-var \"");
+			commandStringBuffer.append(variableName);
+			commandStringBuffer.append("=");
+			commandStringBuffer.append(variableValue.equals("on") ? "true" : variableValue);
+			commandStringBuffer.append("\"");
+		}
+		
+		return commandStringBuffer.toString();
 	}
 	
 	public List<Variable> getProviderDefaults(File providerDefaultsFile) {

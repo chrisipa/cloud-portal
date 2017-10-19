@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <%--@elvariable id="self" type="de.papke.cloud.portal.model.Data"--%>
 
 <jsp:include page="header.jsp" />
@@ -12,62 +13,58 @@
 	<div id="page-wrapper">
 		<div class="row">
 			<h1 class="page-header">Virtual Machines</h1>
-			<div class="col-lg-4">
-				<form method="post" action="<c:url value="/vm/provision" />"
+			<div class="col-lg-3">
+				<form method="post"
+					action="<c:url value="/vm/provision/${self.cloudProvider}" />"
 					target="output" role="form" enctype="multipart/form-data">
-					<div class="form-group">
-						<label>Cloud Provider</label> <select class="form-control"
-							name="provider">
-							<c:forEach items="${self.cloudProviderList}" var="cloudProvider">
-								<option><c:out value="${cloudProvider}" /></option>
-							</c:forEach>
-						</select>
-						<p class="help-block">Cloud provider to use for automated
-							provisioning</p>
-					</div>
-					<div class="form-group">
-						<label>Prefix</label> <input class="form-control" name="prefix">
-						<p class="help-block">Prefix for cloud resources</p>
-					</div>
-					<div class="form-group">
-						<label>Hostname</label> <input class="form-control"
-							name="hostname">
-						<p class="help-block">Hostname for virtual machine</p>
-					</div>
-					<div class="form-group">
-						<label>SSH Public Key File</label> <input type="file"
-							name="ssh-public-key-file">
-					</div>
-					<p class="help-block">File with public key for SSH connections
-						to virtual machine</p>
-					<div class="form-group">
-						<label>SSH Private Key File</label> <input type="file"
-                            name="ssh-private-key-file">
-						<p class="help-block">File with public key for SSH connections
-							to virtual machine</p>
-					</div>
-					<div class="form-group">
-						<label>Bootstrap Script File</label> <input type="file"
-                            name="bootstrap-script-file">
-						<p class="help-block">Script to execute after virtual machine
-							was created</p>
-					</div>
 
-					<input type="hidden" id="action" name="action" />
+					<c:forEach items="${self.cloudProviderDefaultsList}" var="variable">
+						<label><c:out value="${variable.title}" /></label>
+						<c:choose>
+							<c:when test="${fn:endsWith(variable.name, 'file')}">
+								<input type="file" name="${variable.name}" required="required">
+							</c:when>
+							<c:otherwise>
+								<c:choose>
+									<c:when test="${fn:endsWith(variable.name, 'boolean')}">
+									    <br />
+									    <c:choose>
+									       <c:when test="${variable.defaultValue == 'true'}">
+									           <input type="checkbox" name="${variable.name}" required="required" checked="checked">
+									       </c:when>
+									       <c:otherwise>
+									           <input type="checkbox" name="${variable.name}" required="required">
+									       </c:otherwise> 
+									    </c:choose>
+									</c:when>
+									<c:otherwise>
+										<input class="form-control" name="${variable.name}"
+											value="${variable.defaultValue}" required="required">
+									</c:otherwise>
+								</c:choose>
+							</c:otherwise>
+						</c:choose>
+						<p class="help-block">
+							<c:out value="${variable.description}" />
+						</p>
+					</c:forEach>
 
-					<button type="submit" id="plan" class="btn btn-default">Plan</button>
-					<button type="submit" id="apply" class="btn btn-default">Apply</button>
-					<button type="reset" class="btn btn-default">Reset</button>
+					<input type="hidden" id="action" name="action" value="plan" />
+
+					<button type="submit" id="plan" class="btn btn-warning">Plan</button>
+					<button type="submit" id="apply" class="btn btn-danger">Apply</button>
+					
+					<p>&nbsp;</p>
 				</form>
 			</div>
-			<!-- /.col-lg-4 -->
-			<div class="col-lg-8">
+			<!-- /.col-lg-2 -->
+			<div class="col-lg-9">
 				<div class="form-group">
 					<label>Output</label>
 					<iframe name="output" id="output" frameborder="0" scrolling="yes"></iframe>
 				</div>
 			</div>
-			<!-- /.col-lg-8 -->
+			<!-- /.col-lg-10 -->
 		</div>
 		<!-- /.row -->
 	</div>
