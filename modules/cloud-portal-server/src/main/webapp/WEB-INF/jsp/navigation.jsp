@@ -3,7 +3,6 @@
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%--@elvariable id="self" type="de.papke.cloud.portal.model.Data"--%>
 
-<!-- Navigation -->
 <nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
     <div class="navbar-header">
         <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
@@ -14,7 +13,6 @@
         </button>
         <a class="navbar-brand" href="<c:url value="/" />"><c:out value="${self.applicationTitle}" /></a>
     </div>
-    <!-- /.navbar-header -->
 
     <ul class="nav navbar-top-links navbar-right">
         <li class="dropdown">
@@ -28,11 +26,8 @@
                 <li><a href="<c:url value="/logout" />"><i class="fa fa-sign-out fa-fw"></i> Logout</a>
                 </li>
             </ul>
-            <!-- /.dropdown-user -->
         </li>
-        <!-- /.dropdown -->
     </ul>
-    <!-- /.navbar-top-links -->
 
     <div class="navbar-default sidebar" role="navigation">
         <div class="sidebar-nav navbar-collapse">
@@ -46,7 +41,6 @@
                         </button>
                     </span>
                     </div>
-                    <!-- /input-group -->
                 </li>
                 <li>
                     <a href="<c:url value="/" />"><i class="fa fa-dashboard fa-fw"></i> Dashboard</a>
@@ -66,11 +60,8 @@
 		                    <!-- /.nav-third-level -->
                         </c:forEach>
                     </ul>
-                    <!-- /.nav-second-level -->
                 </li>
             </ul>
         </div>
-        <!-- /.sidebar-collapse -->
     </div>
-    <!-- /.navbar-static-side -->
 </nav>

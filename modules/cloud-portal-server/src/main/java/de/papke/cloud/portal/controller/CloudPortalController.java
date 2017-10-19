@@ -199,7 +199,7 @@ public class CloudPortalController {
 		data.setCloudProvider(cloudProvider);
 		
 		// set cloud provider defaults map
-		Map<String, List<Variable>> cloudProviderDefaultsMap = terraformService.getProviderDefaultsMap();
+		Map<String, Map<String, List<Variable>>> cloudProviderDefaultsMap = terraformService.getProviderDefaultsMap();
 
 		// set cloud providers
 		List<String> cloudProviderList = new ArrayList<String>();
@@ -208,7 +208,7 @@ public class CloudPortalController {
 		
 		// set cloud provider defaults
 		if (StringUtils.isNotEmpty(cloudProvider)) {
-			data.setCloudProviderDefaultsList(cloudProviderDefaultsMap.get(cloudProvider));
+			data.setCloudProviderDefaultsMap(cloudProviderDefaultsMap.get(cloudProvider));
 		}
 
 		// set username

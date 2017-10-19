@@ -17,60 +17,71 @@
 				<form method="post"
 					action="<c:url value="/vm/provision/${self.cloudProvider}" />"
 					target="output" role="form" enctype="multipart/form-data">
-
-					<c:forEach items="${self.cloudProviderDefaultsList}" var="variable">
-						<label><c:out value="${variable.title}" /></label>
-						<c:choose>
-							<c:when test="${fn:endsWith(variable.name, 'file')}">
-								<input type="file" name="${variable.name}" required="required">
-							</c:when>
-							<c:otherwise>
-								<c:choose>
-									<c:when test="${fn:endsWith(variable.name, 'boolean')}">
-									    <br />
-									    <c:choose>
-									       <c:when test="${variable.defaultValue == 'true'}">
-									           <input type="checkbox" name="${variable.name}" required="required" checked="checked">
-									       </c:when>
-									       <c:otherwise>
-									           <input type="checkbox" name="${variable.name}" required="required">
-									       </c:otherwise> 
-									    </c:choose>
-									</c:when>
-									<c:otherwise>
-										<input class="form-control" name="${variable.name}"
-											value="${variable.defaultValue}" required="required">
-									</c:otherwise>
-								</c:choose>
-							</c:otherwise>
-						</c:choose>
-						<p class="help-block">
-							<c:out value="${variable.description}" />
-						</p>
+					<c:forEach items="${self.cloudProviderDefaultsMap}"
+						var="variableGroup" varStatus="loop">
+						<div class="panel panel-default">
+							<div class="panel-heading">
+								<h4 class="panel-title">
+									<a data-toggle="collapse" data-parent="#accordion"
+										href="#${variableGroup.key}Content" class="collapsed"
+										aria-expanded="false"><i class="fa fa-plus-square"
+										aria-hidden="true"></i>&nbsp;<c:out
+											value="${variableGroup.key}" /></a>
+								</h4>
+							</div>
+							<div id="${variableGroup.key}Content"
+								class="panel-body panel-collapse collapse${loop.first || loop.last ? ' in' : ''}" aria-expanded="true"
+								style="">
+								<c:forEach items="${variableGroup.value}" var="variable">
+									<label><c:out value="${variable.title}" /></label>
+									<c:choose>
+										<c:when test="${fn:endsWith(variable.name, 'file')}">
+											<input type="file" name="${variable.name}"
+												required="required">
+										</c:when>
+										<c:otherwise>
+											<c:choose>
+												<c:when test="${fn:endsWith(variable.name, 'boolean')}">
+													<br />
+													<c:choose>
+														<c:when test="${variable.defaultValue == 'true'}">
+															<input type="checkbox" name="${variable.name}"
+																required="required" checked="checked">
+														</c:when>
+														<c:otherwise>
+															<input type="checkbox" name="${variable.name}"
+																required="required">
+														</c:otherwise>
+													</c:choose>
+												</c:when>
+												<c:otherwise>
+													<input class="form-control" name="${variable.name}"
+														value="${variable.defaultValue}" required="required">
+												</c:otherwise>
+											</c:choose>
+										</c:otherwise>
+									</c:choose>
+									<p class="help-block">
+										<c:out value="${variable.description}" />
+									</p>
+								</c:forEach>
+							</div>
+						</div>
 					</c:forEach>
-
 					<input type="hidden" id="action" name="action" value="plan" />
-
 					<button type="submit" id="plan" class="btn btn-warning">Plan</button>
 					<button type="submit" id="apply" class="btn btn-danger">Apply</button>
-					
 					<p>&nbsp;</p>
 				</form>
 			</div>
-			<!-- /.col-lg-2 -->
 			<div class="col-lg-9">
 				<div class="form-group">
 					<label>Output</label>
 					<iframe name="output" id="output" frameborder="0" scrolling="yes"></iframe>
 				</div>
 			</div>
-			<!-- /.col-lg-10 -->
 		</div>
-		<!-- /.row -->
 	</div>
-	<!-- /#page-wrapper -->
-
 </div>
-<!-- /#wrapper -->
 
 <jsp:include page="footer.jsp" />

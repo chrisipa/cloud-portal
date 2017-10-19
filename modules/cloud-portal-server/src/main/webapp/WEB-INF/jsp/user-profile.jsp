@@ -21,13 +21,8 @@
 			    </c:forEach>
 			    </ul>
 			</div>
-			<!-- /.col-lg-12 -->
 		</div>
-		<!-- /.row -->
 	</div>
-	<!-- /#page-wrapper -->
-
 </div>
-<!-- /#wrapper -->
 
 <jsp:include page="footer.jsp" />

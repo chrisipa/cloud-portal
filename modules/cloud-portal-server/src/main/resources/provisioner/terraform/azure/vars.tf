@@ -8,27 +8,23 @@ variable "general-location-string" {
   default     = "westeurope"
 }
 
-variable "general-name-prefix-string" {
-  description = "Unique part of the name to give to resources."
-}
-
 variable "network-vnet-address-space-string" {
-  description = "full address space allowed to the virtual network"
+  description = "Full address space allowed to the virtual network."
   default     = "10.0.0.0/16"
 }
 
 variable "network-subnet-address-space-string" {
-  description = "the subset of the virtual network for this subnet"
+  description = "The subset of the virtual network for this subnet."
   default     = "10.0.10.0/24"
 }
 
 variable "storage-account-tier-string" {
-  description = "Storage account Tier for the cluster (e.g. Standard or Premium)"
+  description = "Storage account Tier for the cluster (e.g. Standard or Premium)."
   default     = "Standard"
 }
 
 variable "storage-replication-type-string" {
-  description = "Storage account replication type for the cluster (e.g. LRS, GRS etc)"
+  description = "Storage account replication type for the cluster (e.g. LRS, GRS etc)."
   default     = "LRS"
 }
 
@@ -73,13 +69,13 @@ variable "vm-disable-password-authentication-boolean" {
 }
 
 variable "bootstrap-public-key-file" {
-  description = "public key file for ssh access"
+  description = "Public key file for SSH access."
 }
 
 variable "bootstrap-private-key-file" {
-  description = "private key file for ssh access"
+  description = "Private key file for SSH access."
 }
 
 variable "bootstrap-script-file" {
-  description = "bootstrap script file to execute after vm has been created"
+  description = "Bootstrap script file to execute after vm has been created."
 }

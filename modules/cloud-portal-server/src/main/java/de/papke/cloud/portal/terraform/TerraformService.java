@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.OutputStream;
 import java.net.URI;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,7 +38,7 @@ public class TerraformService {
 	@Value("${terraform.path}")
 	private String terraformPath;
 	
-	private Map<String, List<Variable>> providerDefaultsMap = new HashMap<>();
+	private Map<String, Map<String, List<Variable>>> providerDefaultsMap = new HashMap<>();
 
 	@PostConstruct
 	public void init() {
@@ -51,8 +50,8 @@ public class TerraformService {
 				File[] providerFolderArray = terraformFolder.listFiles();
 				for (File providerFolder : providerFolderArray) {
 					File variableFile = new File(new URI(providerFolder.toURI() + "/vars.tf"));
-					List<Variable> variableList = getProviderDefaults(variableFile);
-					providerDefaultsMap.put(providerFolder.getName(), variableList);
+					Map<String, List<Variable>> variableMap = getProviderDefaults(variableFile);
+					providerDefaultsMap.put(providerFolder.getName(), variableMap);
 				}
 			}
 		}
@@ -133,22 +132,22 @@ public class TerraformService {
 		return commandStringBuffer.toString();
 	}
 	
-	public List<Variable> getProviderDefaults(File providerDefaultsFile) {
+	public Map<String, List<Variable>> getProviderDefaults(File providerDefaultsFile) {
 		
-		List<Variable> variableList = new ArrayList<>();
+		Map<String, List<Variable>> variableMap = new HashMap<>();
 		
 		try {
 			HCLParser hclParser = new HCLParser(providerDefaultsFile);
-			variableList = hclParser.parse();
+			variableMap = hclParser.parse();
 		}
 		catch (Exception e) {
 			LOG.error(e.getMessage(), e);
 		}
 		
-		return variableList;
+		return variableMap;
 	}
 
-	public Map<String, List<Variable>> getProviderDefaultsMap() {
+	public Map<String, Map<String, List<Variable>>> getProviderDefaultsMap() {
 		return providerDefaultsMap;
 	}
 }
