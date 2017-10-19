@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%--@elvariable id="self" type="de.papke.cloud.portal.model.Data"--%>
 
 <!-- Navigation -->
@@ -21,9 +22,7 @@
                 <i class="fa fa-user fa-fw"></i> <c:out value="${self.username}" /> <i class="fa fa-caret-down"></i>
             </a>
             <ul class="dropdown-menu dropdown-user">
-                <li><a href="#"><i class="fa fa-user fa-fw"></i> User Profile</a>
-                </li>
-                <li><a href="#"><i class="fa fa-gear fa-fw"></i> Settings</a>
+                <li><a href="<c:url value="/user/profile" />"><i class="fa fa-user fa-fw"></i> User Profile</a>
                 </li>
                 <li class="divider"></li>
                 <li><a href="<c:url value="/logout" />"><i class="fa fa-sign-out fa-fw"></i> Logout</a>
@@ -55,12 +54,17 @@
                 <li>
                     <a href="#"><i class="fa fa-bar-chart-o fa-fw"></i> Virtual Machines<span class="fa arrow"></span></a>
                     <ul class="nav nav-second-level collapse in">
-                        <li>
-                            <a href="<c:url value="/vm/overview" />">Overview</a>
-                        </li>
-                        <li>
-                            <a href="<c:url value="/vm/create" />">Create</a>
-                        </li>
+                        <c:forEach items="${self.cloudProviderList}" var="cloudProvider">
+                            <li>
+                                <a href="#"><i class="fa fa-cloud fa-fw"></i> <c:out value="${fn:toUpperCase(fn:substring(cloudProvider, 0, 1))}${fn:toLowerCase(fn:substring(cloudProvider, 1,fn:length(cloudProvider)))}" /><span class="fa arrow"></span></a>
+                            </li>
+                            <ul class="nav nav-third-level collapse in">
+		                        <li>
+		                            <a href="<c:url value="/vm/create/${cloudProvider}" />"><i class="fa fa-plus fa-fw"></i> Create<span class="fa arrow"></span></a>
+		                        </li>
+                            </ul>
+		                    <!-- /.nav-third-level -->
+                        </c:forEach>
                     </ul>
                     <!-- /.nav-second-level -->
                 </li>

@@ -1,30 +1,30 @@
 resource "azurerm_resource_group" "rg" {
-  name     = "${var.name_prefix}-rg"
-  location = "${var.location}"
+  name     = "${var.general-name-prefix-string}-rg"
+  location = "${var.general-location-string}"
 }
 
 resource "azurerm_virtual_network" "vnet" {
-  name                = "${var.name_prefix}vnet"
-  location            = "${var.location}"
-  address_space       = ["${var.vnet_address_space}"]
+  name                = "${var.general-name-prefix-string}vnet"
+  location            = "${var.general-location-string}"
+  address_space       = ["${var.network-vnet-address-space-string}"]
   resource_group_name = "${azurerm_resource_group.rg.name}"
 }
 
 resource "azurerm_subnet" "subnet" {
-  name                 = "${var.name_prefix}subnet"
+  name                 = "${var.general-name-prefix-string}subnet"
   virtual_network_name = "${azurerm_virtual_network.vnet.name}"
   resource_group_name  = "${azurerm_resource_group.rg.name}"
-  address_prefix       = "${var.subnet_address_space}"
+  address_prefix       = "${var.network-subnet-address-space-string}"
 }
 
 resource "azurerm_network_security_group" "nsg" {
-  name                = "${var.name_prefix}nsg"
-  location            = "${var.location}"
+  name                = "${var.general-name-prefix-string}nsg"
+  location            = "${var.general-location-string}"
   resource_group_name = "${azurerm_resource_group.rg.name}"
 }
 
 resource "azurerm_network_security_rule" "rulessh" {
-  name                        = "${var.name_prefix}rulessh"
+  name                        = "${var.general-name-prefix-string}rulessh"
   priority                    = 100
   direction                   = "Inbound"
   access                      = "Allow"
@@ -38,13 +38,13 @@ resource "azurerm_network_security_rule" "rulessh" {
 }
 
 resource "azurerm_network_interface" "nic" {
-  name                      = "${var.name_prefix}nic"
-  location                  = "${var.location}"
+  name                      = "${var.general-name-prefix-string}nic"
+  location                  = "${var.general-location-string}"
   resource_group_name       = "${azurerm_resource_group.rg.name}"
   network_security_group_id = "${azurerm_network_security_group.nsg.id}"
 
   ip_configuration {
-    name                          = "${var.name_prefix}ipconfig"
+    name                          = "${var.general-name-prefix-string}ipconfig"
     subnet_id                     = "${azurerm_subnet.subnet.id}"
     private_ip_address_allocation = "dynamic"
     public_ip_address_id          = "${azurerm_public_ip.pip.id}"
@@ -54,61 +54,61 @@ resource "azurerm_network_interface" "nic" {
 }
 
 resource "azurerm_public_ip" "pip" {
-  name                         = "${var.name_prefix}-ip"
-  location                     = "${var.location}"
+  name                         = "${var.general-name-prefix-string}-ip"
+  location                     = "${var.general-location-string}"
   resource_group_name          = "${azurerm_resource_group.rg.name}"
   public_ip_address_allocation = "dynamic"
-  domain_name_label            = "${var.hostname}"
+  domain_name_label            = "${var.general-hostname-string}"
 }
 
 resource "azurerm_storage_account" "stor" {
-  name                     = "${var.hostname}stor"
-  location                 = "${var.location}"
+  name                     = "${var.general-hostname-string}stor"
+  location                 = "${var.general-location-string}"
   resource_group_name      = "${azurerm_resource_group.rg.name}"
-  account_tier             = "${var.storage_account_tier}"
-  account_replication_type = "${var.storage_replication_type}"  
+  account_tier             = "${var.storage-account-tier-string}"
+  account_replication_type = "${var.storage-replication-type-string}"  
 }
 
 resource "azurerm_storage_container" "storc" {
-  name                  = "${var.name_prefix}-vhds"
+  name                  = "${var.general-name-prefix-string}-vhds"
   resource_group_name   = "${azurerm_resource_group.rg.name}"
   storage_account_name  = "${azurerm_storage_account.stor.name}"
   container_access_type = "private"
 }
 
 resource "azurerm_virtual_machine" "vm" {
-  name                  = "${var.name_prefix}vm"
-  location              = "${var.location}"
+  name                  = "${var.general-name-prefix-string}vm"
+  location              = "${var.general-location-string}"
   resource_group_name   = "${azurerm_resource_group.rg.name}"
-  vm_size               = "${var.vm_size}"
+  vm_size               = "${var.vm-size-string}"
   network_interface_ids = ["${azurerm_network_interface.nic.id}"]
 
   storage_image_reference {
-    publisher = "${var.image_publisher}"
-    offer     = "${var.image_offer}"
-    sku       = "${var.image_sku}"
-    version   = "${var.image_version}"
+    publisher = "${var.image-publisher-string}"
+    offer     = "${var.image-offer-string}"
+    sku       = "${var.image-sku-string}"
+    version   = "${var.image-version-string}"
   }
 
   storage_os_disk {
-    name          = "${var.name_prefix}osdisk"
-    vhd_uri       = "${azurerm_storage_account.stor.primary_blob_endpoint}${azurerm_storage_container.storc.name}/${var.name_prefix}osdisk.vhd"
+    name          = "${var.general-name-prefix-string}osdisk"
+    vhd_uri       = "${azurerm_storage_account.stor.primary_blob_endpoint}${azurerm_storage_container.storc.name}/${var.general-name-prefix-string}osdisk.vhd"
     caching       = "ReadWrite"
     create_option = "FromImage"
   }
 
   os_profile {
-    computer_name  = "${var.hostname}"
-    admin_username = "${var.admin_username}"
-    admin_password = "${var.admin_password}"
+    computer_name  = "${var.general-hostname-string}"
+    admin_username = "${var.vm-username-string}"
+    admin_password = "${var.vm-password-string}"
   }
 
   os_profile_linux_config {
-    disable_password_authentication = "${var.disable_password_authentication}"
+    disable_password_authentication = "${var.vm-disable-password-authentication-boolean}"
 
     ssh_keys = [{
-      path     = "/home/${var.admin_username}/.ssh/authorized_keys"
-      key_data = "${file("${var.ssh_public_key_file}")}"
+      path     = "/home/${var.vm-username-string}/.ssh/authorized_keys"
+      key_data = "${file("${var.bootstrap-public-key-file}")}"
     }]
   }
 
@@ -116,13 +116,13 @@ resource "azurerm_virtual_machine" "vm" {
     type = "ssh"
     agent = false  
     host = "${azurerm_public_ip.pip.fqdn}"
-    user = "${var.admin_username}"      
-    private_key = "${file("${var.ssh_private_key_file}")}"
+    user = "${var.vm-username-string}"      
+    private_key = "${file("${var.bootstrap-private-key-file}")}"
     timeout = "1m"      
   }
 
   provisioner "file" {
-    source      = "${var.bootstrap_script_file}"
+    source      = "${var.bootstrap-script-file}"
     destination = "/tmp/bootstrap.sh"                
   }
 
@@ -136,8 +136,8 @@ resource "azurerm_virtual_machine" "vm" {
   depends_on = ["azurerm_storage_account.stor"]
 }
 
-output "admin_username" {
-  value = "${var.admin_username}"
+output "vm-username-string" {
+  value = "${var.vm-username-string}"
 }
 
 output "vm_fqdn" {  

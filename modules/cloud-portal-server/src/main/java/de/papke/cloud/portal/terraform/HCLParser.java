@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 
 public class HCLParser {
 	
@@ -38,6 +39,7 @@ public class HCLParser {
 						String[] variableArray = line.split("\"");
 						variableName = variableArray[1]; 
 						variable.setName(variableName);
+						variable.setTitle(getVariableTitle(variableName));
 					}
 					
 					if (line.contains("=")) {
@@ -62,6 +64,25 @@ public class HCLParser {
 			}
 		}
 		
+		variableList.add(variable);
+		
 		return variableList;
+	}
+	
+	private String getVariableTitle(String variableName) {
+		
+		String title = "";
+		
+		String[] variableNameArray = variableName.split("-");
+		if (variableNameArray.length >= 3) {
+			for (int i = 1; i < variableNameArray.length - 1; i++) {
+				title += StringUtils.capitalize(variableNameArray[i]);
+				if (i < variableNameArray.length - 2) {
+					title += " ";
+				}
+			}
+		}
+		
+		return title;
 	}
 }
