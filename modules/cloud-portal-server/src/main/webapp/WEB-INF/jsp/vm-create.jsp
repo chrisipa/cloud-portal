@@ -26,12 +26,12 @@
 										href="#${variableGroup.key}Content" class="collapsed"
 										aria-expanded="false"><i class="fa fa-plus-square"
 										aria-hidden="true"></i>&nbsp;<c:out
-											value="${variableGroup.key}" /></a>
+											value="${fn:toUpperCase(fn:substring(variableGroup.key, 0, 1))}${fn:toLowerCase(fn:substring(variableGroup.key, 1,fn:length(variableGroup.key)))}" /></a>
 								</h4>
 							</div>
 							<div id="${variableGroup.key}Content"
-								class="panel-body panel-collapse collapse${loop.first || loop.last ? ' in' : ''}" aria-expanded="true"
-								style="">
+								class="panel-body panel-collapse collapse${loop.first || loop.last ? ' in' : ''}"
+								aria-expanded="true" style="">
 								<c:forEach items="${variableGroup.value}" var="variable">
 									<label><c:out value="${variable.title}" /></label>
 									<c:choose>
@@ -75,9 +75,20 @@
 				</form>
 			</div>
 			<div class="col-lg-9">
-				<div class="form-group">
-					<label>Output</label>
-					<iframe name="output" id="output" frameborder="0" scrolling="yes"></iframe>
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<h4 class="panel-title">
+							<a data-toggle="collapse" data-parent="#accordion"
+								href="#outputContent" class="collapsed"
+								aria-expanded="false"><i class="fa fa-plus-square"
+								aria-hidden="true"></i>&nbsp;Output</a>
+						</h4>
+					</div>
+					<div id="outputContent"
+						class="panel-body panel-collapse collapse in" aria-expanded="true"
+						style="">
+						<iframe name="output" id="output" frameborder="0" scrolling="yes"></iframe>
+					</div>
 				</div>
 			</div>
 		</div>

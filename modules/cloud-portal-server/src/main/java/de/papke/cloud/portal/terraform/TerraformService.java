@@ -28,6 +28,13 @@ import de.papke.cloud.portal.process.ProcessExecutorService;
 public class TerraformService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(TerraformService.class);
+
+	private static final String CHAR_EQUAL = "=";
+	private static final String CHAR_WHITESPACE = " ";
+	private static final String CHAR_QUOTE = "\"";
+	private static final String FLAG_NO_COLOR = "-no-color";
+	private static final String FLAG_VAR = "-var";
+	private static final String ACTION_INIT = "init";
 	
 	@Autowired
 	private ProcessExecutorService processExecutorService;
@@ -72,7 +79,7 @@ public class TerraformService {
 				tmpFolder = fileService.copyResourceToFilesystem("terraform/" + provider);
 				
 				// execute init command
-				String initCommand = buildInitCommand(terraformPath, "init");
+				String initCommand = buildInitCommand(terraformPath);
 				processExecutorService.execute(initCommand, tmpFolder, outputStream);
 	
 				// get action to execute
@@ -106,27 +113,32 @@ public class TerraformService {
 		}
 	}
 	
-	private String buildInitCommand(String terraformPath, String action) {
-		return terraformPath + " " + action;
+	private String buildInitCommand(String terraformPath) {
+		return terraformPath + CHAR_WHITESPACE + ACTION_INIT + CHAR_WHITESPACE + FLAG_NO_COLOR;
 	}
 	
 	private String buildActionCommand(String terraformPath, String action, Map<String, Object> variableMap) {
 		
 		StringBuffer commandStringBuffer = new StringBuffer();
 		commandStringBuffer.append(terraformPath);
-		commandStringBuffer.append(" ");
+		commandStringBuffer.append(CHAR_WHITESPACE);
 		commandStringBuffer.append(action);
+		commandStringBuffer.append(CHAR_WHITESPACE);
+		commandStringBuffer.append(FLAG_NO_COLOR);
+		
 				
 		for (String variableName : variableMap.keySet()) {
 			
 			String variableValue = (String) variableMap.get(variableName);
 			
-			commandStringBuffer.append(" ");
-			commandStringBuffer.append("-var \"");
+			commandStringBuffer.append(CHAR_WHITESPACE);
+			commandStringBuffer.append(FLAG_VAR);
+			commandStringBuffer.append(CHAR_WHITESPACE);
+			commandStringBuffer.append(CHAR_QUOTE);
 			commandStringBuffer.append(variableName);
-			commandStringBuffer.append("=");
+			commandStringBuffer.append(CHAR_EQUAL);
 			commandStringBuffer.append(variableValue.equals("on") ? "true" : variableValue);
-			commandStringBuffer.append("\"");
+			commandStringBuffer.append(CHAR_QUOTE);
 		}
 		
 		return commandStringBuffer.toString();
