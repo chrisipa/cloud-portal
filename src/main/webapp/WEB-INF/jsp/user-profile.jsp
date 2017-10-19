@@ -12,7 +12,7 @@
 
 	<div id="page-wrapper">
 		<div class="row">
-			<h1 class="page-header">User Profile</h1>
+			<h4 class="page-header">User Profile</h4>
 			<div class="col-lg-12">
                 <h2>Groups</h2>
                 <ul>
