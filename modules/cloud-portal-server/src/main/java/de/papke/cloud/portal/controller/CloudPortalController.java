@@ -29,6 +29,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.support.StandardMultipartHttpServletRequest;
 
+import de.papke.cloud.portal.credentials.Credentials;
+import de.papke.cloud.portal.credentials.CredentialsService;
 import de.papke.cloud.portal.model.Data;
 import de.papke.cloud.portal.terraform.TerraformService;
 import de.papke.cloud.portal.terraform.Variable;
@@ -46,6 +48,9 @@ public class CloudPortalController {
 
 	@Autowired
 	private TerraformService terraformService;
+	
+	@Autowired
+	private CredentialsService credentialsService;
 
 	/**
 	 * Method for returning the model and view for the index page.
@@ -146,6 +151,13 @@ public class CloudPortalController {
 				
 				// add file paths to variable map
 				variableMap.put(fileName, file.getAbsolutePath());
+			}
+			
+			// get credentials
+			Credentials credentials = credentialsService.getCredentials(cloudProvider);
+			if (credentials != null) {
+				variableMap.put("username", credentials.getUsername());
+				variableMap.put("password", credentials.getPassword());
 			}
 
 			// get response output stream
