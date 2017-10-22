@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.FileUtils;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.support.StandardMultipartHttpServletRequest;
 
 import de.papke.cloud.portal.model.Data;
 import de.papke.cloud.portal.terraform.TerraformService;
@@ -123,25 +125,31 @@ public class CloudPortalController {
 			@RequestParam("bootstrap-public-key-file") MultipartFile sshPublicKeyFileUpload,
 			@RequestParam("bootstrap-private-key-file") MultipartFile sshPrivateKeyFileUpload,
 			@RequestParam("bootstrap-script-file") MultipartFile bootstrapScriptFileUpload,
+			HttpServletRequest request,
 			HttpServletResponse response) {
 		
-		// TODO: Make file upload handling more generic
+		List<File> tempFileList = new ArrayList<>();
 		
-		File sshPublicKeyFile = null;
-		File sshPrivateKeyFile = null;
-		File bootstrapScriptFile = null;
-
 		try {
+			
+			// get multipart request
+			StandardMultipartHttpServletRequest multipartHttpServletRequest = (StandardMultipartHttpServletRequest) request;
 
-			// write file uploads to disk
-			sshPublicKeyFile = writeMultipartFile(sshPublicKeyFileUpload);
-			sshPrivateKeyFile = writeMultipartFile(sshPrivateKeyFileUpload);
-			bootstrapScriptFile = writeMultipartFile(bootstrapScriptFileUpload);
-
-			// add file paths to variable map
-			variableMap.put("bootstrap-public-key-file", sshPublicKeyFile.getAbsolutePath());
-			variableMap.put("bootstrap-private-key-file", sshPrivateKeyFile.getAbsolutePath());
-			variableMap.put("bootstrap-script-file", bootstrapScriptFile.getAbsolutePath());
+			// get file map from request
+			Map<String, MultipartFile> fileMap = multipartHttpServletRequest.getFileMap();
+			
+			// iterate over file map
+			for (String fileName : fileMap.keySet()) {
+				
+				// write file uploads to disk
+				File file = writeMultipartFile(fileMap.get(fileName));
+				
+				// add to temp file list
+				tempFileList.add(file);
+				
+				// add file paths to variable map
+				variableMap.put(fileName, file.getAbsolutePath());
+			}
 
 			// get response output stream
 			OutputStream outputStream = response.getOutputStream();
@@ -154,15 +162,11 @@ public class CloudPortalController {
 		}
 		finally {
 			
-			// remove all uploaded files
-			if (sshPublicKeyFile != null) {
-				sshPublicKeyFile.delete();
-			}
-			if (sshPrivateKeyFile != null) {
-				sshPrivateKeyFile.delete();
-			}
-			if (bootstrapScriptFile != null) {
-				bootstrapScriptFile.delete();
+			// remove temp files
+			for (File tempFile : tempFileList) {
+				if (tempFile != null) {
+					tempFile.delete();
+				}
 			}
 		}
 	}    

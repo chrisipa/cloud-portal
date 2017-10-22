@@ -30,7 +30,7 @@
 								</h4>
 							</div>
 							<div id="${variableGroup.key}Content"
-								class="panel-body panel-collapse collapse${loop.first || loop.last ? ' in' : ''}"
+								class="panel-body panel-collapse collapse${loop.first ? ' in' : ''}"
 								aria-expanded="true" style="">
 								<c:forEach items="${variableGroup.value}" var="variable">
 									<label><c:out value="${variable.title}" /></label>
