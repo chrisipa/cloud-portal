@@ -45,6 +45,9 @@ public class CloudPortalController {
 
 	@Value("${application.title}")
 	private String applicationTitle;
+	
+	@Value("${application.admin.group}")
+	private String adminGroup;
 
 	@Autowired
 	private TerraformService terraformService;
@@ -230,10 +233,20 @@ public class CloudPortalController {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		data.setUsername((String) authentication.getPrincipal());
 
+		// set default for is admin flag
+		data.setIsAdmin(false);
+		
 		// set groups
 		List<String> groupList = new ArrayList<>();
 		for (GrantedAuthority grantedAuthority : authentication.getAuthorities()) {
-			groupList.add(grantedAuthority.toString());
+			
+			String groupName = grantedAuthority.toString();
+			groupList.add(groupName);
+			
+			// set is admin flag
+			if (groupName.equals(adminGroup)) {
+				data.setIsAdmin(true);
+			}
 		}
 		data.setGroupList(groupList);
 		

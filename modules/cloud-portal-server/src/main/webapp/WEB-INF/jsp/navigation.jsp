@@ -22,6 +22,10 @@
             <ul class="dropdown-menu dropdown-user">
                 <li><a href="<c:url value="/user/profile" />"><i class="fa fa-user fa-fw"></i> User Profile</a>
                 </li>
+                <c:if test="${self.isAdmin}">
+                <li><a href="<c:url value="/group/admin" />"><i class="fa fa-users fa-fw"></i> Group Admin</a>
+                </li>
+                </c:if>
                 <li class="divider"></li>
                 <li><a href="<c:url value="/logout" />"><i class="fa fa-sign-out fa-fw"></i> Logout</a>
                 </li>
