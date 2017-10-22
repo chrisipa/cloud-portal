@@ -122,9 +122,6 @@ public class CloudPortalController {
 	public void vmProvision(
 			@PathVariable String cloudProvider,
 			@RequestParam Map<String, Object> variableMap,
-			@RequestParam("bootstrap-public-key-file") MultipartFile sshPublicKeyFileUpload,
-			@RequestParam("bootstrap-private-key-file") MultipartFile sshPrivateKeyFileUpload,
-			@RequestParam("bootstrap-script-file") MultipartFile bootstrapScriptFileUpload,
 			HttpServletRequest request,
 			HttpServletResponse response) {
 		
