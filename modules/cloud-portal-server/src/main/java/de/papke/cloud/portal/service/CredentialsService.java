@@ -14,10 +14,22 @@ import de.papke.cloud.portal.pojo.Credentials;
 public class CredentialsService {
 	
 	@Autowired
-	private CredentialsDao credentialsRepository;
+	private EncryptionService encryptionService;
+	
+	@Autowired
+	private CredentialsDao credentialsDao;
 	
 	public List<Credentials> getCredentialList() {
-		return credentialsRepository.findAll();
+		
+		List<Credentials> credentialsList = credentialsDao.findAll();
+		
+		for (Credentials credentials : credentialsList) {
+			String encryptedPassword = credentials.getPassword();
+			String decryptedPassword = encryptionService.decrypt(encryptedPassword);
+			credentials.setPassword(decryptedPassword);
+		}
+		
+		return credentialsList;
 	}
 	
 	public Credentials getCredentials(String provider) {
@@ -25,9 +37,12 @@ public class CredentialsService {
 		for (GrantedAuthority grantedAuthority : SecurityContextHolder.getContext().getAuthentication().getAuthorities()) {
 			
 			String groupName = grantedAuthority.toString();
-			Credentials credentials = credentialsRepository.findByGroupAndProvider(groupName, provider);
+			Credentials credentials = credentialsDao.findByGroupAndProvider(groupName, provider);
 			
 			if (credentials != null) {
+				String encryptedPassword = credentials.getPassword();
+				String decryptedPassword = encryptionService.decrypt(encryptedPassword);
+				credentials.setPassword(decryptedPassword);
 				return credentials;
 			}
 		}
@@ -36,7 +51,13 @@ public class CredentialsService {
 	}
 	
 	public Credentials create(String group, String provider, String username, String password) {
-		Credentials credentials = new Credentials(group, provider, username, password);
-		return credentialsRepository.save(credentials);
+		
+		String encryptedPassword = encryptionService.encrypt(password);
+		Credentials credentials = new Credentials(group, provider, username, encryptedPassword);
+		return credentialsDao.save(credentials);
+	}
+	
+	public void delete(String id) {
+		credentialsDao.delete(id);
 	}
 }

@@ -61,8 +61,8 @@
 									<td><c:out value="${cred.username}" /></td>
 									<td><c:out value="${cred.password}" /></td>
 									<td>
-									   <button id="update" type="submit" class="btn btn-warning btn-circle"><i class="fa fa-edit"></i></button>
-									   <button id="delete" type="submit" class="btn btn-danger btn-circle"><i class="fa fa-times"></i></button>
+									   <button id="update/form/${cred.id}" type="submit" class="btn btn-warning btn-circle"><i class="fa fa-edit"></i></button>
+									   <button id="delete/action/${cred.id}" type="submit" class="btn btn-danger btn-circle"><i class="fa fa-times"></i></button>
 									</td>
 								</tr>
 							</c:forEach>
