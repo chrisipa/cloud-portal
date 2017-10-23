@@ -1,4 +1,4 @@
-package de.papke.cloud.portal.mail;
+package de.papke.cloud.portal.service;
 
 import java.util.Map;
 import java.util.Properties;
@@ -14,8 +14,6 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.mail.javamail.MimeMessagePreparator;
 import org.springframework.stereotype.Service;
-
-import de.papke.cloud.portal.velocity.VelocityService;
 
 /**
  * Service class for sending emails.

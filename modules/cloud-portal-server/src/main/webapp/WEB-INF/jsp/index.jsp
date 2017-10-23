@@ -1,6 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<%--@elvariable id="self" type="de.papke.cloud.portal.model.Data"--%>
+<%--@elvariable id="application" type="de.papke.cloud.portal.model.ApplicationModel"--%>
 
 <jsp:include page="header.jsp" />
 

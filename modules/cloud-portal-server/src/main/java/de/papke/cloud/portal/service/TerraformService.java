@@ -1,4 +1,4 @@
-package de.papke.cloud.portal.terraform;
+package de.papke.cloud.portal.service;
 
 import java.io.File;
 import java.io.OutputStream;
@@ -18,8 +18,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import de.papke.cloud.portal.file.FileService;
-import de.papke.cloud.portal.process.ProcessExecutorService;
+import de.papke.cloud.portal.terraform.HCLParser;
+import de.papke.cloud.portal.terraform.Variable;
 
 /**
  * Created by chris on 16.10.17.
@@ -67,7 +67,7 @@ public class TerraformService {
 		}
 	}
 
-	public void provisionVM(String provider, Map<String, Object> variableMap, OutputStream outputStream) {
+	public void provisionVM(String action, String provider, Map<String, Object> variableMap, OutputStream outputStream) {
 		
 		File tmpFolder = null;
 		
@@ -83,11 +83,7 @@ public class TerraformService {
 				processExecutorService.execute(initCommand, tmpFolder, outputStream);
 	
 				// get action to execute
-				String action = (String) variableMap.get("action");
 				if (StringUtils.isNotEmpty(action)) {
-					
-					// remove action from map
-					variableMap.remove("action");
 					
 					// build the command string
 					String commandString = buildActionCommand(terraformPath, action, variableMap);
@@ -95,7 +91,6 @@ public class TerraformService {
 					// execute action command
 					processExecutorService.execute(commandString, tmpFolder, outputStream);
 				}
-				
 			}
 		}
 		catch (Exception e) {

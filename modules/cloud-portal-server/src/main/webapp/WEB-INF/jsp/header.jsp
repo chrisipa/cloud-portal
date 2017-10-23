@@ -1,6 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<%--@elvariable id="self" type="de.papke.cloud.portal.model.Data"--%>
+<%--@elvariable id="application" type="de.papke.cloud.portal.model.ApplicationModel"--%>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -13,7 +13,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title><c:out value="${self.applicationTitle}" /></title>
+    <title><c:out value="${application.applicationTitle}" /></title>
 
     <!-- Bootstrap Core CSS -->
     <link href="<c:url value="/static/vendor/bootstrap/css/bootstrap.min.css" />" rel="stylesheet">

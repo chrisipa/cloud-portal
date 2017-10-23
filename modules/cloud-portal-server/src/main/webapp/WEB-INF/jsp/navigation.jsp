@@ -1,7 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
-<%--@elvariable id="self" type="de.papke.cloud.portal.model.Data"--%>
+<%--@elvariable id="application" type="de.papke.cloud.portal.model.ApplicationModel"--%>
 
 <nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
     <div class="navbar-header">
@@ -11,19 +11,19 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
         </button>
-        <a class="navbar-brand" href="<c:url value="/" />"><c:out value="${self.applicationTitle}" /></a>
+        <a class="navbar-brand" href="<c:url value="/" />"><c:out value="${application.applicationTitle}" /></a>
     </div>
 
     <ul class="nav navbar-top-links navbar-right">
         <li class="dropdown">
             <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                <i class="fa fa-user fa-fw"></i> <c:out value="${self.username}" /> <i class="fa fa-caret-down"></i>
+                <i class="fa fa-user fa-fw"></i> <c:out value="${application.username}" /> <i class="fa fa-caret-down"></i>
             </a>
             <ul class="dropdown-menu dropdown-user">
                 <li><a href="<c:url value="/user/profile" />"><i class="fa fa-user fa-fw"></i> User Profile</a>
                 </li>
-                <c:if test="${self.isAdmin}">
-                <li><a href="<c:url value="/group/admin" />"><i class="fa fa-users fa-fw"></i> Group Admin</a>
+                <c:if test="${application.isAdmin}">
+                <li><a href="<c:url value="/credentials/list" />"><i class="fa fa-key fa-fw"></i> Credentials Admin</a>
                 </li>
                 </c:if>
                 <li class="divider"></li>
@@ -52,7 +52,7 @@
                 <li>
                     <a href="#"><i class="fa fa-bar-chart-o fa-fw"></i> Virtual Machines<span class="fa arrow"></span></a>
                     <ul class="nav nav-second-level collapse in">
-                        <c:forEach items="${self.cloudProviderList}" var="cloudProvider">
+                        <c:forEach items="${application.cloudProviderList}" var="cloudProvider">
                             <li>
                                 <a href="#"><i class="fa fa-cloud fa-fw"></i> <c:out value="${fn:toUpperCase(fn:substring(cloudProvider, 0, 1))}${fn:toLowerCase(fn:substring(cloudProvider, 1,fn:length(cloudProvider)))}" /><span class="fa arrow"></span></a>
                             </li>
@@ -61,7 +61,6 @@
 		                            <a href="<c:url value="/vm/create/${cloudProvider}" />"><i class="fa fa-plus fa-fw"></i> Create<span class="fa arrow"></span></a>
 		                        </li>
                             </ul>
-		                    <!-- /.nav-third-level -->
                         </c:forEach>
                     </ul>
                 </li>

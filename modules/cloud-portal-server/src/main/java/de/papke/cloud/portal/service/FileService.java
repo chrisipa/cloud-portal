@@ -1,4 +1,4 @@
-package de.papke.cloud.portal.file;
+package de.papke.cloud.portal.service;
 
 import java.io.File;
 import java.net.URL;

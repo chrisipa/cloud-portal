@@ -12,14 +12,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,25 +24,22 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.support.StandardMultipartHttpServletRequest;
 
-import de.papke.cloud.portal.credentials.Credentials;
-import de.papke.cloud.portal.credentials.CredentialsService;
-import de.papke.cloud.portal.model.Data;
-import de.papke.cloud.portal.terraform.TerraformService;
+import de.papke.cloud.portal.model.VirtualMachineModel;
+import de.papke.cloud.portal.pojo.Credentials;
+import de.papke.cloud.portal.service.CredentialsService;
+import de.papke.cloud.portal.service.TerraformService;
 import de.papke.cloud.portal.terraform.Variable;
 
 /**
  * Created by chris on 16.10.17.
  */
 @Controller
-public class CloudPortalController {
+public class VirtualMachineController extends ApplicationController {
 
-	private static final Logger LOG = LoggerFactory.getLogger(CloudPortalController.class);
+	private static final Logger LOG = LoggerFactory.getLogger(VirtualMachineController.class);
 
-	@Value("${application.title}")
-	private String applicationTitle;
-	
-	@Value("${application.admin.group}")
-	private String adminGroup;
+	private static final String PREFIX = "/vm";
+	private static final String MODEL_VAR_NAME = "virtualMachine";
 
 	@Autowired
 	private TerraformService terraformService;
@@ -56,64 +48,16 @@ public class CloudPortalController {
 	private CredentialsService credentialsService;
 
 	/**
-	 * Method for returning the model and view for the index page.
-	 *
-	 * @param model
-	 * @return
-	 */
-	@GetMapping(path = "/")
-	public String index(Map<String, Object> model) throws IOException {
-
-		// put data object into model
-		model.put("self", getData(null));
-
-		// return view name
-		return "index";
-	}
-
-	/**
-	 * Method for returning the model and view for the login page.
-	 *
-	 * @param model
-	 * @return
-	 */
-	@GetMapping(path = "/login")
-	public String login(Map<String, Object> model) {
-
-		// put data object into model
-		model.put("self", getData(null));
-
-		// return view name
-		return "login";
-	}
-
-	/**
-	 * Method for returning the model and view for the user profile page.
-	 *
-	 * @param model
-	 * @return
-	 */
-	@GetMapping(path = "/user/profile")
-	public String vmCreate(Map<String, Object> model) throws IOException {
-
-		// put data object into model
-		model.put("self", getData(null));
-
-		// return view name
-		return "user-profile";
-	}	
-	
-	/**
 	 * Method for returning the model and view for the create vm page.
 	 *
 	 * @param model
 	 * @return
 	 */
-	@GetMapping(path = "/vm/create/{cloudProvider}")
+	@GetMapping(path = PREFIX + "/create/{cloudProvider}")
 	public String vmCreate(Map<String, Object> model, @PathVariable String cloudProvider) throws IOException {
 
-		// put data object into model
-		model.put("self", getData(cloudProvider));
+		// fill model
+		fillModel(model, cloudProvider);
 
 		// return view name
 		return "vm-create";
@@ -125,10 +69,11 @@ public class CloudPortalController {
 	 * @param model
 	 * @return
 	 */
-	@PostMapping(path = "/vm/provision/{cloudProvider}", produces="text/plain")
+	@PostMapping(path = PREFIX + "/provision/{action}", produces="text/plain")
 	@ResponseBody
 	public void vmProvision(
-			@PathVariable String cloudProvider,
+			@PathVariable String action,
+			@RequestParam String cloudProvider,
 			@RequestParam Map<String, Object> variableMap,
 			HttpServletRequest request,
 			HttpServletResponse response) {
@@ -167,7 +112,7 @@ public class CloudPortalController {
 			OutputStream outputStream = response.getOutputStream();
 
 			// provision VM
-			terraformService.provisionVM(cloudProvider, variableMap, outputStream);
+			terraformService.provisionVM(action, cloudProvider, variableMap, outputStream);
 		}
 		catch (Exception e) {
 			LOG.error(e.getMessage(), e);
@@ -204,52 +149,23 @@ public class CloudPortalController {
 
 		return file;
 	}
-
-	private Data getData(String cloudProvider) {
-
-		// create data object
-		Data data = new Data();
-
-		// set application title
-		data.setApplicationTitle(applicationTitle);
+	
+	private void fillModel(Map<String, Object> model, String cloudProvider) {
 		
-		// set provider
-		data.setCloudProvider(cloudProvider);
+		fillModel(model);
 		
-		// set cloud provider defaults map
+		// get cloud provider defaults map
 		Map<String, Map<String, List<Variable>>> cloudProviderDefaultsMap = terraformService.getProviderDefaultsMap();
-
-		// set cloud providers
-		List<String> cloudProviderList = new ArrayList<String>();
-		cloudProviderList.addAll(cloudProviderDefaultsMap.keySet());
-		data.setCloudProviderList(cloudProviderList);
+		
+		// create virtual machine model
+		VirtualMachineModel virtualMachineModel = new VirtualMachineModel();
+		
+		// set cloud provider
+		virtualMachineModel.setCloudProvider(cloudProvider);
 		
 		// set cloud provider defaults
-		if (StringUtils.isNotEmpty(cloudProvider)) {
-			data.setCloudProviderDefaultsMap(cloudProviderDefaultsMap.get(cloudProvider));
-		}
-
-		// set username
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		data.setUsername((String) authentication.getPrincipal());
-
-		// set default for is admin flag
-		data.setIsAdmin(false);
+		virtualMachineModel.setCloudProviderDefaultsMap(cloudProviderDefaultsMap.get(cloudProvider));
 		
-		// set groups
-		List<String> groupList = new ArrayList<>();
-		for (GrantedAuthority grantedAuthority : authentication.getAuthorities()) {
-			
-			String groupName = grantedAuthority.toString();
-			groupList.add(groupName);
-			
-			// set is admin flag
-			if (groupName.equals(adminGroup)) {
-				data.setIsAdmin(true);
-			}
-		}
-		data.setGroupList(groupList);
-		
-		return data;
+		model.put(MODEL_VAR_NAME, virtualMachineModel);
 	}
 }

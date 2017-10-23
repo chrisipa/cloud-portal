@@ -1,4 +1,4 @@
-package de.papke.cloud.portal.ldap;
+package de.papke.cloud.portal.service;
 
 import java.util.ArrayList;
 import java.util.List;

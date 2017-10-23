@@ -7,8 +7,6 @@ import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 
-import de.papke.cloud.portal.ldap.DirectoryAuthenticationProvider;
-
 /**
  * Web security config class for configurating the spring boot webapp.
  */

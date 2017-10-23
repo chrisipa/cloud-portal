@@ -1,4 +1,4 @@
-package de.papke.cloud.portal.ldap;
+package de.papke.cloud.portal.auth;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,6 +11,8 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
+
+import de.papke.cloud.portal.service.DirectoryService;
 
 @Component
 public class DirectoryAuthenticationProvider implements AuthenticationProvider {

@@ -1,4 +1,4 @@
-package de.papke.cloud.portal.velocity;
+package de.papke.cloud.portal.service;
 
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
