@@ -102,11 +102,11 @@ public class VirtualMachineController extends ApplicationController {
 			}
 			
 			// get credentials
-			Credentials credentials = credentialsService.getCredentials(cloudProvider);
-			if (credentials != null) {
-				variableMap.put("username", credentials.getUsername());
-				variableMap.put("password", credentials.getPassword());
-			}
+//			Credentials credentials = credentialsService.getCredentials(cloudProvider);
+//			if (credentials != null) {
+//				variableMap.put("username", credentials.getUsername());
+//				variableMap.put("password", credentials.getPassword());
+//			}
 
 			// get response output stream
 			OutputStream outputStream = response.getOutputStream();

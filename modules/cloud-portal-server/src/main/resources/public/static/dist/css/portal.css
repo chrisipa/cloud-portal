@@ -3,3 +3,12 @@
     height: 700px;
     width: 100%;
 }
+
+label.error {
+	color: #ff0000;
+}
+
+.modal-dialog {
+    margin: 20px;
+    width: auto;
+}

@@ -74,34 +74,33 @@
 	                    </c:if>
 					</c:forEach>
 	            </div>
+	            <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+	                <div class="modal-dialog">
+	                    <div class="modal-content">
+	                        <div class="modal-header">
+	                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+	                            <h4 class="modal-title" id="myModalLabel">Output</h4>
+	                        </div>
+	                        <div class="modal-body">
+		                        <iframe name="output" id="output" frameborder="0" scrolling="yes"></iframe>
+	                        </div>
+	                        <div class="modal-footer">
+	                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+	                        </div>
+	                    </div>
+	                    <!-- /.modal-content -->
+	                </div>
+	                <!-- /.modal-dialog -->
+	            </div>
 	        <div class="row">
 	            <div class="col-lg-12">				
 					<input type="hidden" name="cloudProvider" value="${virtualMachine.cloudProvider}" />
-					<button type="submit" id="plan" class="btn btn-warning">Plan</button>
-					<button type="submit" id="apply" class="btn btn-danger">Apply</button>
+					<button type="submit" id="plan" class="btn btn-warning" data-toggle="modal" data-target="#myModal">Plan</button>
+					<button type="submit" id="apply" class="btn btn-danger" data-toggle="modal" data-target="#myModal">Apply</button>
 					<button id="cancel" type="button" class="btn btn-default">Cancel</button>
 					<p>&nbsp;</p>
 				</div>
 	        </div>			
-	        <div class="row">			
-				<div class="col-lg-12">
-					<div class="panel panel-default">
-						<div class="panel-heading">
-							<h4 class="panel-title">
-								<a data-toggle="collapse" data-parent="#accordion"
-									href="#outputContent" class="collapsed"
-									aria-expanded="false"><i class="fa fa-plus-square"
-									aria-hidden="true"></i>&nbsp;Output</a>
-							</h4>
-						</div>
-						<div id="outputContent"
-							class="panel-body panel-collapse collapse in" aria-expanded="true"
-							style="">
-							<iframe name="output" id="output" frameborder="0" scrolling="yes"></iframe>
-						</div>
-					</div>
-				</div>
-			</div>
 		</div>
 	</form>
 </div>
