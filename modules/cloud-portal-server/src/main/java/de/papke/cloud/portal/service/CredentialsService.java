@@ -1,6 +1,8 @@
 package de.papke.cloud.portal.service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
@@ -19,14 +21,14 @@ public class CredentialsService {
 	@Autowired
 	private CredentialsDao credentialsDao;
 	
-	public List<Credentials> getCredentialList() {
+	public List<Credentials> getCredentialList(String provider) {
 		
-		List<Credentials> credentialsList = credentialsDao.findAll();
+		List<Credentials> credentialsList = credentialsDao.findByProvider(provider);
 		
 		for (Credentials credentials : credentialsList) {
-			String encryptedPassword = credentials.getPassword();
-			String decryptedPassword = encryptionService.decrypt(encryptedPassword);
-			credentials.setPassword(decryptedPassword);
+			Map<String, String> secretMap = credentials.getSecretMap();
+			Map<String, String> decryptedSecretMap = decryptSecretMap(secretMap);
+			credentials.setSecretMap(decryptedSecretMap);
 		}
 		
 		return credentialsList;
@@ -40,9 +42,11 @@ public class CredentialsService {
 			Credentials credentials = credentialsDao.findByGroupAndProvider(groupName, provider);
 			
 			if (credentials != null) {
-				String encryptedPassword = credentials.getPassword();
-				String decryptedPassword = encryptionService.decrypt(encryptedPassword);
-				credentials.setPassword(decryptedPassword);
+				
+				Map<String, String> secretMap = credentials.getSecretMap();
+				Map<String, String> decryptedSecretMap = decryptSecretMap(secretMap);
+				credentials.setSecretMap(decryptedSecretMap);
+				
 				return credentials;
 			}
 		}
@@ -50,14 +54,43 @@ public class CredentialsService {
 		return null;
 	}
 	
-	public Credentials create(String group, String provider, String username, String password) {
+	public Credentials create(String group, String provider, Map<String, String> secretMap) {
 		
-		String encryptedPassword = encryptionService.encrypt(password);
-		Credentials credentials = new Credentials(group, provider, username, encryptedPassword);
+		Map<String, String> encryptedSecretMap = encryptSecretMap(secretMap);
+		Credentials credentials = new Credentials(group, provider, encryptedSecretMap);
+		
 		return credentialsDao.save(credentials);
 	}
 	
 	public void delete(String id) {
 		credentialsDao.delete(id);
+	}
+	
+	private Map<String, String> encryptSecretMap(Map<String, String> secretMap) {
+		
+		Map<String, String> encryptedSecretMap = new HashMap<>();
+		
+		if (secretMap != null) {
+			for (String key : secretMap.keySet()) {
+				String value = secretMap.get(key);					
+				encryptedSecretMap.put(key, encryptionService.encrypt(value));
+			}
+		}
+		
+		return encryptedSecretMap;
+	}
+	
+	private Map<String, String> decryptSecretMap(Map<String, String> secretMap) {
+		
+		Map<String, String> decryptedSecretMap = new HashMap<>();
+		
+		if (secretMap != null) {
+			for (String key : secretMap.keySet()) {
+				String value = secretMap.get(key);					
+				decryptedSecretMap.put(key, encryptionService.decrypt(value));
+			}
+		}
+		
+		return decryptedSecretMap;
 	}
 }

@@ -3,7 +3,7 @@
 
     <!-- jQuery -->
     <script src="<c:url value="/static/vendor/jquery/jquery.min.js" />"></script>
-    <script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
+    <script src="<c:url value="/static/vendor/jquery/jquery.validate.min.js" />"></script>
 
     <!-- Bootstrap Core JavaScript -->
     <script src="<c:url value="/static/vendor/bootstrap/js/bootstrap.min.js" />"></script>

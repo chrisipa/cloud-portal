@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.support.StandardMultipartHttpServletRequest;
 
+import de.papke.cloud.portal.constants.AzureConstants;
 import de.papke.cloud.portal.model.VirtualMachineModel;
 import de.papke.cloud.portal.pojo.Credentials;
 import de.papke.cloud.portal.service.CredentialsService;
@@ -102,11 +103,13 @@ public class VirtualMachineController extends ApplicationController {
 			}
 			
 			// get credentials
-//			Credentials credentials = credentialsService.getCredentials(cloudProvider);
-//			if (credentials != null) {
-//				variableMap.put("username", credentials.getUsername());
-//				variableMap.put("password", credentials.getPassword());
-//			}
+			Credentials credentials = credentialsService.getCredentials(cloudProvider);
+			if (credentials != null) {
+				variableMap.put("credentials-subscription-id-string", credentials.getSecretMap().get(AzureConstants.SUBSCRIPTION_ID));
+				variableMap.put("credentials-tenant-id-string", credentials.getSecretMap().get(AzureConstants.TENANT_ID));
+				variableMap.put("credentials-client-id-string", credentials.getSecretMap().get(AzureConstants.CLIENT_ID));
+				variableMap.put("credentials-client-secret-string", credentials.getSecretMap().get(AzureConstants.CLIENT_SECRET));
+			}
 
 			// get response output stream
 			OutputStream outputStream = response.getOutputStream();

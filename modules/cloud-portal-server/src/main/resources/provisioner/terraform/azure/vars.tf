@@ -1,4 +1,19 @@
-# required variables
+variable "credentials-subscription-id-string" {
+  description = "Azure Subscription ID."
+}
+
+variable "credentials-tenant-id-string" {
+  description = "Azure Tenant ID."
+}
+
+variable "credentials-client-id-string" {
+  description = "Azure Client ID."
+}
+
+variable "credentials-client-secret-string" {
+  description = "Azure Client Secret."
+}
+
 variable "general-hostname-string" {
   description = "Name of the machine to create."
 }

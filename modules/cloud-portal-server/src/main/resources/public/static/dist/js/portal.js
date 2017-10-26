@@ -14,13 +14,18 @@ $(function() {
 			$(button).click(function(e){
 				
 				e.preventDefault();
-				
 				var form = $(this).closest('form');
-				
 				var originalActionUrl = $(form).attr('action');
 				
-				if ($(form).validate()) {
-					$(form).attr('action', originalActionUrl + "/" + $(button).attr('id'));
+				if ($(form).valid()) {
+					
+					var buttonId = $(button).attr('id');
+					
+					if (buttonId == "plan" || buttonId == "apply") {
+						$('#myModal').modal('toggle');
+					}
+						
+					$(form).attr('action', originalActionUrl + "/" + buttonId);
 					$(form).submit();
 					$(form).attr('action', originalActionUrl);
 				}

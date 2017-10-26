@@ -146,6 +146,7 @@ public class TerraformService {
 		try {
 			HCLParser hclParser = new HCLParser(providerDefaultsFile);
 			variableMap = hclParser.parse();
+			variableMap.remove("credentials");
 		}
 		catch (Exception e) {
 			LOG.error(e.getMessage(), e);

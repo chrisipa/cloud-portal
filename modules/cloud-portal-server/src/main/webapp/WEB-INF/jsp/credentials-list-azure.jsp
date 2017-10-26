@@ -12,13 +12,10 @@
 
 	<div id="page-wrapper">
 		<div class="row">
-			<h4 class="page-header">Credentials Admin</h4>
+			<h4 class="page-header">Credentials Admin > Azure > List</h4>
 			<div class="col-lg-12">
-				<h2>Credentials</h2>
 				<form id="main-form" method="get" action="<c:url value="/credentials" />"
 					role="form">
-					<button id="create/form" type="submit" class="btn btn-success">Create</button>
-					<br /> <br />
 					<table
 						class="table table-striped table-bordered table-hover dataTable no-footer dtr-inline"
 						id="dataTables-example" role="grid"
@@ -36,16 +33,20 @@
 									aria-label="Browser: activate to sort column ascending">Group</th>
 								<th class="sorting" tabindex="0"
 									aria-controls="dataTables-example" rowspan="1" colspan="1"
-									style="width: 304px;"
-									aria-label="Platform(s): activate to sort column ascending">Provider</th>
-								<th class="sorting" tabindex="0"
-									aria-controls="dataTables-example" rowspan="1" colspan="1"
 									style="width: 244px;"
-									aria-label="Engine version: activate to sort column ascending">Username</th>
+									aria-label="Engine version: activate to sort column ascending">Subscription ID</th>
 								<th class="sorting" tabindex="0"
 									aria-controls="dataTables-example" rowspan="1" colspan="1"
 									style="width: 183px;"
-									aria-label="CSS grade: activate to sort column ascending">Password</th>
+									aria-label="CSS grade: activate to sort column ascending">Tenant ID</th>
+								<th class="sorting" tabindex="0"
+									aria-controls="dataTables-example" rowspan="1" colspan="1"
+									style="width: 183px;"
+									aria-label="CSS grade: activate to sort column ascending">Client ID</th>
+								<th class="sorting" tabindex="0"
+									aria-controls="dataTables-example" rowspan="1" colspan="1"
+									style="width: 183px;"
+									aria-label="CSS grade: activate to sort column ascending">Client Secret</th>
 								<th class="sorting" tabindex="0"
 									aria-controls="dataTables-example" rowspan="1" colspan="1"
 									style="width: 183px;"
@@ -57,12 +58,13 @@
 								<tr class="gradeA odd" role="row">
 									<td class="sorting_1"><c:out value="${cred.id}" /></td>
 									<td><c:out value="${cred.group}" /></td>
-									<td><c:out value="${cred.provider}" /></td>
-									<td><c:out value="${cred.username}" /></td>
-									<td><c:out value="${cred.password}" /></td>
+									<td><c:out value="${cred.secretMap['subscriptionId']}" /></td>
+									<td><c:out value="${cred.secretMap['tenantId']}" /></td>
+									<td><c:out value="${cred.secretMap['clientId']}" /></td>
+									<td><c:out value="${cred.secretMap['clientSecret']}" /></td>
 									<td>
-									   <button id="update/form/${cred.id}" type="submit" class="btn btn-warning btn-circle"><i class="fa fa-edit"></i></button>
-									   <button id="delete/action/${cred.id}" type="submit" class="btn btn-danger btn-circle"><i class="fa fa-times"></i></button>
+									   <button id="update/form/azure/${cred.id}" type="submit" class="btn btn-warning btn-circle"><i class="fa fa-edit"></i></button>
+									   <button id="delete/action/azure/${cred.id}" type="submit" class="btn btn-danger btn-circle"><i class="fa fa-times"></i></button>
 									</td>
 								</tr>
 							</c:forEach>

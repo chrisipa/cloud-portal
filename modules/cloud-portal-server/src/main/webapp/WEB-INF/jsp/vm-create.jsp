@@ -95,8 +95,8 @@
 	        <div class="row">
 	            <div class="col-lg-12">				
 					<input type="hidden" name="cloudProvider" value="${virtualMachine.cloudProvider}" />
-					<button type="submit" id="plan" class="btn btn-warning" data-toggle="modal" data-target="#myModal">Plan</button>
-					<button type="submit" id="apply" class="btn btn-danger" data-toggle="modal" data-target="#myModal">Apply</button>
+					<button type="submit" id="plan" class="btn btn-warning">Plan</button>
+					<button type="submit" id="apply" class="btn btn-danger">Apply</button>
 					<button id="cancel" type="button" class="btn btn-default">Cancel</button>
 					<p>&nbsp;</p>
 				</div>

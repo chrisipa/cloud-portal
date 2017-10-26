@@ -12,7 +12,7 @@
 
 	<div id="page-wrapper">
 		<div class="row">
-			<h4 class="page-header">Credentials Admin</h4>
+			<h4 class="page-header">Credentials Admin > Azure > Create</h4>
 			<div class="col-lg-12">
 				<form method="post" action="/credentials">
 					<div class="form-group">
@@ -20,23 +20,22 @@
 							required="required">
 					</div>
 					<div class="form-group">
-						<label>Provider</label> 
-						<select class="form-control" name="provider">
-							<c:forEach items="${application.cloudProviderList}" var="provider">
-								<option><c:out
-										value="${fn:toUpperCase(fn:substring(provider, 0, 1))}${fn:toLowerCase(fn:substring(provider, 1,fn:length(provider)))}" /></option>
-							</c:forEach>
-						</select>
-					</div>
-					<div class="form-group">
-                        <label>Username</label> <input class="form-control" name="username"
+                        <label>Subscription ID</label> <input class="form-control" name="subscriptionId"
                             required="required">
                     </div>
 					<div class="form-group">
-                        <label>Password</label> <input class="form-control" name="password"
+                        <label>Tenant ID</label> <input class="form-control" name="tenantId"
                             required="required">
                     </div>
-                    <button id="create/action" type="submit" class="btn btn-warning">Create</button>
+					<div class="form-group">
+                        <label>Client ID</label> <input class="form-control" name="clientId"
+                            required="required">
+                    </div>
+					<div class="form-group">
+                        <label>Client Secret</label> <input class="form-control" name="clientSecret"
+                            required="required">
+                    </div>
+                    <button id="create/action/azure" type="submit" class="btn btn-warning">Create</button>
                     <button id="cancel" type="button" class="btn btn-default">Cancel</button>
 				</form>
 			</div>

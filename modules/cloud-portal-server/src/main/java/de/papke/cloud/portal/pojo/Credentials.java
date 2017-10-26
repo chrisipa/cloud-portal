@@ -1,5 +1,8 @@
 package de.papke.cloud.portal.pojo;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.data.annotation.Id;
 
 public class Credentials {
@@ -8,17 +11,14 @@ public class Credentials {
     private String id;
     private String group;
     private String provider;
-    private String username;
-    private String password;
+    private Map<String, String> secretMap = new HashMap<>();
 
     public Credentials() {}
     
-    public Credentials(String group, String provider, String username, String password) {
-		super();
+	public Credentials(String group, String provider, Map<String, String> secretMap) {
 		this.group = group;
 		this.provider = provider;
-		this.username = username;
-		this.password = password;
+		this.secretMap = secretMap;
 	}
 
 	public String getId() {
@@ -36,28 +36,20 @@ public class Credentials {
 	public void setGroup(String group) {
 		this.group = group;
 	}
-	
+
 	public String getProvider() {
 		return provider;
 	}
-	
+
 	public void setProvider(String provider) {
 		this.provider = provider;
 	}
-	
-	public String getUsername() {
-		return username;
+
+	public Map<String, String> getSecretMap() {
+		return secretMap;
 	}
 
-	public void setUsername(String username) {
-		this.username = username;
-	}
-
-	public String getPassword() {
-		return password;
-	}
-
-	public void setPassword(String password) {
-		this.password = password;
+	public void setSecretMap(Map<String, String> secretMap) {
+		this.secretMap = secretMap;
 	}
 }

@@ -22,10 +22,6 @@
             <ul class="dropdown-menu dropdown-user">
                 <li><a href="<c:url value="/user/profile" />"><i class="fa fa-user fa-fw"></i> User Profile</a>
                 </li>
-                <c:if test="${application.isAdmin}">
-                <li><a href="<c:url value="/credentials/list" />"><i class="fa fa-key fa-fw"></i> Credentials Admin</a>
-                </li>
-                </c:if>
                 <li class="divider"></li>
                 <li><a href="<c:url value="/logout" />"><i class="fa fa-sign-out fa-fw"></i> Logout</a>
                 </li>
@@ -49,6 +45,26 @@
                 <li>
                     <a href="<c:url value="/" />"><i class="fa fa-dashboard fa-fw"></i> Dashboard</a>
                 </li>
+                <c:if test="${application.isAdmin}">
+	                <li>
+	                    <a href="#"><i class="fa fa-key fa-fw"></i> Credentials Admin<span class="fa arrow"></span></a>
+	                    <ul class="nav nav-second-level collapse in">
+	                        <c:forEach items="${application.cloudProviderList}" var="cloudProvider">
+	                            <li>
+	                                <a href="#"><i class="fa fa-cloud fa-fw"></i> <c:out value="${fn:toUpperCase(fn:substring(cloudProvider, 0, 1))}${fn:toLowerCase(fn:substring(cloudProvider, 1,fn:length(cloudProvider)))}" /><span class="fa arrow"></span></a>
+	                            </li>
+	                            <ul class="nav nav-third-level collapse in">
+	                                <li>
+	                                    <a href="<c:url value="/credentials/list/${cloudProvider}" />"><i class="fa fa-list fa-fw"></i> List<span class="fa arrow"></span></a>
+	                                </li>
+	                                <li>
+	                                    <a href="<c:url value="/credentials/create/form/${cloudProvider}" />"><i class="fa fa-plus fa-fw"></i> Create<span class="fa arrow"></span></a>
+	                                </li>
+	                            </ul>
+	                        </c:forEach>
+	                    </ul>
+	                </li>
+                </c:if>
                 <li>
                     <a href="#"><i class="fa fa-bar-chart-o fa-fw"></i> Virtual Machines<span class="fa arrow"></span></a>
                     <ul class="nav nav-second-level collapse in">

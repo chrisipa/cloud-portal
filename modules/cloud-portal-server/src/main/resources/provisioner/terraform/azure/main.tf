@@ -1,3 +1,10 @@
+provider "azurerm" {
+  subscription_id = "${var.credentials-subscription-id-string}"
+  tenant_id       = "${var.credentials-tenant-id-string}"
+  client_id       = "${var.credentials-client-id-string}"
+  client_secret   = "${var.credentials-client-secret-string}"
+}
+
 resource "azurerm_resource_group" "rg" {
   name     = "${var.general-hostname-string}-rg"
   location = "${var.general-location-string}"
