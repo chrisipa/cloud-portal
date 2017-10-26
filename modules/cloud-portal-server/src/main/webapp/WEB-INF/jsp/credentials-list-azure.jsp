@@ -63,7 +63,6 @@
 									<td><c:out value="${cred.secretMap['clientId']}" /></td>
 									<td><c:out value="${cred.secretMap['clientSecret']}" /></td>
 									<td>
-									   <button id="update/form/azure/${cred.id}" type="submit" class="btn btn-warning btn-circle"><i class="fa fa-edit"></i></button>
 									   <button id="delete/action/azure/${cred.id}" type="submit" class="btn btn-danger btn-circle"><i class="fa fa-times"></i></button>
 									</td>
 								</tr>

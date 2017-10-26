@@ -15,7 +15,7 @@
 	                action="<c:url value="/vm/provision" />"
 	                target="output" role="form" enctype="multipart/form-data">
 			<div class="row">
-				<h4 class="page-header">Virtual Machines</h4>
+				<h4 class="page-header">Virtual Machines > Azure > Create</h4>
 					<c:forEach items="${virtualMachine.cloudProviderDefaultsMap}"
 						var="variableGroup" varStatus="loop">
 						<c:if test="${loop.index % 2 == 0}">

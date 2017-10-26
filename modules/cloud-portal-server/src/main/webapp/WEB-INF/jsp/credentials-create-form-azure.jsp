@@ -16,23 +16,23 @@
 			<div class="col-lg-12">
 				<form method="post" action="/credentials">
 					<div class="form-group">
-						<label>Group</label> <input class="form-control" name="group"
+						<label>Group</label> <input type="text" class="form-control" name="group"
 							required="required">
 					</div>
 					<div class="form-group">
-                        <label>Subscription ID</label> <input class="form-control" name="subscriptionId"
+                        <label>Subscription ID</label> <input type="text" class="form-control" name="subscriptionId"
                             required="required">
                     </div>
 					<div class="form-group">
-                        <label>Tenant ID</label> <input class="form-control" name="tenantId"
+                        <label>Tenant ID</label> <input type="text" class="form-control" name="tenantId"
                             required="required">
                     </div>
 					<div class="form-group">
-                        <label>Client ID</label> <input class="form-control" name="clientId"
+                        <label>Client ID</label> <input type="text" class="form-control" name="clientId"
                             required="required">
                     </div>
 					<div class="form-group">
-                        <label>Client Secret</label> <input class="form-control" name="clientSecret"
+                        <label>Client Secret</label> <input type="password" class="form-control" name="clientSecret"
                             required="required">
                     </div>
                     <button id="create/action/azure" type="submit" class="btn btn-warning">Create</button>
