@@ -35,7 +35,8 @@
 		<registry>docker.io</registry>
 		<tenant>chrisipa</tenant>
 		<opt.folder>/opt</opt.folder>
-		<app.folder>${opt.folder}/${project.artifactId}</app.folder>
+		<catalina.home>${opt.folder}/tomcat</catalina.home>
+        <tomcat.webapps.folder>${catalina.home}/webapps</tomcat.webapps.folder>
 
 	</properties>
 
@@ -127,12 +128,10 @@
 		<finalName>${project.artifactId}</finalName>
 
 		<plugins>
-
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
-
 			<plugin>
 				<groupId>io.fabric8</groupId>
 				<artifactId>docker-maven-plugin</artifactId>
@@ -148,13 +147,50 @@
 								<tags>
 									<tag>${project.version}</tag>
 								</tags>
-								<from>${registry}/${tenant}/jdk-base:8u66</from>
+								<from>${registry}/${tenant}/tomcat-base:7.0.70</from>
 								<optimise>true</optimise>
 								<entryPoint>
 									<exec>
 										<args>/${project.artifactId}.sh</args>
 									</exec>
 								</entryPoint>
+								<cmd>
+									<exec>
+										<args>catalina.sh</args>
+										<args>run</args>
+									</exec>
+								</cmd>
+								<runCmds>
+
+									<!-- update package sources -->
+									<run>apt-get update</run>
+
+									<!-- install apt transport https -->
+									<run>apt-get install -y apt-transport-https</run>
+
+									<!-- add azure cli package repo -->
+									<run>echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ wheezy main" >> /etc/apt/sources.list.d/azure-cli.list</run>
+									<run>apt-key adv --keyserver packages.microsoft.com --recv-keys 52E16F86FEE04B979B07E28DB02C46DF417A0893</run>
+
+									<!-- update package sources -->
+									<run>apt-get update</run>
+
+									<!-- install azure cli -->
+									<run>apt-get install -y --no-install-recommends azure-cli</run>
+
+									<!-- install aws cli -->
+									<run>apt-get install -y --no-install-recommends python-pip</run>
+									<run>pip install awscli</run>
+
+									<!-- download and install terraform -->
+									<run>wget -q https://releases.hashicorp.com/terraform/0.10.7/terraform_0.10.7_linux_amd64.zip</run>
+									<run>unzip -q terraform_0.10.7_linux_amd64.zip -d /usr/local/bin</run>
+									<run>rm terraform_0.10.7_linux_amd64.zip</run>
+
+									<!-- clear apt cache -->
+									<run>apt-get clean</run>
+
+								</runCmds>
 								<assembly>
 									<basedir>/</basedir>
 									<inline>
@@ -163,13 +199,21 @@
 												<includes>
 													<include>${project.groupId}:${project.artifactId}:${project.packaging}</include>
 												</includes>
-												<outputDirectory>${app.folder}</outputDirectory>
+												<outputDirectory>${tomcat.webapps.folder}/${project.artifactId}</outputDirectory>
+												<unpack>true</unpack>
 											</dependencySet>
 										</dependencySets>
 										<fileSets>
 											<fileSet>
 												<directory>${project.basedir}/src/main/resources/docker/entrypoint</directory>
 												<outputDirectory>/</outputDirectory>
+												<includes>
+													<include>**/*</include>
+												</includes>
+											</fileSet>
+											<fileSet>
+												<directory>${project.basedir}/src/main/resources/docker/ROOT</directory>
+												<outputDirectory>${tomcat.webapps.folder}/ROOT</outputDirectory>
 												<includes>
 													<include>**/*</include>
 												</includes>
@@ -182,8 +226,8 @@
 					</images>
 				</configuration>
 			</plugin>
-
 		</plugins>
+
 	</build>
 
 </project>
