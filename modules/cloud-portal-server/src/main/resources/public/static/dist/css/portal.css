@@ -12,3 +12,16 @@ label.error {
     margin: 20px;
     width: auto;
 }
+
+#datatable_length {
+	margin-bottom: 10px;
+}
+
+#datatable_paginate {
+	text-align: right;
+}
+
+#datatable_filter {
+	margin-bottom: 10px;
+	text-align: right;
+}

@@ -15,7 +15,11 @@
 	                action="<c:url value="/vm/provision" />"
 	                target="output" role="form" enctype="multipart/form-data">
 			<div class="row">
-				<h4 class="page-header">Virtual Machines > Azure > Create</h4>
+			    <div class="col-lg-12">
+				    <h4 class="page-header">Virtual Machines > <c:out value="${fn:toUpperCase(fn:substring(cloudProvider, 0, 1))}${fn:toLowerCase(fn:substring(cloudProvider, 1,fn:length(cloudProvider)))}" /> > Create</h4>
+				</div>    
+			</div>	
+			<div class="row">
 					<c:forEach items="${virtualMachine.cloudProviderDefaultsMap}"
 						var="variableGroup" varStatus="loop">
 						<c:if test="${loop.index % 2 == 0}">
@@ -88,9 +92,7 @@
 	                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
 	                        </div>
 	                    </div>
-	                    <!-- /.modal-content -->
 	                </div>
-	                <!-- /.modal-dialog -->
 	            </div>
 	        <div class="row">
 	            <div class="col-lg-12">				

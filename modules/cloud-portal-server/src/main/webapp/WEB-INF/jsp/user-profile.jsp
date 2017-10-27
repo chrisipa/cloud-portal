@@ -11,9 +11,9 @@
 
 	<div id="page-wrapper">
 		<div class="row">
-			<h4 class="page-header">User Profile</h4>
 			<div class="col-lg-12">
-                <h2>Groups</h2>
+			<h4 class="page-header">User Profile</h4>
+                <h5 class="page-header">Groups</h5>
                 <ul>
 			    <c:forEach items="${application.groupList}" var="group">
 			         <li><c:out value="${group}" /></li>

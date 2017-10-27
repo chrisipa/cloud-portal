@@ -12,8 +12,8 @@
 
 	<div id="page-wrapper">
 		<div class="row">
-			<h4 class="page-header">Credentials Admin > Azure > Create</h4>
 			<div class="col-lg-12">
+			    <h4 class="page-header">Credentials Admin > Azure > Create</h4>
 				<form method="post" action="/credentials">
 					<div class="form-group">
 						<label>Group</label> <input type="text" class="form-control" name="group"

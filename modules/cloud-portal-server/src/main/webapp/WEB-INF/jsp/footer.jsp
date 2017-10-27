@@ -10,6 +10,11 @@
 
     <!-- Metis Menu Plugin JavaScript -->
     <script src="<c:url value="/static/vendor/metisMenu/metisMenu.min.js" />"></script>
+    
+    <!-- DataTables JavaScript -->
+    <script src="<c:url value="/static/vendor/datatables/js/jquery.dataTables.min.js" />"></script>
+    <script src="<c:url value="/static/vendor/datatables-plugins/dataTables.bootstrap.min.js" />"></script>
+    <script src="<c:url value="/static/vendor/datatables-responsive/dataTables.responsive.js" />"></script>
 
     <!-- Morris Charts JavaScript -->
     <script src="<c:url value="/static/vendor/raphael/raphael.min.js" />"></script>

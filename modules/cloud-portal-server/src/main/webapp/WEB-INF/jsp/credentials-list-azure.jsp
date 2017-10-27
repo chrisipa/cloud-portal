@@ -12,13 +12,13 @@
 
 	<div id="page-wrapper">
 		<div class="row">
-			<h4 class="page-header">Credentials Admin > Azure > List</h4>
 			<div class="col-lg-12">
+			    <h4 class="page-header">Credentials Admin > Azure > List</h4>
 				<form id="main-form" method="get" action="<c:url value="/credentials" />"
 					role="form">
 					<table
 						class="table table-striped table-bordered table-hover dataTable no-footer dtr-inline"
-						id="dataTables-example" role="grid"
+						id="datatable" role="grid"
 						aria-describedby="dataTables-example_info" style="width: 100%;"
 						width="100%">
 						<thead>

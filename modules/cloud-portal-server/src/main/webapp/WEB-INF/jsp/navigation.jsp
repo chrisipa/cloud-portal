@@ -51,14 +51,14 @@
 	                    <ul class="nav nav-second-level collapse in">
 	                        <c:forEach items="${application.cloudProviderList}" var="cloudProvider">
 	                            <li>
-	                                <a href="#"><i class="fa fa-cloud fa-fw"></i> <c:out value="${fn:toUpperCase(fn:substring(cloudProvider, 0, 1))}${fn:toLowerCase(fn:substring(cloudProvider, 1,fn:length(cloudProvider)))}" /><span class="fa arrow"></span></a>
+	                                <a href="#"><i class="fa fa-cloud fa-fw"></i> <c:out value="${fn:toUpperCase(fn:substring(cloudProvider, 0, 1))}${fn:toLowerCase(fn:substring(cloudProvider, 1,fn:length(cloudProvider)))}" /></a>
 	                            </li>
 	                            <ul class="nav nav-third-level collapse in">
 	                                <li>
-	                                    <a href="<c:url value="/credentials/list/${cloudProvider}" />"><i class="fa fa-list fa-fw"></i> List<span class="fa arrow"></span></a>
+	                                    <a href="<c:url value="/credentials/list/${cloudProvider}" />"><i class="fa fa-list fa-fw"></i> List</a>
 	                                </li>
 	                                <li>
-	                                    <a href="<c:url value="/credentials/create/form/${cloudProvider}" />"><i class="fa fa-plus fa-fw"></i> Create<span class="fa arrow"></span></a>
+	                                    <a href="<c:url value="/credentials/create/form/${cloudProvider}" />"><i class="fa fa-plus fa-fw"></i> Create</a>
 	                                </li>
 	                            </ul>
 	                        </c:forEach>
@@ -66,15 +66,15 @@
 	                </li>
                 </c:if>
                 <li>
-                    <a href="#"><i class="fa fa-bar-chart-o fa-fw"></i> Virtual Machines<span class="fa arrow"></span></a>
+                    <a href="#"><i class="fa fa-television fa-fw"></i> Virtual Machines<span class="fa arrow"></span></a>
                     <ul class="nav nav-second-level collapse in">
                         <c:forEach items="${application.cloudProviderList}" var="cloudProvider">
                             <li>
-                                <a href="#"><i class="fa fa-cloud fa-fw"></i> <c:out value="${fn:toUpperCase(fn:substring(cloudProvider, 0, 1))}${fn:toLowerCase(fn:substring(cloudProvider, 1,fn:length(cloudProvider)))}" /><span class="fa arrow"></span></a>
+                                <a href="#"><i class="fa fa-cloud fa-fw"></i> <c:out value="${fn:toUpperCase(fn:substring(cloudProvider, 0, 1))}${fn:toLowerCase(fn:substring(cloudProvider, 1,fn:length(cloudProvider)))}" /></a>
                             </li>
                             <ul class="nav nav-third-level collapse in">
 		                        <li>
-		                            <a href="<c:url value="/vm/create/${cloudProvider}" />"><i class="fa fa-plus fa-fw"></i> Create<span class="fa arrow"></span></a>
+		                            <a href="<c:url value="/vm/create/${cloudProvider}" />"><i class="fa fa-plus fa-fw"></i> Create</a>
 		                        </li>
                             </ul>
                         </c:forEach>
