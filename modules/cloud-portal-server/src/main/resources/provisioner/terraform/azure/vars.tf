@@ -18,7 +18,7 @@ variable "general-hostname-string" {
   description = "Name of the machine to create."
 }
 
-variable "general-location-string" {
+variable "general-region-string" {
   description = "Region where the resources should exist."
   default     = "westeurope"
 }

@@ -7,12 +7,12 @@ provider "azurerm" {
 
 resource "azurerm_resource_group" "rg" {
   name     = "${var.general-hostname-string}-rg"
-  location = "${var.general-location-string}"
+  location = "${var.general-region-string}"
 }
 
 resource "azurerm_virtual_network" "vnet" {
   name                = "${var.general-hostname-string}vnet"
-  location            = "${var.general-location-string}"
+  location            = "${var.general-region-string}"
   address_space       = ["${var.network-vnet-address-space-string}"]
   resource_group_name = "${azurerm_resource_group.rg.name}"
 }
@@ -26,7 +26,7 @@ resource "azurerm_subnet" "subnet" {
 
 resource "azurerm_network_security_group" "nsg" {
   name                = "${var.general-hostname-string}nsg"
-  location            = "${var.general-location-string}"
+  location            = "${var.general-region-string}"
   resource_group_name = "${azurerm_resource_group.rg.name}"
 }
 
@@ -46,7 +46,7 @@ resource "azurerm_network_security_rule" "ruleports" {
 
 resource "azurerm_network_interface" "nic" {
   name                      = "${var.general-hostname-string}nic"
-  location                  = "${var.general-location-string}"
+  location                  = "${var.general-region-string}"
   resource_group_name       = "${azurerm_resource_group.rg.name}"
   network_security_group_id = "${azurerm_network_security_group.nsg.id}"
 
@@ -62,7 +62,7 @@ resource "azurerm_network_interface" "nic" {
 
 resource "azurerm_public_ip" "pip" {
   name                         = "${var.general-hostname-string}-ip"
-  location                     = "${var.general-location-string}"
+  location                     = "${var.general-region-string}"
   resource_group_name          = "${azurerm_resource_group.rg.name}"
   public_ip_address_allocation = "dynamic"
   domain_name_label            = "${var.general-hostname-string}"
@@ -70,7 +70,7 @@ resource "azurerm_public_ip" "pip" {
 
 resource "azurerm_storage_account" "stor" {
   name                     = "${var.general-hostname-string}stor"
-  location                 = "${var.general-location-string}"
+  location                 = "${var.general-region-string}"
   resource_group_name      = "${azurerm_resource_group.rg.name}"
   account_tier             = "${var.storage-account-tier-string}"
   account_replication_type = "${var.storage-replication-type-string}"  
@@ -85,7 +85,7 @@ resource "azurerm_storage_container" "storc" {
 
 resource "azurerm_virtual_machine" "vm" {
   name                  = "${var.general-hostname-string}vm"
-  location              = "${var.general-location-string}"
+  location              = "${var.general-region-string}"
   resource_group_name   = "${azurerm_resource_group.rg.name}"
   vm_size               = "${var.vm-size-string}"
   network_interface_ids = ["${azurerm_network_interface.nic.id}"]

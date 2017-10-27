@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.support.StandardMultipartHttpServletRequest;
 
+import de.papke.cloud.portal.constants.AwsConstants;
 import de.papke.cloud.portal.constants.AzureConstants;
 import de.papke.cloud.portal.model.VirtualMachineModel;
 import de.papke.cloud.portal.pojo.Credentials;
@@ -105,17 +106,27 @@ public class VirtualMachineController extends ApplicationController {
 			// get credentials
 			Credentials credentials = credentialsService.getCredentials(cloudProvider);
 			if (credentials != null) {
-				variableMap.put("credentials-subscription-id-string", credentials.getSecretMap().get(AzureConstants.SUBSCRIPTION_ID));
-				variableMap.put("credentials-tenant-id-string", credentials.getSecretMap().get(AzureConstants.TENANT_ID));
-				variableMap.put("credentials-client-id-string", credentials.getSecretMap().get(AzureConstants.CLIENT_ID));
-				variableMap.put("credentials-client-secret-string", credentials.getSecretMap().get(AzureConstants.CLIENT_SECRET));
+				
+				if (cloudProvider.equals(AzureConstants.PROVIDER)) {
+					variableMap.put("credentials-subscription-id-string", credentials.getSecretMap().get(AzureConstants.SUBSCRIPTION_ID));
+					variableMap.put("credentials-tenant-id-string", credentials.getSecretMap().get(AzureConstants.TENANT_ID));
+					variableMap.put("credentials-client-id-string", credentials.getSecretMap().get(AzureConstants.CLIENT_ID));
+					variableMap.put("credentials-client-secret-string", credentials.getSecretMap().get(AzureConstants.CLIENT_SECRET));
+				}
+				else if (cloudProvider.equals(AwsConstants.PROVIDER)) {
+					variableMap.put("credentials-access-key-string", credentials.getSecretMap().get(AwsConstants.ACCESS_KEY));
+					variableMap.put("credentials-secret-key-string", credentials.getSecretMap().get(AwsConstants.SECRET_KEY));
+				}
+				
+				// get response output stream
+				OutputStream outputStream = response.getOutputStream();
+
+				// provision VM
+				terraformService.provisionVM(action, cloudProvider, variableMap, outputStream);
 			}
-
-			// get response output stream
-			OutputStream outputStream = response.getOutputStream();
-
-			// provision VM
-			terraformService.provisionVM(action, cloudProvider, variableMap, outputStream);
+			else {
+				response.getWriter().println(String.format("No credentials found for cloud provider '%s'. Please contact your administrator.", cloudProvider));
+			}
 		}
 		catch (Exception e) {
 			LOG.error(e.getMessage(), e);
