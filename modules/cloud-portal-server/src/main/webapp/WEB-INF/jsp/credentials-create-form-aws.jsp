@@ -14,7 +14,7 @@
 		<div class="row">
 			<div class="col-lg-12">
 			    <h4 class="page-header">Credentials Admin > Azure > Create</h4>
-				<form method="post" action="/credentials">
+				<form method="post" action="<c:url value="/credentials" />">
 					<div class="form-group">
 						<label>Group</label> <input type="text" class="form-control" name="group"
 							required="required">
