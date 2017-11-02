@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<configuration scan="true" scanPeriod="30 seconds">
+    
+    <property name="fileName" value="cloud-portal.log" />
+    	
+	<!-- ########################################## -->
+	<!-- # DO NOT CHANGE ANYTHING BELOW THIS LINE # -->
+	<!-- ########################################## -->
+	
+	<if condition='!isDefined("pattern")'>
+		<then>
+			<property name="pattern"
+				value="%d{yyyy-MM-dd'T'HH:mm:ss.SSSZ} [%level] [%class] [%method]: %message %n" />
+		</then>
+	</if>
+	<if condition='!isDefined("folderPath")'>
+		<then>
+			<property name="folderPath" value="${catalina.home}/logs" />
+		</then>
+	</if>
+	<if condition='!isDefined("fileName")'>
+		<then>
+			<property name="fileName" value="my-application.log" />
+		</then>
+	</if>
+	<if condition='!isDefined("filePath")'>
+		<then>
+			<property name="filePath" value="${folderPath}/${fileName}" />
+		</then>
+	</if>
+	<if condition='!isDefined("fileNamePattern")'>
+		<then>
+			<property name="fileNamePattern" value="${filePath}.%d{yyyy-MM-dd}.%i.log" />
+		</then>
+	</if>
+	<if condition='!isDefined("maxFileSize")'>
+		<then>
+			<property name="maxFileSize" value="10MB" />
+		</then>
+	</if>
+	<if condition='!isDefined("maxHistory")'>
+		<then>
+			<property name="maxHistory" value="30" />
+		</then>
+	</if>
+	<if condition='!isDefined("level")'>
+		<then>
+			<property name="level" value="info" />
+		</then>
+	</if>
+
+	<if condition='isDefined("catalina.home")'>
+		<then>
+			<appender name="file"
+				class="ch.qos.logback.core.rolling.RollingFileAppender">
+				<file>${filePath}</file>
+				<encoder>
+					<pattern>${pattern}</pattern>
+				</encoder>
+				<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+					<fileNamePattern>${fileNamePattern}</fileNamePattern>
+					<timeBasedFileNamingAndTriggeringPolicy
+						class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+						<maxFileSize>${maxFileSize}</maxFileSize>
+					</timeBasedFileNamingAndTriggeringPolicy>
+					<maxHistory>${maxHistory}</maxHistory>
+				</rollingPolicy>
+			</appender>
+		</then>
+		<else>
+			<appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
+				<encoder>
+					<pattern>${pattern}</pattern>
+				</encoder>
+			</appender>
+		</else>
+	</if>
+
+	<root level="${level}">
+		<if condition='isDefined("catalina.home")'>
+			<then>
+				<appender-ref ref="file" />
+			</then>
+			<else>
+				<appender-ref ref="stdout" />
+			</else>
+		</if>
+	</root>
+
+</configuration>
