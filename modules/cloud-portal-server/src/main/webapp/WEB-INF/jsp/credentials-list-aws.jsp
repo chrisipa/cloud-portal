@@ -13,7 +13,7 @@
 	<div id="page-wrapper">
 		<div class="row">
 			<div class="col-lg-12">
-			    <h4 class="page-header">Credentials Admin > AWS > List</h4>
+			    <h4 class="page-header">Credentials Admin > Aws > List</h4>
 				<form id="main-form" method="get" action="<c:url value="/credentials" />"
 					role="form">
 					<table
