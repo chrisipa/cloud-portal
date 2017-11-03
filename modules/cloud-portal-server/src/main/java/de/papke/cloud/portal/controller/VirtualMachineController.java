@@ -26,6 +26,7 @@ import org.springframework.web.multipart.support.StandardMultipartHttpServletReq
 
 import de.papke.cloud.portal.constants.AwsConstants;
 import de.papke.cloud.portal.constants.AzureConstants;
+import de.papke.cloud.portal.constants.VSphereConstants;
 import de.papke.cloud.portal.model.VirtualMachineModel;
 import de.papke.cloud.portal.pojo.Credentials;
 import de.papke.cloud.portal.service.CredentialsService;
@@ -116,6 +117,11 @@ public class VirtualMachineController extends ApplicationController {
 				else if (cloudProvider.equals(AwsConstants.PROVIDER)) {
 					variableMap.put("credentials-access-key-string", credentials.getSecretMap().get(AwsConstants.ACCESS_KEY));
 					variableMap.put("credentials-secret-key-string", credentials.getSecretMap().get(AwsConstants.SECRET_KEY));
+				}
+				else if (cloudProvider.equals(VSphereConstants.PROVIDER)) {
+					variableMap.put("credentials-vcenter-hostname-string", credentials.getSecretMap().get(VSphereConstants.VCENTER_HOSTNAME));
+					variableMap.put("credentials-vcenter-username-string", credentials.getSecretMap().get(VSphereConstants.VCENTER_USERNAME));
+					variableMap.put("credentials-vcenter-password-string", credentials.getSecretMap().get(VSphereConstants.VCENTER_PASSWORD));
 				}
 				
 				// get response output stream

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import de.papke.cloud.portal.constants.AwsConstants;
 import de.papke.cloud.portal.constants.AzureConstants;
+import de.papke.cloud.portal.constants.VSphereConstants;
 import de.papke.cloud.portal.model.CredentialsModel;
 import de.papke.cloud.portal.service.CredentialsService;
 
@@ -45,6 +46,11 @@ public class CredentialsController extends ApplicationController {
 		else if (provider.equals(AwsConstants.PROVIDER)) {
 			secretMap.put(AwsConstants.ACCESS_KEY, variableMap.get(AwsConstants.ACCESS_KEY));
 			secretMap.put(AwsConstants.SECRET_KEY, variableMap.get(AwsConstants.SECRET_KEY));
+		}
+		else if (provider.equals(VSphereConstants.PROVIDER)) {
+			secretMap.put(VSphereConstants.VCENTER_HOSTNAME, variableMap.get(VSphereConstants.VCENTER_HOSTNAME));
+			secretMap.put(VSphereConstants.VCENTER_USERNAME, variableMap.get(VSphereConstants.VCENTER_USERNAME));
+			secretMap.put(VSphereConstants.VCENTER_PASSWORD, variableMap.get(VSphereConstants.VCENTER_PASSWORD));
 		}
 		
 		// create credentials
