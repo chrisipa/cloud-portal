@@ -143,10 +143,10 @@ resource "azurerm_virtual_machine" "vm" {
   depends_on = ["azurerm_storage_account.stor"]
 }
 
-output "username" {
-  value = "${var.vm-username-string}"
-}
-
 output "host" {  
   value = "${azurerm_public_ip.pip.fqdn}"
+}
+
+output "username" {
+  value = "${var.vm-username-string}"
 }

@@ -72,10 +72,10 @@ resource "aws_instance" "vm" {
   }
 }
 
-output "username" {
-  value = "ubuntu"
-}
-
 output "host" {
   value = "${aws_instance.vm.public_dns}"
+}
+
+output "username" {
+  value = "ubuntu"
 }
