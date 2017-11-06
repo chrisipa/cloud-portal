@@ -17,6 +17,7 @@ Features (working)
 * VM provisioning to Azure, AWS and VMWare vSphere using Hashicorp's Terraform
 * Execute bootstrap scripts for automated server configuration
 * Send HTML emails with customizable velocity templates and Terraform log data as attachment
+* Responsive WebUI with generic Terraform variable rendering
 
 Features (planned)
 ------------------
