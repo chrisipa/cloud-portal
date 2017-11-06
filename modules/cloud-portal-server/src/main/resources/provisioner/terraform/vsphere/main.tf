@@ -28,7 +28,7 @@ resource "vmware_virtual_machine" "vm" {
 
   provisioner "remote-exec" {
     inline = [
-      "bash /tmp/bootstrap.sh",
+      "echo '${var.bootstrap-password-string}' | sudo -S bash /tmp/bootstrap.sh",
       "rm /tmp/bootstrap.sh"
     ]
   }
