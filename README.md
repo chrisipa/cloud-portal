@@ -28,7 +28,7 @@ Features (planned)
 
 Prerequisites
 -------------
-* LDAP interface of the Active Directory must be reachable
+* LDAP server must be available
 * SMTP server must be available
 * [Docker](https://docs.docker.com/engine/installation/) must be installed
 * [Docker-Compose](https://docs.docker.com/compose/install/) must be installed
