@@ -1,0 +1,13 @@
+<html>
+<body>
+<h2>VM provisioning was successful</h2>
+<p>Hello,<br /><br />your VM provisioning to <strong>${provider}</strong> was successful.</p>
+<p>Please use this data to connect to the server:<p>
+<hr />
+<p>Host: <strong>${host}</strong></p>
+<p>Username: <strong>${username}</strong></p>
+<hr />
+<p>Best regards</p>
+<p>Your Self Service Cloud Portal</p>
+</body>
+</html>

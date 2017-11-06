@@ -13,22 +13,24 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-@Service
-public class ProcessExecutorService {
-	
-	private static final Logger LOG = LoggerFactory.getLogger(ProcessExecutorService.class);
+import de.papke.cloud.portal.pojo.CommandResult;
 
-	public String execute(String command) {
+@Service
+public class CommandExecutorService {
+	
+	private static final Logger LOG = LoggerFactory.getLogger(CommandExecutorService.class);
+
+	public CommandResult execute(String command) {
 		return execute(command, null);
 	}
 	
-	public String execute(String command, File workingDirectory) {
+	public CommandResult execute(String command, File workingDirectory) {
 		return execute(command, workingDirectory, new ByteArrayOutputStream());
 	}
 	
-	public String execute(String command, File workingDirectory, OutputStream outputStream) {
+	public CommandResult execute(String command, File workingDirectory, OutputStream outputStream) {
 		
-		String output = null;
+		CommandResult commandResult = new CommandResult();
 		
 		try {
 		
@@ -47,19 +49,25 @@ public class ProcessExecutorService {
 	        executor.setExitValues(IntStream.range(0, 255).toArray());
 	
 	        // create output stream for command
-	        PumpStreamHandler streamHandler = new PumpStreamHandler(outputStream);
+	        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+	        PumpStreamHandler streamHandler = new PumpStreamHandler(byteArrayOutputStream);
 	        executor.setStreamHandler(streamHandler);
 
 	        // execute command
-	        executor.execute(commandLine);
+	        int exitValue = executor.execute(commandLine);
 	        
-	        // get output from command
-	        output = outputStream.toString();
+	        // fill command result
+	        commandResult.setOutput(byteArrayOutputStream.toString());
+	        commandResult.setSuccess(exitValue == 0 ? true : false);
+	        
+	        // write to request output stream
+	        outputStream.write(commandResult.getOutput().getBytes());
+	        outputStream.flush();
 		}
 		catch(IOException e) {
 			LOG.error(e.getMessage(), e);
 		}
 		
-		return output;
+		return commandResult;
 	}
 }

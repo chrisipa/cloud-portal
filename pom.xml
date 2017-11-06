@@ -35,8 +35,8 @@
 		<registry>docker.io</registry>
 		<tenant>chrisipa</tenant>
 		<opt.folder>/opt</opt.folder>
-		<catalina.home>${opt.folder}/tomcat</catalina.home>
-        <tomcat.webapps.folder>${catalina.home}/webapps</tomcat.webapps.folder>
+		<tomcat.home>${opt.folder}/tomcat</tomcat.home>
+        <tomcat.webapps.folder>${tomcat.home}/webapps</tomcat.webapps.folder>
         <terraform.version>0.10.7</terraform.version>
         <terraform.vmware.version>1.2</terraform.vmware.version>
 

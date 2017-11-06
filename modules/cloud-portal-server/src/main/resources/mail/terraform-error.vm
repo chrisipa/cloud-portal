@@ -1,0 +1,9 @@
+<html>
+<body>
+<h2>Error while provisioning VM</h2>
+<p>Hello,<br /><br />there was an error provisioning your VM to <strong>${provider}</strong>.</p>
+<p>See log file for additional details<p>
+<p>Best regards</p>
+<p>Your Self Service Cloud Portal</p>
+</body>
+</html>

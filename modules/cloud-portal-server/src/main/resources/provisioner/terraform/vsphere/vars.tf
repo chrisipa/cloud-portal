@@ -29,3 +29,17 @@ variable "vm-ram-string" {
   description = "RAM (in MB) of the virtual machine."
   default     = "1024"  
 }
+
+variable "bootstrap-username-string" {
+  description = "Username for SSH access."
+  default     = "devops"
+}
+
+variable "bootstrap-password-string" {
+  description = "Password for SSH access."
+  default     = "devops"
+}
+
+variable "bootstrap-script-file" {
+  description = "Bootstrap script file to execute after vm has been created."
+}

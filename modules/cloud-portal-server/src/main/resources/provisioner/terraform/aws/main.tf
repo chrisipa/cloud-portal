@@ -72,6 +72,10 @@ resource "aws_instance" "vm" {
   }
 }
 
-output "hostname" {
+output "username" {
+  value = "ubuntu"
+}
+
+output "host" {
   value = "${aws_instance.vm.public_dns}"
 }

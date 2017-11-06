@@ -13,21 +13,24 @@ $(function() {
 		else {
 			$(button).click(function(e){
 				
-				e.preventDefault();
-				var form = $(this).closest('form');
-				var originalActionUrl = $(form).attr('action');
+				var buttonId = $(button).attr('id');
 				
-				if ($(form).valid()) {
+				if (typeof buttonId !== 'undefined') {
 					
-					var buttonId = $(button).attr('id');
+					e.preventDefault();
+					var form = $(this).closest('form');
+					var originalActionUrl = $(form).attr('action');
 					
-					if (buttonId == "plan" || buttonId == "apply") {
-						$('#myModal').modal('toggle');
-					}
+					if ($(form).valid()) {
 						
-					$(form).attr('action', originalActionUrl + "/" + buttonId);
-					$(form).submit();
-					$(form).attr('action', originalActionUrl);
+						if (buttonId == "plan" || buttonId == "apply") {
+							$('#myModal').modal('toggle');
+						}
+							
+						$(form).attr('action', originalActionUrl + "/" + buttonId);
+						$(form).submit();
+						$(form).attr('action', originalActionUrl);
+					}
 				}
 			});
 		}
