@@ -104,7 +104,7 @@ public class TerraformService {
 			if (StringUtils.isNotEmpty(provider)) {
 
 				// print waiting message
-				outputStream.write("TERRAFORM IS WORKING ON YOUR ACTION. PLEASE BE PATIENT!!!\n".getBytes());
+				outputStream.write("TERRAFORM IS WORKING ON YOUR ACTION. YOU WILL GET AN EMAIL WITH THE RESULTS. PLEASE BE PATIENT!!!\n".getBytes());
 				outputStream.flush();				
 				
 				// copy terraform resources to filesystem
