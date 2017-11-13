@@ -26,10 +26,18 @@ $(function() {
 						if (buttonId == "plan" || buttonId == "apply") {
 							$('#myModal').modal('toggle');
 						}
+						
+						var submit = true;
+						
+						if (buttonId.startsWith('delete')) {
+							submit = confirm('Do you really want to delete this item?');
+						}
 							
-						$(form).attr('action', originalActionUrl + "/" + buttonId);
-						$(form).submit();
-						$(form).attr('action', originalActionUrl);
+						if (submit) {
+							$(form).attr('action', originalActionUrl + "/" + buttonId);
+							$(form).submit();
+							$(form).attr('action', originalActionUrl);
+						}
 					}
 				}
 			});

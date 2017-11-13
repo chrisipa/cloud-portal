@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
 import de.papke.cloud.portal.dao.ProvisionLogDao;
 import de.papke.cloud.portal.pojo.ProvisionLog;
 import de.papke.cloud.portal.pojo.User;
-import de.papke.cloud.portal.util.ZipUtil;
 
 @Service
 public class ProvisionLogService {
@@ -45,6 +44,10 @@ public class ProvisionLogService {
 
 		return provisionLogList;
 	}
+	
+	public ProvisionLog get(String id) {
+		return provisionLogDao.findById(id);
+	}
 
 	public ProvisionLog create(String command, String provider, Boolean success, Map<String, Object> variableMapWithCredentials, File tmpFolder) {
 
@@ -59,7 +62,7 @@ public class ProvisionLogService {
 
 			// zip temp folder
 			zipFile = File.createTempFile(TMP_FILE_PREFIX, TMP_FILE_SUFFIX);
-			ZipUtil.compressZipfile(tmpFolder, zipFile);
+			ZipService.zip(tmpFolder, zipFile);
 			byte[] data = IOUtils.toByteArray(new FileInputStream(zipFile));
 
 			// remove credentials from variable map
@@ -84,5 +87,9 @@ public class ProvisionLogService {
 		}
 
 		return provisionLog;
+	}
+	
+	public void delete(String id) {
+		provisionLogDao.delete(id);
 	}
 }

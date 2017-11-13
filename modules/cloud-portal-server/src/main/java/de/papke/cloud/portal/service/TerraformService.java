@@ -12,6 +12,7 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -102,10 +103,19 @@ public class TerraformService {
 		}
 	}
 
-	public void provisionVM(String action, String provider, Map<String, Object> variableMap, OutputStream outputStream) {
+	public CommandResult provisionVM(String action, String provider, Map<String, Object> variableMap, File resourceFolder) {
+		return provisionVM(action, provider, variableMap, new ByteArrayOutputStream(), resourceFolder);
+	}
+	
+	public CommandResult provisionVM(String action, String provider, Map<String, Object> variableMap, OutputStream outputStream) {
+		return provisionVM(action, provider, variableMap, outputStream, null);
+	}
+	
+	public CommandResult provisionVM(String action, String provider, Map<String, Object> variableMap, OutputStream outputStream, File resourceFolder) {
 
+		CommandResult commandResult = null;
 		File tmpFolder = null;
-
+		
 		try {
 
 			if (StringUtils.isNotEmpty(provider)) {
@@ -115,7 +125,12 @@ public class TerraformService {
 				outputStream.flush();				
 				
 				// copy terraform resources to filesystem
-				tmpFolder = fileService.copyResourceToFilesystem("terraform/" + provider);
+				if (resourceFolder != null) {
+					tmpFolder = resourceFolder;
+				}
+				else {
+					tmpFolder = fileService.copyResourceToFilesystem("terraform/" + provider);
+				}
 
 				// execute init command
 				String initCommand = buildInitCommand(terraformPath);
@@ -128,7 +143,7 @@ public class TerraformService {
 					String commandString = buildActionCommand(terraformPath, action, variableMap);
 
 					// execute action command
-					CommandResult commandResult = commandExecutorService.execute(commandString, tmpFolder, outputStream);
+					commandResult = commandExecutorService.execute(commandString, tmpFolder, outputStream);
 
 					// if terraform action is apply
 					if (action.equals(ACTION_APPLY)) {
@@ -191,6 +206,8 @@ public class TerraformService {
 				}
 			}
 		}
+		
+		return commandResult;
 	}
 
 	private Map<String, String> parseOutput(String output) {
