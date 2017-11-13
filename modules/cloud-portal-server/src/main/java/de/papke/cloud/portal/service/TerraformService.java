@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import de.papke.cloud.portal.pojo.CommandResult;
+import de.papke.cloud.portal.pojo.User;
 import de.papke.cloud.portal.terraform.HCLParser;
 import de.papke.cloud.portal.terraform.Variable;
 
@@ -57,6 +58,9 @@ public class TerraformService {
 
 	@Autowired
 	private MailService mailService;
+	
+	@Autowired
+	private UserService userService;
 
 	@Value("${terraform.path}")
 	private String terraformPath;
@@ -95,7 +99,7 @@ public class TerraformService {
 		}
 	}
 
-	public void provisionVM(String email, String action, String provider, Map<String, Object> variableMap, OutputStream outputStream) {
+	public void provisionVM(String action, String provider, Map<String, Object> variableMap, OutputStream outputStream) {
 
 		File tmpFolder = null;
 
@@ -142,12 +146,18 @@ public class TerraformService {
 								FileUtils.writeStringToFile(attachment, commandResult.getOutput(), StandardCharsets.UTF_8);
 							}
 							
+							// get mail address
+							User user = userService.getUser();
+							String email = user.getEmail(); 
+							
 							// send mail
-							if (commandResult.isSuccess()) {
-								mailService.send(email, mailSuccessSubject, mailSuccessTemplate, attachment, mailVariableMap);
-							}
-							else {
-								mailService.send(email, mailErrorSubject, mailErrorTemplate, attachment, mailVariableMap);
+							if (StringUtils.isNotEmpty(email)) {
+								if (commandResult.isSuccess()) {
+									mailService.send(email, mailSuccessSubject, mailSuccessTemplate, attachment, mailVariableMap);
+								}
+								else {
+									mailService.send(email, mailErrorSubject, mailErrorTemplate, attachment, mailVariableMap);
+								}
 							}
 						}
 						catch (Exception e) {

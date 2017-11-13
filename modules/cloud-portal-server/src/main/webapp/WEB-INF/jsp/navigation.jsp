@@ -17,7 +17,7 @@
     <ul class="nav navbar-top-links navbar-right">
         <li class="dropdown">
             <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                <i class="fa fa-user fa-fw"></i> <c:out value="${application.username}" /> <i class="fa fa-caret-down"></i>
+                <i class="fa fa-user fa-fw"></i> <c:out value="${application.user.username}" /> <i class="fa fa-caret-down"></i>
             </a>
             <ul class="dropdown-menu dropdown-user">
                 <li><a href="<c:url value="/user/profile" />"><i class="fa fa-user fa-fw"></i> User Profile</a>
@@ -45,7 +45,7 @@
                 <li>
                     <a href="<c:url value="/" />"><i class="fa fa-dashboard fa-fw"></i> Dashboard</a>
                 </li>
-                <c:if test="${application.isAdmin}">
+                <c:if test="${application.user.isAdmin}">
 	                <li>
 	                    <a href="#"><i class="fa fa-key fa-fw"></i> Credentials Admin<span class="fa arrow"></span></a>
 	                    <ul class="nav nav-second-level collapse in">

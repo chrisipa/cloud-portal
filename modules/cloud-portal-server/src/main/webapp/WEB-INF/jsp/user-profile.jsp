@@ -15,7 +15,7 @@
 			<h4 class="page-header">User Profile</h4>
                 <h5 class="page-header">Groups</h5>
                 <ul>
-			    <c:forEach items="${application.groupList}" var="group">
+			    <c:forEach items="${application.user.groups}" var="group">
 			         <li><c:out value="${group}" /></li>
 			    </c:forEach>
 			    </ul>

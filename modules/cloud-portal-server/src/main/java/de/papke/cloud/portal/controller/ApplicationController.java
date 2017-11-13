@@ -6,13 +6,11 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 
 import de.papke.cloud.portal.model.ApplicationModel;
 import de.papke.cloud.portal.service.TerraformService;
+import de.papke.cloud.portal.service.UserService;
 import de.papke.cloud.portal.terraform.Variable;
 
 @Controller
@@ -23,9 +21,9 @@ public class ApplicationController {
 	@Value("${application.title}")
 	private String applicationTitle;
 	
-	@Value("${application.admin.group}")
-	private String adminGroup;	
-	
+	@Autowired
+	private UserService userService;
+
 	@Autowired
 	private TerraformService terraformService;
 	
@@ -42,26 +40,8 @@ public class ApplicationController {
 		applicationModel.setApplicationTitle(applicationTitle);
 		
 		// set username
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		applicationModel.setUsername((String) authentication.getPrincipal());
+		applicationModel.setUser(userService.getUser());
 
-		// set default for is admin flag
-		applicationModel.setIsAdmin(false);
-		
-		// set groups
-		List<String> groupList = new ArrayList<>();
-		for (GrantedAuthority grantedAuthority : authentication.getAuthorities()) {
-			
-			String groupName = grantedAuthority.toString();
-			groupList.add(groupName);
-			
-			// set is admin flag
-			if (groupName.equals(adminGroup)) {
-				applicationModel.setIsAdmin(true);
-			}
-		}
-		applicationModel.setGroupList(groupList);
-		
 		// get cloud provider defaults map
 		Map<String, Map<String, List<Variable>>> cloudProviderDefaultsMap = terraformService.getProviderDefaultsMap();
 

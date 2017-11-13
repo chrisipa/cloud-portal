@@ -15,7 +15,6 @@ import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -128,11 +127,8 @@ public class VirtualMachineController extends ApplicationController {
 				// get response output stream
 				OutputStream outputStream = response.getOutputStream();
 
-				// get email from current user
-				String email = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
-				
 				// provision VM
-				terraformService.provisionVM(email, action, cloudProvider, variableMap, outputStream);
+				terraformService.provisionVM(action, cloudProvider, variableMap, outputStream);
 			}
 			else {
 				response.getWriter().println(String.format("No credentials found for cloud provider '%s'. Please contact your administrator.", cloudProvider));

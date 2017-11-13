@@ -2,12 +2,12 @@ package de.papke.cloud.portal.model;
 
 import java.util.List;
 
+import de.papke.cloud.portal.pojo.User;
+
 public class ApplicationModel {
 	
     private String applicationTitle;
-    private String username;
-    private Boolean isAdmin;
-	private List<String> groupList;
+    private User user;
 	private List<String> cloudProviderList;
 
 	public String getApplicationTitle() {
@@ -18,29 +18,13 @@ public class ApplicationModel {
 		this.applicationTitle = applicationTitle;
 	}
 	
-	public String getUsername() {
-		return username;
+	public User getUser() {
+		return user;
 	}
 	
-	public void setUsername(String username) {
-		this.username = username;
+	public void setUser(User user) {
+		this.user = user;
 	}
-	
-	public Boolean getIsAdmin() {
-		return isAdmin;
-	}
-	
-	public void setIsAdmin(Boolean isAdmin) {
-		this.isAdmin = isAdmin;
-	}
-	
-	public List<String> getGroupList() {
-		return groupList;
-	}
-
-	public void setGroupList(List<String> groupList) {
-		this.groupList = groupList;
-	}	
 	
 	public List<String> getCloudProviderList() {
 		return cloudProviderList;

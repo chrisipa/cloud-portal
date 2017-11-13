@@ -5,18 +5,20 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import de.papke.cloud.portal.dao.CredentialsDao;
 import de.papke.cloud.portal.pojo.Credentials;
+import de.papke.cloud.portal.pojo.User;
 
 @Service
 public class CredentialsService {
 	
 	@Autowired
 	private EncryptionService encryptionService;
+	
+	@Autowired
+	private UserService userService;
 	
 	@Autowired
 	private CredentialsDao credentialsDao;
@@ -36,18 +38,22 @@ public class CredentialsService {
 	
 	public Credentials getCredentials(String provider) {
 		
-		for (GrantedAuthority grantedAuthority : SecurityContextHolder.getContext().getAuthentication().getAuthorities()) {
+		User user = userService.getUser();
+		
+		if (user != null) {
 			
-			String groupName = grantedAuthority.toString();
-			Credentials credentials = credentialsDao.findByGroupAndProvider(groupName, provider);
-			
-			if (credentials != null) {
+			for (String group : user.getGroups()) {
 				
-				Map<String, String> secretMap = credentials.getSecretMap();
-				Map<String, String> decryptedSecretMap = decryptSecretMap(secretMap);
-				credentials.setSecretMap(decryptedSecretMap);
+				Credentials credentials = credentialsDao.findByGroupAndProvider(group, provider);
 				
-				return credentials;
+				if (credentials != null) {
+					
+					Map<String, String> secretMap = credentials.getSecretMap();
+					Map<String, String> decryptedSecretMap = decryptSecretMap(secretMap);
+					credentials.setSecretMap(decryptedSecretMap);
+					
+					return credentials;
+				}
 			}
 		}
 		
