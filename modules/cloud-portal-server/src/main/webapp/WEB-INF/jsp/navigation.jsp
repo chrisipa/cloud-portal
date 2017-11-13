@@ -74,7 +74,10 @@
                             </li>
                             <ul class="nav nav-third-level collapse in">
 		                        <li>
-		                            <a href="<c:url value="/vm/create/${cloudProvider}" />"><i class="fa fa-plus fa-fw"></i> Create</a>
+		                            <a href="<c:url value="/vm/list/form/${cloudProvider}" />"><i class="fa fa-list fa-fw"></i> List</a>
+		                        </li>
+		                        <li>
+		                            <a href="<c:url value="/vm/create/form/${cloudProvider}" />"><i class="fa fa-plus fa-fw"></i> Create</a>
 		                        </li>
                             </ul>
                         </c:forEach>

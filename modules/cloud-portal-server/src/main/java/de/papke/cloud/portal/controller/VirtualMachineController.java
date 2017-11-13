@@ -30,6 +30,7 @@ import de.papke.cloud.portal.constants.VSphereConstants;
 import de.papke.cloud.portal.model.VirtualMachineModel;
 import de.papke.cloud.portal.pojo.Credentials;
 import de.papke.cloud.portal.service.CredentialsService;
+import de.papke.cloud.portal.service.ProvisionLogService;
 import de.papke.cloud.portal.service.TerraformService;
 import de.papke.cloud.portal.terraform.Variable;
 
@@ -49,6 +50,9 @@ public class VirtualMachineController extends ApplicationController {
 	
 	@Autowired
 	private CredentialsService credentialsService;
+	
+	@Autowired
+	private ProvisionLogService provisionLogService;
 
 	/**
 	 * Method for returning the model and view for the create vm page.
@@ -56,14 +60,30 @@ public class VirtualMachineController extends ApplicationController {
 	 * @param model
 	 * @return
 	 */
-	@GetMapping(path = PREFIX + "/create/{cloudProvider}")
+	@GetMapping(path = PREFIX + "/list/form/{cloudProvider}")
+	public String vmList(Map<String, Object> model, @PathVariable String cloudProvider) throws IOException {
+		
+		// fill model
+		fillModel(model, cloudProvider);
+		
+		// return view name
+		return "vm-list-form";
+	}
+	
+	/**
+	 * Method for returning the model and view for the create vm page.
+	 *
+	 * @param model
+	 * @return
+	 */
+	@GetMapping(path = PREFIX + "/create/form/{cloudProvider}")
 	public String vmCreate(Map<String, Object> model, @PathVariable String cloudProvider) throws IOException {
 
 		// fill model
 		fillModel(model, cloudProvider);
 
 		// return view name
-		return "vm-create";
+		return "vm-create-form";
 	}
 
 	/**
@@ -72,7 +92,7 @@ public class VirtualMachineController extends ApplicationController {
 	 * @param model
 	 * @return
 	 */
-	@PostMapping(path = PREFIX + "/provision/{action}", produces="text/plain")
+	@PostMapping(path = PREFIX + "/create/action/{action}", produces="text/plain")
 	@ResponseBody
 	public void vmProvision(
 			@PathVariable String action,
@@ -185,6 +205,9 @@ public class VirtualMachineController extends ApplicationController {
 		
 		// set cloud provider defaults
 		virtualMachineModel.setCloudProviderDefaultsMap(cloudProviderDefaultsMap.get(cloudProvider));
+		
+		// set provision log list
+		virtualMachineModel.setProvisionLogList(provisionLogService.getList(cloudProvider));
 		
 		model.put(MODEL_VAR_NAME, virtualMachineModel);
 	}

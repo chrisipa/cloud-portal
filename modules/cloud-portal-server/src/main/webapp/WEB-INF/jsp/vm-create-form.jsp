@@ -12,7 +12,7 @@
 
 	<div id="page-wrapper">
 		<form method="post"
-	                action="<c:url value="/vm/provision" />"
+	                action="<c:url value="/vm/create/action" />"
 	                target="output" role="form" enctype="multipart/form-data">
 			<div class="row">
 			    <div class="col-lg-12">

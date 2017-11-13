@@ -16,43 +16,21 @@
 			    <h4 class="page-header">Credentials Admin > Vsphere > List</h4>
 				<form id="main-form" method="get" action="<c:url value="/credentials" />"
 					role="form">
-					<table
-						class="table table-striped table-bordered table-hover dataTable no-footer dtr-inline"
-						id="datatable" role="grid"
-						aria-describedby="dataTables-example_info" style="width: 100%;"
-						width="100%">
+					<table id="datatable" class="table table-striped table-bordered" cellspacing="0" width="100%">
 						<thead>
-							<tr role="row">
-								<th class="sorting_asc" tabindex="0"
-									aria-controls="dataTables-example" rowspan="1" colspan="1"
-									style="width: 280px;" aria-sort="ascending"
-									aria-label="Rendering engine: activate to sort column descending">ID</th>
-								<th class="sorting" tabindex="0"
-									aria-controls="dataTables-example" rowspan="1" colspan="1"
-									style="width: 333px;"
-									aria-label="Browser: activate to sort column ascending">Group</th>
-								<th class="sorting" tabindex="0"
-									aria-controls="dataTables-example" rowspan="1" colspan="1"
-									style="width: 244px;"
-									aria-label="Engine version: activate to sort column ascending">vCenter Hostname</th>
-								<th class="sorting" tabindex="0"
-									aria-controls="dataTables-example" rowspan="1" colspan="1"
-									style="width: 183px;"
-									aria-label="CSS grade: activate to sort column ascending">vCenter Username</th>
-								<th class="sorting" tabindex="0"
-									aria-controls="dataTables-example" rowspan="1" colspan="1"
-									style="width: 183px;"
-									aria-label="CSS grade: activate to sort column ascending">vCenter Password</th>
-								<th class="sorting" tabindex="0"
-									aria-controls="dataTables-example" rowspan="1" colspan="1"
-									style="width: 183px;"
-									aria-label="CSS grade: activate to sort column ascending">Actions</th>
+							<tr>
+								<th>ID</th>
+								<th>Group</th>
+								<th>vCenter Hostname</th>
+								<th>vCenter Username</th>
+								<th>vCenter Password</th>
+								<th>Actions</th>
 							</tr>
 						</thead>
 						<tbody>
 							<c:forEach items="${credentials.credentialsList}" var="cred">
-								<tr class="gradeA odd" role="row">
-									<td class="sorting_1"><c:out value="${cred.id}" /></td>
+								<tr>
+									<td><c:out value="${cred.id}" /></td>
 									<td><c:out value="${cred.group}" /></td>
 									<td><c:out value="${cred.secretMap['vCenterHostname']}" /></td>
 									<td><c:out value="${cred.secretMap['vCenterUsername']}" /></td>

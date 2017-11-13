@@ -49,7 +49,7 @@ public class TerraformService {
 	
 	private static final String ATTACHMENT_SUFFIX = ".txt";
 	private static final String ATTACHMENT_PREFIX = "log";
-
+	
 	@Autowired
 	private CommandExecutorService commandExecutorService;
 
@@ -61,6 +61,9 @@ public class TerraformService {
 	
 	@Autowired
 	private UserService userService;
+	
+	@Autowired 
+	private ProvisionLogService provisionLogService;
 
 	@Value("${terraform.path}")
 	private String terraformPath;
@@ -130,6 +133,9 @@ public class TerraformService {
 					// if terraform action is apply
 					if (action.equals(ACTION_APPLY)) {
 
+						// create provision log
+						provisionLogService.create(action, provider, commandResult.isSuccess(), variableMap, tmpFolder);
+						
 						// send mail
 						File attachment = null;
 						
