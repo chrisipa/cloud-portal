@@ -1,4 +1,4 @@
-package de.papke.cloud.portal.service;
+package de.papke.cloud.portal.util;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -15,17 +15,12 @@ import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.IOUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
 
-@Service
-public class ZipService {
+public class ZipUtil {
 	
-	private static final Logger LOG = LoggerFactory.getLogger(ZipService.class);
+	private ZipUtil() {}
 	
 	public static void zip(File sourceDir, File outputFile) throws IOException, FileNotFoundException {
-		
 		ZipOutputStream zipFile = new ZipOutputStream(new FileOutputStream(outputFile));
 		Path srcPath = Paths.get(sourceDir.toURI());
 		zipFolder(srcPath.getParent().toString(), srcPath.getFileName().toString(), zipFile);
@@ -55,18 +50,13 @@ public class ZipService {
 		}
 	}
 	
-	public static void unzip(File archive, File outputDir) {
-        try {
-            ZipFile zipfile = new ZipFile(archive);
-            for (Enumeration<?> e = zipfile.entries(); e.hasMoreElements(); ) {
-                ZipEntry entry = (ZipEntry) e.nextElement();
-                unzipEntry(zipfile, entry, outputDir);
-            }
-        } 
-        catch (Exception e) {
-            LOG.error(e.getMessage(), e);
+	public static void unzip(File archive, File outputDir) throws IOException {
+        ZipFile zipfile = new ZipFile(archive);
+        for (Enumeration<?> e = zipfile.entries(); e.hasMoreElements();) {
+            ZipEntry entry = (ZipEntry) e.nextElement();
+            unzipEntry(zipfile, entry, outputDir);
         }
-    }
+	}
 
     private static void unzipEntry(ZipFile zipfile, ZipEntry entry, File outputDir) throws IOException {
 
@@ -93,6 +83,6 @@ public class ZipService {
     }
 
     private static void createDir(File dir) {
-        if(!dir.mkdirs()) throw new RuntimeException("Can not create dir "+dir);
+        if(!dir.mkdirs()) throw new RuntimeException("Can not create dir " + dir);
     }
 }

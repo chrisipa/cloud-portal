@@ -12,7 +12,6 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +32,9 @@ public class TerraformService {
 
 
 	private static final Logger LOG = LoggerFactory.getLogger(TerraformService.class);
-
+	
+	private static final String TEXT_INTRODUCTION = "TERRAFORM IS WORKING ON YOUR ACTION. YOU WILL GET AN EMAIL WITH THE RESULTS. PLEASE BE PATIENT!!!\n";
+	
 	private static final String CHAR_EQUAL = "=";
 	private static final String CHAR_WHITESPACE = " ";
 	private static final String CHAR_QUOTE = "\"";
@@ -103,14 +104,6 @@ public class TerraformService {
 		}
 	}
 
-	public CommandResult provisionVM(String action, String provider, Map<String, Object> variableMap, File resourceFolder) {
-		return provisionVM(action, provider, variableMap, new ByteArrayOutputStream(), resourceFolder);
-	}
-	
-	public CommandResult provisionVM(String action, String provider, Map<String, Object> variableMap, OutputStream outputStream) {
-		return provisionVM(action, provider, variableMap, outputStream, null);
-	}
-	
 	public CommandResult provisionVM(String action, String provider, Map<String, Object> variableMap, OutputStream outputStream, File resourceFolder) {
 
 		CommandResult commandResult = null;
@@ -121,7 +114,7 @@ public class TerraformService {
 			if (StringUtils.isNotEmpty(provider)) {
 
 				// print waiting message
-				outputStream.write("TERRAFORM IS WORKING ON YOUR ACTION. YOU WILL GET AN EMAIL WITH THE RESULTS. PLEASE BE PATIENT!!!\n".getBytes());
+				outputStream.write(TEXT_INTRODUCTION.getBytes());
 				outputStream.flush();				
 				
 				// copy terraform resources to filesystem
@@ -147,7 +140,7 @@ public class TerraformService {
 
 					// if terraform action is apply
 					if (action.equals(ACTION_APPLY)) {
-
+						
 						// create provision log
 						provisionLogService.create(action, provider, commandResult.isSuccess(), variableMap, tmpFolder);
 						

@@ -61,7 +61,8 @@ resource "aws_instance" "vm" {
 
   provisioner "file" {
     source      = "${var.bootstrap-script-file}"
-    destination = "/tmp/bootstrap.sh"                
+    destination = "/tmp/bootstrap.sh"     
+    on_failure = "continue"           
   }
 
   provisioner "remote-exec" {
@@ -69,6 +70,7 @@ resource "aws_instance" "vm" {
       "bash /tmp/bootstrap.sh",
       "rm /tmp/bootstrap.sh"
     ]
+    on_failure = "continue"
   }
 }
 

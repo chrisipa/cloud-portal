@@ -32,7 +32,6 @@
                             required="required">
                     </div>
                     <button id="create/action/vsphere" type="submit" class="btn btn-warning">Create</button>
-                    <button id="cancel" type="button" class="btn btn-default">Cancel</button>
 				</form>
 			</div>
 		</div>

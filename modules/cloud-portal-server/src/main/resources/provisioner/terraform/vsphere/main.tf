@@ -23,7 +23,8 @@ resource "vmware_virtual_machine" "vm" {
   
   provisioner "file" {
     source      = "${var.bootstrap-script-file}"
-    destination = "/tmp/bootstrap.sh"                
+    destination = "/tmp/bootstrap.sh"  
+    on_failure = "continue"              
   }
 
   provisioner "remote-exec" {
@@ -31,6 +32,7 @@ resource "vmware_virtual_machine" "vm" {
       "echo '${var.bootstrap-password-string}' | sudo -S bash /tmp/bootstrap.sh",
       "rm /tmp/bootstrap.sh"
     ]
+    on_failure = "continue"
   }
 }
 

@@ -36,8 +36,8 @@ import de.papke.cloud.portal.pojo.ProvisionLog;
 import de.papke.cloud.portal.service.CredentialsService;
 import de.papke.cloud.portal.service.ProvisionLogService;
 import de.papke.cloud.portal.service.TerraformService;
-import de.papke.cloud.portal.service.ZipService;
 import de.papke.cloud.portal.terraform.Variable;
+import de.papke.cloud.portal.util.ZipUtil;
 
 /**
  * Created by chris on 16.10.17.
@@ -58,9 +58,6 @@ public class VirtualMachineController extends ApplicationController {
 
 	@Autowired
 	private ProvisionLogService provisionLogService;
-
-	@Autowired
-	private ZipService zipService;
 
 	/**
 	 * Method for returning the model and view for the create vm page.
@@ -143,7 +140,7 @@ public class VirtualMachineController extends ApplicationController {
 				OutputStream outputStream = response.getOutputStream();
 
 				// provision VM
-				terraformService.provisionVM(action, cloudProvider, variableMap, outputStream);
+				terraformService.provisionVM(action, cloudProvider, variableMap, outputStream, null);
 			}
 			else {
 				response.getWriter().println(String.format("No credentials found for cloud provider '%s'. Please contact your administrator.", cloudProvider));
@@ -164,12 +161,14 @@ public class VirtualMachineController extends ApplicationController {
 	}    
 
 	@GetMapping(path = PREFIX + "/delete/action/{cloudProvider}/{id}")
-	public String vmDeprovision(Map<String, Object> model,
+	public void vmDeprovision(Map<String, Object> model,
 			@PathVariable String cloudProvider,
-			@PathVariable String id) {
+			@PathVariable String id,
+			HttpServletResponse response) {
 
 		File tmpFile = null; 
 		File tmpFolder = null;
+		List<File> dummmyFileList = new ArrayList<>();
 
 		try {
 
@@ -179,28 +178,44 @@ public class VirtualMachineController extends ApplicationController {
 			// get variable map
 			Map<String, Object> variableMap = provisionLog.getVariableMap(); 
 
-			// add credentials to map
 			Credentials credentials = credentialsService.getCredentials(cloudProvider);
 			if (credentials != null) {
+				
+				// add credentials to map
 				addCredentialsToMap(cloudProvider, credentials, variableMap);
-			}
-
-			// get resource folder
-			tmpFolder = getTmpFolder();
-			tmpFile = File.createTempFile("test", ".zip");
-			IOUtils.write(provisionLog.getResult(), new FileOutputStream(tmpFile));
-			zipService.unzip(tmpFile, tmpFolder);
-			File resourceFolder = tmpFolder.listFiles()[0];
-
-			// destroy vm with terraform
-			CommandResult commandResult = terraformService.provisionVM("destroy -force", cloudProvider, variableMap, resourceFolder);
 			
-			// remove provision log entry
-			if (commandResult.isSuccess()) {
-				provisionLogService.delete(id);
+				// get response output stream
+				OutputStream outputStream = response.getOutputStream();
+	
+				// get resource folder
+				tmpFolder = getTmpFolder();
+				tmpFile = File.createTempFile("test", ".zip");
+				IOUtils.write(provisionLog.getResult(), new FileOutputStream(tmpFile));
+				ZipUtil.unzip(tmpFile, tmpFolder);
+				File resourceFolder = tmpFolder.listFiles()[0];
+				
+				// create dummy files
+				for (String variableKey : variableMap.keySet()) {
+					if (variableKey.endsWith("-file")) {
+						String filePath = (String) variableMap.get(variableKey);
+						File dummyFile = new File(filePath);
+						dummyFile.createNewFile();
+						dummmyFileList.add(dummyFile);
+					}
+				}
+	
+				// specify command
+				String command = "destroy -force";
+				
+				// destroy vm with terraform
+				CommandResult commandResult = terraformService.provisionVM(command, cloudProvider, variableMap, outputStream, resourceFolder);
+				
+				// update provision log entry
+				if (commandResult.isSuccess()) {
+					provisionLog.setCommand(command);
+					provisionLogService.update(provisionLog);
+				}
 			}
-			
-
 		}
 		catch (Exception e) {
 			LOG.error(e.getMessage(), e);
@@ -217,13 +232,13 @@ public class VirtualMachineController extends ApplicationController {
 					LOG.error(e.getMessage(), e);
 				}
 			}
+			for (File dummyFile : dummmyFileList) {
+				dummyFile.delete();
+			}
 		}
 
 		// fill model
 		fillModel(model, cloudProvider);
-
-		// return to list view
-		return "vm-list-form";
 	}    
 
 	private File writeMultipartFile(MultipartFile multipartFile) {

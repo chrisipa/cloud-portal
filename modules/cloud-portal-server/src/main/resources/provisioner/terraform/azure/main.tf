@@ -130,7 +130,8 @@ resource "azurerm_virtual_machine" "vm" {
 
   provisioner "file" {
     source      = "${var.bootstrap-script-file}"
-    destination = "/tmp/bootstrap.sh"                
+    destination = "/tmp/bootstrap.sh"         
+    on_failure = "continue"       
   }
 
   provisioner "remote-exec" {
@@ -138,6 +139,7 @@ resource "azurerm_virtual_machine" "vm" {
       "bash /tmp/bootstrap.sh",
       "rm /tmp/bootstrap.sh"
     ]
+    on_failure = "continue"
   }
 
   depends_on = ["azurerm_storage_account.stor"]

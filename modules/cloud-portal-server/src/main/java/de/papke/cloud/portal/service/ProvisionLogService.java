@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import de.papke.cloud.portal.dao.ProvisionLogDao;
 import de.papke.cloud.portal.pojo.ProvisionLog;
 import de.papke.cloud.portal.pojo.User;
+import de.papke.cloud.portal.util.ZipUtil;
 
 @Service
 public class ProvisionLogService {
@@ -35,7 +36,7 @@ public class ProvisionLogService {
 	public List<ProvisionLog> getList(String provider) {
 
 		List<ProvisionLog> provisionLogList = new ArrayList<>();
-		
+
 		User user = userService.getUser();
 		if (user != null) {
 			String username = user.getUsername();
@@ -44,12 +45,12 @@ public class ProvisionLogService {
 
 		return provisionLogList;
 	}
-	
+
 	public ProvisionLog get(String id) {
 		return provisionLogDao.findById(id);
 	}
 
-	public ProvisionLog create(String command, String provider, Boolean success, Map<String, Object> variableMapWithCredentials, File tmpFolder) {
+	public ProvisionLog create(String state, String provider, Boolean success, Map<String, Object> variableMap, File tmpFolder) {
 
 		ProvisionLog provisionLog = null;
 		File zipFile = null;
@@ -62,20 +63,14 @@ public class ProvisionLogService {
 
 			// zip temp folder
 			zipFile = File.createTempFile(TMP_FILE_PREFIX, TMP_FILE_SUFFIX);
-			ZipService.zip(tmpFolder, zipFile);
+			ZipUtil.zip(tmpFolder, zipFile);
 			byte[] data = IOUtils.toByteArray(new FileInputStream(zipFile));
 
 			// remove credentials from variable map
-			Map<String, Object> variableMap = new HashMap<>();
-			for (String key : variableMapWithCredentials.keySet()) {
-				if (!key.startsWith("credentials-")) {
-					Object value = variableMapWithCredentials.get(key);
-					variableMap.put(key, value);
-				}
-			}
-			
+			Map<String, Object> variableMapWithoutCredentials = removeCredentialsFromMap(variableMap);
+
 			// create provision log
-			provisionLog = provisionLogDao.save(new ProvisionLog(new Date(), username, command, provider, success, variableMap, data));
+			provisionLog = provisionLogDao.save(new ProvisionLog(new Date(), username, state, provider, success, variableMapWithoutCredentials, data));
 		}
 		catch (Exception e) {
 			LOG.error(e.getMessage(), e);
@@ -88,8 +83,33 @@ public class ProvisionLogService {
 
 		return provisionLog;
 	}
-	
+
+	public ProvisionLog update(ProvisionLog provisionLog) {
+		
+		// set date
+		provisionLog.setDate(new Date());
+		
+		// remove credentials from variable map
+		Map<String, Object> variableMapWithoutCredentials = removeCredentialsFromMap(provisionLog.getVariableMap());
+		provisionLog.setVariableMap(variableMapWithoutCredentials);
+		
+		return provisionLogDao.save(provisionLog);
+	}
+
 	public void delete(String id) {
 		provisionLogDao.delete(id);
+	}
+
+	private Map<String, Object> removeCredentialsFromMap(Map<String, Object> variableMap) {
+
+		Map<String, Object> variableMapWithoutCredentials = new HashMap<>();
+		for (String key : variableMap.keySet()) {
+			if (!key.startsWith("credentials-")) {
+				Object value = variableMap.get(key);
+				variableMapWithoutCredentials.put(key, value);
+			}
+		}
+
+		return variableMapWithoutCredentials;
 	}
 }
