@@ -31,7 +31,9 @@ $(function() {
 						
 						if (buttonId.startsWith('delete')) {
 							submit = confirm('Do you really want to delete this item?');
-							$('#myModal').modal('toggle');
+							if (submit) {
+								$('#myModal').modal('toggle');
+							}
 						}
 							
 						if (submit) {
