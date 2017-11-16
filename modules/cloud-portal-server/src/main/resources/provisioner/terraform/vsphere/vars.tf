@@ -15,9 +15,14 @@ variable "vm-name-string" {
   description = "Name of the virtual machine."  
 }
 
+variable "vm-resource-pool-string" {
+  description = "Virtual machine resource pool to use."
+  default     = "DevOps EMEA POC"
+}
+
 variable "vm-image-string" {
   description = "Virtual machine image to use."
-  default     = "DevOps EMEA POC/templates/TPL_UBUNTU_SERVER_16.04.3_LTS"
+  default     = "TPL_UBUNTU_SERVER_16.04.3_LTS"
 }
 
 variable "vm-vcores-string" {
