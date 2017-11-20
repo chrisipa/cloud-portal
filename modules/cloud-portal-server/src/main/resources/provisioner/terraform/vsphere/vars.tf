@@ -17,32 +17,32 @@ variable "vm-name-string" {
 
 variable "vm-resource-pool-string" {
   description = "Virtual machine resource pool to use."
-  default     = "DevOps EMEA POC"
+  default = "DevOps EMEA POC"
 }
 
 variable "vm-image-string" {
   description = "Virtual machine image to use."
-  default     = "TPL_UBUNTU_SERVER_16.04.3_LTS"
+  default = "TPL_UBUNTU_SERVER_16.04.3_LTS"
 }
 
 variable "vm-vcores-string" {
   description = "Number of virtual cores of the virtual machine."  
-  default     = "1"
+  default = "1"
 }
 
 variable "vm-ram-string" {
   description = "RAM (in MB) of the virtual machine."
-  default     = "1024"  
+  default = "1024"  
 }
 
 variable "bootstrap-username-string" {
   description = "Username for SSH access."
-  default     = "devops"
+  default = "devops"
 }
 
 variable "bootstrap-password-string" {
   description = "Password for SSH access."
-  default     = "devops"
+  default = "devops"
 }
 
 variable "bootstrap-script-file" {

@@ -1,8 +1,9 @@
 provider "aws" {
-  profile = "default"
+  profile    = "default"
   access_key = "${var.credentials-access-key-string}"
   secret_key = "${var.credentials-secret-key-string}"
-  region  = "${var.general-region-string}"
+  region     = "${var.general-region-string}"
+  version    = "1.3"
 }
 
 resource "aws_security_group" "nsg" {

@@ -3,6 +3,7 @@ provider "vmware" {
   user = "${var.credentials-vcenter-username-string}"
   password = "${var.credentials-vcenter-password-string}"
   insecure_connection = "true"
+  version = "1.2"
 }
 
 resource "vmware_virtual_machine" "vm" {

@@ -12,42 +12,42 @@ variable "general-name-string" {
 
 variable "general-region-string" {
   description = "Region where the resources should exist."
-  default     = "eu-central-1"
+  default = "eu-central-1"
 }
 
 variable "general-availability-zone-string" {
   description = "Availability zone where the resources should exist."
-  default     = "eu-central-1a"
+  default = "eu-central-1a"
 }
 
 variable "vm-size-string" {
   description = "Size of the virtual machine to create."
-  default     = "t2.micro"
+  default = "t2.micro"
 }
 
 variable "image-ami-string" {
   description = "Amazon machine image to use."
-  default     = "ami-1e339e71"
+  default = "ami-1e339e71"
 }
 
 variable "storage-size-string" {
   description = "Size of the virtual machine storage in GB."
-  default     = "8"
+  default = "8"
 }
 
 variable "storage-type-string" {
   description = "Type of the virtual machine storage."
-  default     = "standard"
+  default = "standard"
 }
 
 variable "network-incoming-port-start-string" {
   description = "Start port for incoming connections."
-  default     = "1"
+  default = "1"
 }
 
 variable "network-incoming-port-end-string" {
   description = "End port for incoming connections."
-  default     = "1024"
+  default = "1024"
 }
 
 variable "bootstrap-public-key-file" {
