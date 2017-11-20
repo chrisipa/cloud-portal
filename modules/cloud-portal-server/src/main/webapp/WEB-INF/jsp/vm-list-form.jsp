@@ -1,7 +1,8 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%--@elvariable id="virtualMachine" type="de.papke.cloud.portal.model.VirtualMachineModel"--%>
 
 <jsp:include page="header.jsp" />
@@ -29,7 +30,7 @@
                         <tbody>
                             <c:forEach items="${virtualMachine.provisionLogList}" var="provisionLog">
                                 <tr>
-                                    <td><c:out value="${provisionLog.date}" /></td>
+                                    <td data-order="<fmt:formatDate pattern="yyyy-MM-dd HH:mm" value="${provisionLog.date}"/>"><fmt:formatDate pattern="dd.MM.yyyy HH:mm:ss" value="${provisionLog.date}"/></td>
                                     <td><c:out value="${provisionLog.command}" /></td>
                                     <td><c:out value="${provisionLog.success}" /></td>
                                     <td>
