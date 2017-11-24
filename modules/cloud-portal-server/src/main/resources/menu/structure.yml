@@ -1,0 +1,86 @@
+menus:
+
+ - title: Dashboard
+   path: /
+   icon: fa-dashboard
+   
+ - title: Credentials Admin
+   icon: fa-key
+   secure: true
+   menus:
+    
+    - title: Amazon Web Services
+      icon: fa-cloud
+      menus:
+      
+      - title: List
+        path: /credentials/list/form/aws
+        icon: fa-list
+        
+      - title: Create
+        path: /credentials/create/form/aws
+        icon: fa-plus
+        
+    - title: Microsoft Azure
+      icon: fa-cloud
+      menus:
+      
+       - title: List
+         path: /credentials/list/form/azure
+         icon: fa-list
+         
+       - title: Create
+         path: /credentials/create/form/azure
+         icon: fa-plus
+         
+    - title: VMWare vSphere
+      icon: fa-cloud
+      menus:
+      
+       - title: List
+         path: /credentials/list/form/vsphere
+         icon: fa-list
+         
+       - title: Create
+         path: /credentials/create/form/vsphere
+         icon: fa-plus
+         
+ - title: Virtual Machines
+   icon: fa-television 
+   menus:
+    
+    - title: Amazon Web Services
+      icon: fa-cloud
+      menus:
+      
+      - title: List
+        path: /vm/list/form/aws
+        icon: fa-list
+        
+      - title: Create
+        path: /vm/create/form/aws
+        icon: fa-plus
+        
+    - title: Microsoft Azure
+      icon: fa-cloud
+      menus:
+      
+       - title: List
+         path: /vm/list/form/azure
+         icon: fa-list
+         
+       - title: Create
+         path: /vm/create/form/azure
+         icon: fa-plus
+         
+    - title: VMWare vSphere
+      icon: fa-cloud
+      menus:
+      
+       - title: List
+         path: /vm/list/form/vsphere
+         icon: fa-list
+         
+       - title: Create
+         path: /vm/create/form/vsphere
+         icon: fa-plus

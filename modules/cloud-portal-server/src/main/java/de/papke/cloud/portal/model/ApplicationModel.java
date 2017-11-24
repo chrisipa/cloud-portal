@@ -2,6 +2,7 @@ package de.papke.cloud.portal.model;
 
 import java.util.List;
 
+import de.papke.cloud.portal.pojo.Menu;
 import de.papke.cloud.portal.pojo.User;
 
 public class ApplicationModel {
@@ -9,6 +10,7 @@ public class ApplicationModel {
     private String applicationTitle;
     private User user;
 	private List<String> cloudProviderList;
+	private Menu menu;
 
 	public String getApplicationTitle() {
 		return applicationTitle;
@@ -32,5 +34,13 @@ public class ApplicationModel {
 	
 	public void setCloudProviderList(List<String> cloudProviderList) {
 		this.cloudProviderList = cloudProviderList;
+	}
+
+	public Menu getMenu() {
+		return menu;
+	}
+
+	public void setMenu(Menu menu) {
+		this.menu = menu;
 	}	
 }

@@ -42,6 +42,13 @@
                     </span>
                     </div>
                 </li>
+                
+                <c:set var="menuEntry" value="${application.menu}" scope="request" />
+                <jsp:include page="menu-entry.jsp">
+                    <jsp:param name="level" value="1" />
+                </jsp:include>
+                
+                <!-- 
                 <li>
                     <a href="<c:url value="/" />"><i class="fa fa-dashboard fa-fw"></i> Dashboard</a>
                 </li>
@@ -83,6 +90,8 @@
                         </c:forEach>
                     </ul>
                 </li>
+                
+                -->
             </ul>
         </div>
     </div>

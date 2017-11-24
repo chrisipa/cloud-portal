@@ -22,7 +22,8 @@ public class CredentialsController extends ApplicationController {
 	
 	private static final String PREFIX = "/credentials";
 	private static final String MODEL_VAR_NAME = "credentials";
-	private static final String LIST_VIEW_PREFIX = "credentials-list-";
+	private static final String LIST_PATH_PREFIX = PREFIX + "/list/form";
+	private static final String LIST_VIEW_PREFIX = "credentials-list-form-";
 	
 	@Autowired
 	private CredentialsService credentialsService;
@@ -60,7 +61,7 @@ public class CredentialsController extends ApplicationController {
 		fillModel(model, provider);
 		
 		// return to list view
-		return LIST_VIEW_PREFIX + provider;
+		return REDIRECT_PREFIX + LIST_PATH_PREFIX + "/" + provider;
 	}
 	
 	/**
@@ -86,7 +87,7 @@ public class CredentialsController extends ApplicationController {
 	 * @param model
 	 * @return
 	 */
-	@GetMapping(value = PREFIX + "/list/{provider}")
+	@GetMapping(value = LIST_PATH_PREFIX + "/{provider}")
 	public String list(Map<String, Object> model,
 			@PathVariable String provider) throws IOException {
 
@@ -109,7 +110,7 @@ public class CredentialsController extends ApplicationController {
 		fillModel(model, provider);
 		
 		// return to list view
-		return LIST_VIEW_PREFIX + provider;
+		return REDIRECT_PREFIX + LIST_PATH_PREFIX + "/" + provider;
 	}	
 	
 	private CredentialsModel getCredentialsModel(String provider) {
