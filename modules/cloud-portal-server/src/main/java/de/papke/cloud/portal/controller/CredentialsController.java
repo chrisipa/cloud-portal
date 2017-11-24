@@ -16,54 +16,61 @@ import de.papke.cloud.portal.constants.AzureConstants;
 import de.papke.cloud.portal.constants.VSphereConstants;
 import de.papke.cloud.portal.model.CredentialsModel;
 import de.papke.cloud.portal.service.CredentialsService;
+import de.papke.cloud.portal.service.UserService;
 
 @Controller
 public class CredentialsController extends ApplicationController {
-	
+
 	private static final String PREFIX = "/credentials";
 	private static final String MODEL_VAR_NAME = "credentials";
 	private static final String LIST_PATH_PREFIX = PREFIX + "/list/form";
 	private static final String LIST_VIEW_PREFIX = "credentials-list-form-";
-	
+
 	@Autowired
 	private CredentialsService credentialsService;
+
+	@Autowired
+	private UserService userService;
 
 	@PostMapping(path = PREFIX + "/create/action/{provider}")
 	public String createAction(Map<String, Object> model,
 			@PathVariable String provider,
 			@RequestParam Map<String, String> variableMap) throws IOException {
 
-		// get group
-		String group = variableMap.get("group");
-		
-		// get secret map from variable map
-		Map<String, String> secretMap = new HashMap<>();
-		if (provider.equals(AzureConstants.PROVIDER)) {
-			secretMap.put(AzureConstants.SUBSCRIPTION_ID, variableMap.get(AzureConstants.SUBSCRIPTION_ID));
-			secretMap.put(AzureConstants.TENANT_ID, variableMap.get(AzureConstants.TENANT_ID));
-			secretMap.put(AzureConstants.CLIENT_ID, variableMap.get(AzureConstants.CLIENT_ID));
-			secretMap.put(AzureConstants.CLIENT_SECRET, variableMap.get(AzureConstants.CLIENT_SECRET));
+		if (userService.isAdmin()) {
+
+			// get group
+			String group = variableMap.get("group");
+
+			// get secret map from variable map
+			Map<String, String> secretMap = new HashMap<>();
+			if (provider.equals(AzureConstants.PROVIDER)) {
+				secretMap.put(AzureConstants.SUBSCRIPTION_ID, variableMap.get(AzureConstants.SUBSCRIPTION_ID));
+				secretMap.put(AzureConstants.TENANT_ID, variableMap.get(AzureConstants.TENANT_ID));
+				secretMap.put(AzureConstants.CLIENT_ID, variableMap.get(AzureConstants.CLIENT_ID));
+				secretMap.put(AzureConstants.CLIENT_SECRET, variableMap.get(AzureConstants.CLIENT_SECRET));
+			}
+			else if (provider.equals(AwsConstants.PROVIDER)) {
+				secretMap.put(AwsConstants.ACCESS_KEY, variableMap.get(AwsConstants.ACCESS_KEY));
+				secretMap.put(AwsConstants.SECRET_KEY, variableMap.get(AwsConstants.SECRET_KEY));
+			}
+			else if (provider.equals(VSphereConstants.PROVIDER)) {
+				secretMap.put(VSphereConstants.VCENTER_HOSTNAME, variableMap.get(VSphereConstants.VCENTER_HOSTNAME));
+				secretMap.put(VSphereConstants.VCENTER_USERNAME, variableMap.get(VSphereConstants.VCENTER_USERNAME));
+				secretMap.put(VSphereConstants.VCENTER_PASSWORD, variableMap.get(VSphereConstants.VCENTER_PASSWORD));
+			}
+
+			// create credentials
+			credentialsService.create(group, provider, secretMap);
+
+			// fill model
+			fillModel(model, provider);
 		}
-		else if (provider.equals(AwsConstants.PROVIDER)) {
-			secretMap.put(AwsConstants.ACCESS_KEY, variableMap.get(AwsConstants.ACCESS_KEY));
-			secretMap.put(AwsConstants.SECRET_KEY, variableMap.get(AwsConstants.SECRET_KEY));
-		}
-		else if (provider.equals(VSphereConstants.PROVIDER)) {
-			secretMap.put(VSphereConstants.VCENTER_HOSTNAME, variableMap.get(VSphereConstants.VCENTER_HOSTNAME));
-			secretMap.put(VSphereConstants.VCENTER_USERNAME, variableMap.get(VSphereConstants.VCENTER_USERNAME));
-			secretMap.put(VSphereConstants.VCENTER_PASSWORD, variableMap.get(VSphereConstants.VCENTER_PASSWORD));
-		}
-		
-		// create credentials
-		credentialsService.create(group, provider, secretMap);
-		
-		// fill model
-		fillModel(model, provider);
-		
+
 		// return to list view
 		return REDIRECT_PREFIX + LIST_PATH_PREFIX + "/" + provider;
 	}
-	
+
 	/**
 	 * Method for returning the model and view for the credentials create form page.
 	 *
@@ -73,14 +80,17 @@ public class CredentialsController extends ApplicationController {
 	@GetMapping(value = PREFIX + "/create/form/{provider}")
 	public String createForm(Map<String, Object> model,
 			@PathVariable String provider) throws IOException {
-		
-		// fill model
-		fillModel(model, provider);
-		
+
+		if (userService.isAdmin()) {
+			
+			// fill model
+			fillModel(model, provider);
+		}
+
 		// return view name
 		return "credentials-create-form-" + provider;
 	}
-	
+
 	/**
 	 * Method for returning the model and view for the credentials list page.
 	 *
@@ -91,36 +101,42 @@ public class CredentialsController extends ApplicationController {
 	public String list(Map<String, Object> model,
 			@PathVariable String provider) throws IOException {
 
-		// fill model
-		fillModel(model, provider);
+		if (userService.isAdmin()) {
 		
+			// fill model
+			fillModel(model, provider);
+		}
+
 		// return view name
 		return LIST_VIEW_PREFIX + provider;
 	}	
-	
+
 	@GetMapping(path = PREFIX + "/delete/action/{provider}/{id}")
 	public String deleteAction(Map<String, Object> model,
 			@PathVariable String provider,
 			@PathVariable String id) throws IOException {
 
-		// delete credentials
-		credentialsService.delete(id);
+		if (userService.isAdmin()) {
 		
-		// fill model
-		fillModel(model, provider);
-		
+			// delete credentials
+			credentialsService.delete(id);
+	
+			// fill model
+			fillModel(model, provider);
+		}
+
 		// return to list view
 		return REDIRECT_PREFIX + LIST_PATH_PREFIX + "/" + provider;
 	}	
-	
+
 	private CredentialsModel getCredentialsModel(String provider) {
-		
+
 		CredentialsModel credentialsModel = new CredentialsModel();
 		credentialsModel.setCredentialsList(credentialsService.getCredentialList(provider));
-		
+
 		return credentialsModel;
 	}
-	
+
 	protected void fillModel(Map<String, Object> model, String provider) {
 		super.fillModel(model);
 		model.put(MODEL_VAR_NAME, getCredentialsModel(provider));

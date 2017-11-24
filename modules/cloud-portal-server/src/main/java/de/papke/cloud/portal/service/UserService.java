@@ -28,6 +28,10 @@ public class UserService {
 		
 		return user;
 	}
+
+	public boolean isAdmin() {
+		return getUser().getIsAdmin();
+	}
 	
 	public void setUser(User user) {
 		session.setAttribute(SESSION_ATTRIBUTE_USER, user);

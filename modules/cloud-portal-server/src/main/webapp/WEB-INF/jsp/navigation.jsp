@@ -42,56 +42,11 @@
                     </span>
                     </div>
                 </li>
-                
                 <c:set var="menuEntry" value="${application.menu}" scope="request" />
                 <jsp:include page="menu-entry.jsp">
                     <jsp:param name="level" value="1" />
+                    <jsp:param name="isAdmin" value="${application.user.isAdmin}" />
                 </jsp:include>
-                
-                <!-- 
-                <li>
-                    <a href="<c:url value="/" />"><i class="fa fa-dashboard fa-fw"></i> Dashboard</a>
-                </li>
-                <c:if test="${application.user.isAdmin}">
-	                <li>
-	                    <a href="#"><i class="fa fa-key fa-fw"></i> Credentials Admin<span class="fa arrow"></span></a>
-	                    <ul class="nav nav-second-level collapse in">
-	                        <c:forEach items="${application.cloudProviderList}" var="cloudProvider">
-	                            <li>
-	                                <a href="#"><i class="fa fa-cloud fa-fw"></i> <c:out value="${fn:toUpperCase(fn:substring(cloudProvider, 0, 1))}${fn:toLowerCase(fn:substring(cloudProvider, 1,fn:length(cloudProvider)))}" /></a>
-	                            </li>
-	                            <ul class="nav nav-third-level collapse in">
-	                                <li>
-	                                    <a href="<c:url value="/credentials/list/${cloudProvider}" />"><i class="fa fa-list fa-fw"></i> List</a>
-	                                </li>
-	                                <li>
-	                                    <a href="<c:url value="/credentials/create/form/${cloudProvider}" />"><i class="fa fa-plus fa-fw"></i> Create</a>
-	                                </li>
-	                            </ul>
-	                        </c:forEach>
-	                    </ul>
-	                </li>
-                </c:if>
-                <li>
-                    <a href="#"><i class="fa fa-television fa-fw"></i> Virtual Machines<span class="fa arrow"></span></a>
-                    <ul class="nav nav-second-level collapse in">
-                        <c:forEach items="${application.cloudProviderList}" var="cloudProvider">
-                            <li>
-                                <a href="#"><i class="fa fa-cloud fa-fw"></i> <c:out value="${fn:toUpperCase(fn:substring(cloudProvider, 0, 1))}${fn:toLowerCase(fn:substring(cloudProvider, 1,fn:length(cloudProvider)))}" /></a>
-                            </li>
-                            <ul class="nav nav-third-level collapse in">
-		                        <li>
-		                            <a href="<c:url value="/vm/list/form/${cloudProvider}" />"><i class="fa fa-list fa-fw"></i> List</a>
-		                        </li>
-		                        <li>
-		                            <a href="<c:url value="/vm/create/form/${cloudProvider}" />"><i class="fa fa-plus fa-fw"></i> Create</a>
-		                        </li>
-                            </ul>
-                        </c:forEach>
-                    </ul>
-                </li>
-                
-                -->
             </ul>
         </div>
     </div>

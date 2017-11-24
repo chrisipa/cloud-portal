@@ -1,19 +1,19 @@
-<%@page import="de.papke.cloud.portal.pojo.Menu"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
-<jsp:useBean id="menuEntry" class="de.papke.cloud.portal.pojo.Menu" scope="request"/>
+<jsp:useBean id="menuEntry" class="de.papke.cloud.portal.pojo.Menu" scope="request" />
 
 <li>
-<c:if test="${menuEntry.title != null}">
-	   <c:choose>
-	       <c:when test="${menuEntry.path != null}">
-	           <a href="<c:url value="${menuEntry.path}" />"><i class="fa ${menuEntry.icon} fa-fw"></i> <c:out value="${menuEntry.title}" /></a>
-	       </c:when>
-           <c:otherwise>
-               <a href="#"><i class="fa ${menuEntry.icon} fa-fw"></i> <c:out value="${menuEntry.title}" /><span class="fa arrow"></span></a>
-           </c:otherwise>	           
-	   </c:choose>
+
+<c:if test="${!(menuEntry.title == null || (menuEntry.secure && !param.isAdmin))}">
+	<c:choose>
+	   <c:when test="${menuEntry.path != null}">
+	       <a href="<c:url value="${menuEntry.path}" />"><i class="fa ${menuEntry.icon} fa-fw"></i> <c:out value="${menuEntry.title}" /></a>
+	   </c:when>
+       <c:otherwise>
+           <a href="#"><i class="fa ${menuEntry.icon} fa-fw"></i> <c:out value="${menuEntry.title}" /><span class="fa arrow"></span></a>
+       </c:otherwise>               
+	</c:choose>
 </c:if>
 
 <c:if test="${param.level == 2}">
