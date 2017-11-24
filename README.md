@@ -15,13 +15,13 @@ Features (working)
 ------------------
 * LDAP authentication & authorization
 * VM provisioning to Azure, AWS and VMWare vSphere using Hashicorp's Terraform
+* VM provisioning history
 * Execute bootstrap scripts for automated server configuration
 * Send HTML emails with customizable velocity templates and Terraform log data as attachment
 * Responsive WebUI with generic Terraform variable rendering
 
 Features (planned)
 ------------------
-* VM provisioning history
 * Automated VM decommisioning with terraform destroy (VM expiration dates)
 * Optimized RESTful WebService for CD pipeline integrations
 * Additional workflow actions after VM provisioning
