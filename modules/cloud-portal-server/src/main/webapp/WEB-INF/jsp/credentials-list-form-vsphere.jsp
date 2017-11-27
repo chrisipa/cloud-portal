@@ -13,7 +13,7 @@
 	<div id="page-wrapper">
 		<div class="row">
 			<div class="col-lg-12">
-			    <h4 class="page-header">Credentials Admin > Vsphere > List</h4>
+			    <h4 class="page-header">Credentials List</h4>
 				<form id="main-form" method="get" action="<c:url value="/credentials" />"
 					role="form">
 					<table id="datatable" class="table table-striped table-bordered" cellspacing="0" width="100%">

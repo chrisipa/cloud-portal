@@ -16,7 +16,7 @@
 	                target="output" role="form" enctype="multipart/form-data">
 			<div class="row">
 			    <div class="col-lg-12">
-				    <h4 class="page-header">Virtual Machines > <c:out value="${fn:toUpperCase(fn:substring(cloudProvider, 0, 1))}${fn:toLowerCase(fn:substring(cloudProvider, 1,fn:length(cloudProvider)))}" /> > Create</h4>
+				    <h4 class="page-header">Create Virtual Machine</h4>
 				</div>    
 			</div>	
 			<div class="row">

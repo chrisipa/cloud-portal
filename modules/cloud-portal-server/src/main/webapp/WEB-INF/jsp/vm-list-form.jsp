@@ -14,7 +14,7 @@
 	<div id="page-wrapper">
 		<div class="row">
 			<div class="col-lg-12">
-			    <h4 class="page-header">Credentials Admin > <c:out value="${fn:toUpperCase(fn:substring(virtualMachine.cloudProvider, 0, 1))}${fn:toLowerCase(fn:substring(virtualMachine.cloudProvider, 1,fn:length(virtualMachine.cloudProvider)))}" /> > List</h4>
+			    <h4 class="page-header">Virtual Machines List</h4>
 				<form id="main-form" method="get" action="<c:url value="/vm" />" target="output"
 					role="form">
 					<table id="datatable" class="table table-striped table-bordered" cellspacing="0" width="100%">
