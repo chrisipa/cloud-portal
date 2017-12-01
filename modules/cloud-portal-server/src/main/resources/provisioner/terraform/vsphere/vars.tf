@@ -10,13 +10,13 @@ variable "credentials-vcenter-password-string" {
   description = "VMWare vCenter password."
 }
 
+variable "vm-name-string" {
+  description = "Name of the virtual machine."  
+}
+
 variable "vm-expiration-days-string" {
   description = "Days till virtual machine will be removed automatically."
   default = "-1"
-}
-
-variable "vm-name-string" {
-  description = "Name of the virtual machine."  
 }
 
 variable "vm-resource-pool-string" {
