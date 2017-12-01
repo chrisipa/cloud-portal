@@ -1,0 +1,10 @@
+<html>
+<body>
+<h2>VM destroyed successfully</h2>
+<p>Hello,<br /><br />your VM from <strong>${provider}</strong> was destroyed successfully.</p>
+<p>See log file for additional details:<p>
+<hr />
+<p>Best regards</p>
+<p>Your Self Service Cloud Portal</p>
+</body>
+</html>

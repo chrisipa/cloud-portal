@@ -7,6 +7,6 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import de.papke.cloud.portal.pojo.ProvisionLog;
 
 public interface ProvisionLogDao extends MongoRepository<ProvisionLog, String> {
-	public ProvisionLog findById(String id);
+	public ProvisionLog findByUsernameAndId(String username, String id);
 	public List<ProvisionLog> findByUsernameAndProvider(String username, String provider);
 }

@@ -1,19 +1,18 @@
 package de.papke.cloud.portal.controller;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,18 +25,16 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.support.StandardMultipartHttpServletRequest;
 
-import de.papke.cloud.portal.constants.AwsConstants;
-import de.papke.cloud.portal.constants.AzureConstants;
-import de.papke.cloud.portal.constants.VSphereConstants;
 import de.papke.cloud.portal.model.VirtualMachineModel;
-import de.papke.cloud.portal.pojo.CommandResult;
 import de.papke.cloud.portal.pojo.Credentials;
 import de.papke.cloud.portal.pojo.ProvisionLog;
+import de.papke.cloud.portal.pojo.User;
 import de.papke.cloud.portal.service.CredentialsService;
 import de.papke.cloud.portal.service.ProvisionLogService;
 import de.papke.cloud.portal.service.TerraformService;
+import de.papke.cloud.portal.service.UserService;
+import de.papke.cloud.portal.service.VirtualMachineService;
 import de.papke.cloud.portal.terraform.Variable;
-import de.papke.cloud.portal.util.ZipUtil;
 
 /**
  * Created by chris on 16.10.17.
@@ -51,13 +48,19 @@ public class VirtualMachineController extends ApplicationController {
 	private static final String MODEL_VAR_NAME = "virtualMachine";
 
 	@Autowired
-	private TerraformService terraformService;
-
-	@Autowired
 	private CredentialsService credentialsService;
 
 	@Autowired
+	private VirtualMachineService virtualMachineService;
+
+	@Autowired
+	private TerraformService terraformService;
+
+	@Autowired
 	private ProvisionLogService provisionLogService;
+	
+	@Autowired
+	private UserService userService;
 
 	/**
 	 * Method for returning the model and view for the create vm page.
@@ -99,7 +102,7 @@ public class VirtualMachineController extends ApplicationController {
 	 */
 	@PostMapping(path = PREFIX + "/create/action/{action}", produces="text/plain")
 	@ResponseBody
-	public void vmProvision(
+	public void provision(
 			@PathVariable String action,
 			@RequestParam String cloudProvider,
 			@RequestParam Map<String, Object> variableMap,
@@ -117,30 +120,29 @@ public class VirtualMachineController extends ApplicationController {
 			Map<String, MultipartFile> fileMap = multipartHttpServletRequest.getFileMap();
 
 			// iterate over file map
-			for (String fileName : fileMap.keySet()) {
+			for (Entry<String, MultipartFile> fileMapEntry : fileMap.entrySet()) {
 
 				// write file uploads to disk
-				File file = writeMultipartFile(fileMap.get(fileName));
-
-				// add to temp file list
-				tempFileList.add(file);
-
-				// add file paths to variable map
-				variableMap.put(fileName, file.getAbsolutePath());
+				File file = writeMultipartFile(fileMapEntry.getValue());
+				if (file != null) {
+					
+					// add to temp file list
+					tempFileList.add(file);
+	
+					// add file paths to variable map
+					variableMap.put(fileMapEntry.getKey(), file.getAbsolutePath());
+				}
 			}
 
 			// get credentials
 			Credentials credentials = credentialsService.getCredentials(cloudProvider);
 			if (credentials != null) {
 
-				// add credentials to map
-				addCredentialsToMap(cloudProvider, credentials, variableMap);
-
 				// get response output stream
 				OutputStream outputStream = response.getOutputStream();
 
 				// provision VM
-				terraformService.provisionVM(action, cloudProvider, variableMap, outputStream, null);
+				virtualMachineService.provision(action, credentials, variableMap, outputStream);
 			}
 			else {
 				response.getWriter().println(String.format("No credentials found for cloud provider '%s'. Please contact your administrator.", cloudProvider));
@@ -153,93 +155,53 @@ public class VirtualMachineController extends ApplicationController {
 
 			// remove temp files
 			for (File tempFile : tempFileList) {
-				if (tempFile != null) {
-					tempFile.delete();
-				}
+				FileUtils.deleteQuietly(tempFile);
 			}
 		}
 	}    
 
 	@GetMapping(path = PREFIX + "/delete/action/{cloudProvider}/{id}")
-	public void vmDeprovision(Map<String, Object> model,
+	public void deprovision(Map<String, Object> model,
 			@PathVariable String cloudProvider,
 			@PathVariable String id,
 			HttpServletResponse response) {
 
-		File tmpFile = null; 
-		File tmpFolder = null;
-		List<File> dummmyFileList = new ArrayList<>();
-
 		try {
 
-			// get provision log
-			ProvisionLog provisionLog = provisionLogService.get(id);
-
-			// get variable map
-			Map<String, Object> variableMap = provisionLog.getVariableMap(); 
-
+			// get credentials
 			Credentials credentials = credentialsService.getCredentials(cloudProvider);
 			if (credentials != null) {
+
+				// get username
+				User user = userService.getUser();
+				String username = user.getUsername();
 				
-				// add credentials to map
-				addCredentialsToMap(cloudProvider, credentials, variableMap);
-			
-				// get response output stream
-				OutputStream outputStream = response.getOutputStream();
-	
-				// get resource folder
-				tmpFolder = getTmpFolder();
-				tmpFile = File.createTempFile("test", ".zip");
-				IOUtils.write(provisionLog.getResult(), new FileOutputStream(tmpFile));
-				ZipUtil.unzip(tmpFile, tmpFolder);
-				File resourceFolder = tmpFolder.listFiles()[0];
-				
-				// create dummy files
-				for (String variableKey : variableMap.keySet()) {
-					if (variableKey.endsWith("-file")) {
-						String filePath = (String) variableMap.get(variableKey);
-						File dummyFile = new File(filePath);
-						dummyFile.createNewFile();
-						dummmyFileList.add(dummyFile);
-					}
+				// get provision log entry
+				ProvisionLog provisionLog = provisionLogService.get(username, id);
+				if (provisionLog != null) {
+					
+					// get response output stream
+					OutputStream outputStream = response.getOutputStream();
+					
+					// provision VM
+					virtualMachineService.deprovision(provisionLog, credentials, outputStream);
 				}
-	
-				// specify command
-				String command = "destroy -force";
-				
-				// destroy vm with terraform
-				CommandResult commandResult = terraformService.provisionVM(command, cloudProvider, variableMap, outputStream, resourceFolder);
-				
-				// update provision log entry
-				if (commandResult.isSuccess()) {
-					provisionLog.setCommand(command);
-					provisionLogService.update(provisionLog);
+				else {
+					response.getWriter().println(String.format("No provision log entry found for username '%s' and id '%s'.", username, id));
 				}
 			}
+			else {
+				response.getWriter().println(String.format("No credentials found for cloud provider '%s'. Please contact your administrator.", cloudProvider));
+			}
+
 		}
-		catch (Exception e) {
+		catch(Exception e) {
 			LOG.error(e.getMessage(), e);
-		}
-		finally {
-			if (tmpFile != null) {
-				tmpFile.delete();
-			}
-			if (tmpFolder != null) {
-				try {
-					FileUtils.deleteDirectory(tmpFolder);
-				}
-				catch (Exception e) {
-					LOG.error(e.getMessage(), e);
-				}
-			}
-			for (File dummyFile : dummmyFileList) {
-				dummyFile.delete();
-			}
 		}
 
 		// fill model
 		fillModel(model, cloudProvider);
-	}    
+	} 
 
 	private File writeMultipartFile(MultipartFile multipartFile) {
 
@@ -284,31 +246,4 @@ public class VirtualMachineController extends ApplicationController {
 
 		model.put(MODEL_VAR_NAME, virtualMachineModel);
 	}	
-
-	private void addCredentialsToMap(String cloudProvider, Credentials credentials, Map<String, Object> variableMap) {
-
-		if (cloudProvider.equals(AzureConstants.PROVIDER)) {
-			variableMap.put("credentials-subscription-id-string", credentials.getSecretMap().get(AzureConstants.SUBSCRIPTION_ID));
-			variableMap.put("credentials-tenant-id-string", credentials.getSecretMap().get(AzureConstants.TENANT_ID));
-			variableMap.put("credentials-client-id-string", credentials.getSecretMap().get(AzureConstants.CLIENT_ID));
-			variableMap.put("credentials-client-secret-string", credentials.getSecretMap().get(AzureConstants.CLIENT_SECRET));
-		}
-		else if (cloudProvider.equals(AwsConstants.PROVIDER)) {
-			variableMap.put("credentials-access-key-string", credentials.getSecretMap().get(AwsConstants.ACCESS_KEY));
-			variableMap.put("credentials-secret-key-string", credentials.getSecretMap().get(AwsConstants.SECRET_KEY));
-		}
-		else if (cloudProvider.equals(VSphereConstants.PROVIDER)) {
-			variableMap.put("credentials-vcenter-hostname-string", credentials.getSecretMap().get(VSphereConstants.VCENTER_HOSTNAME));
-			variableMap.put("credentials-vcenter-username-string", credentials.getSecretMap().get(VSphereConstants.VCENTER_USERNAME));
-			variableMap.put("credentials-vcenter-password-string", credentials.getSecretMap().get(VSphereConstants.VCENTER_PASSWORD));
-		}
-	}
-
-	private static final File getTmpFolder() {
-
-		File tmpFolder = new File(System.getProperty("java.io.tmpdir") + "/tmp" + System.nanoTime());
-		tmpFolder.mkdirs();
-
-		return tmpFolder;
-	}
 }

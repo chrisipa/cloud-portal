@@ -46,8 +46,8 @@ public class ProvisionLogService {
 		return provisionLogList;
 	}
 
-	public ProvisionLog get(String id) {
-		return provisionLogDao.findById(id);
+	public ProvisionLog get(String username, String id) {
+		return provisionLogDao.findByUsernameAndId(username, id);
 	}
 
 	public ProvisionLog create(String state, String provider, Boolean success, Map<String, Object> variableMap, File tmpFolder) {
