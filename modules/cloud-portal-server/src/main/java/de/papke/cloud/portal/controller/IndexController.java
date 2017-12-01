@@ -1,6 +1,5 @@
 package de.papke.cloud.portal.controller;
 
-import java.io.IOException;
 import java.util.Map;
 
 import org.springframework.stereotype.Controller;
@@ -18,7 +17,7 @@ public class IndexController extends ApplicationController {
 	 * @return
 	 */
 	@GetMapping(path = PREFIX)
-	public String index(Map<String, Object> model) throws IOException {
+	public String index(Map<String, Object> model) {
 
 		// fill model
 		fillModel(model);

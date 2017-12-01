@@ -7,8 +7,6 @@ public class Variable {
 	private String description = "";
 	private String defaultValue = "";
 	
-	public Variable() {}
-
 	@Override
 	public String toString() {
 		return "title=" + title + ", name=" + name + ", description=" + description + ", defaultValue=" + defaultValue;

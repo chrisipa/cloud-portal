@@ -203,53 +203,57 @@ public class DirectoryService {
      */
     public List<SearchResultEntry> search(String baseDn, SearchScope searchScope, Filter filter, String[] attributes, boolean paging) {
 
-        List<SearchResultEntry> searchResultEntries = new ArrayList<SearchResultEntry>();
-        LDAPConnection connection = getAdminConnection();
+        List<SearchResultEntry> searchResultEntries = new ArrayList<>();
 
         try {
+        	
+        	LDAPConnection connection = getAdminConnection();
 
-            // check if paging should be used
-            if (paging) {
-
-                // create LDAP search request
-                SearchRequest searchRequest = new SearchRequest(baseDn, searchScope, filter, attributes);
-
-                // instantiate variable for paging cookie
-                ASN1OctetString cookie = null;
-
-                do {
-
-                    // set controls for LDAP search request
-                    Control[] controls = new Control[1];
-                    controls[0] = new SimplePagedResultsControl(pageSize, cookie);
-                    searchRequest.setControls(controls);
-
-                    // execute LDAP search request
-                    SearchResult searchResult = connection.search(searchRequest);
-
-                    // add search entries from page to result list
-                    searchResultEntries.addAll(searchResult.getSearchEntries());
-
-                    // get cookie for next page
-                    cookie = null;
-                    for (Control control : searchResult.getResponseControls()) {
-                        if (control instanceof SimplePagedResultsControl) {
-                            SimplePagedResultsControl simplePagedResultsControl = (SimplePagedResultsControl) control; 
-                            cookie = simplePagedResultsControl.getCookie();
-                        }
-                    }
-
-                } 
-                // do this as long as a cookie is returned
-                while ((cookie != null) && (cookie.getValueLength() > 0));
-            }
-            else {
-                // execute LDAP search request
-                SearchResult searchResult = connection.search(baseDn, searchScope, filter, attributes);
-
-                // set search entries as result list
-                searchResultEntries = searchResult.getSearchEntries();
-            }
+        	if (connection != null) { 
+        	
+	            // check if paging should be used
+	            if (paging) {
+	
+	                // create LDAP search request
+	                SearchRequest searchRequest = new SearchRequest(baseDn, searchScope, filter, attributes);
+	
+	                // instantiate variable for paging cookie
+	                ASN1OctetString cookie = null;
+	
+	                do {
+	
+	                    // set controls for LDAP search request
+	                    Control[] controls = new Control[1];
+	                    controls[0] = new SimplePagedResultsControl(pageSize, cookie);
+	                    searchRequest.setControls(controls);
+	
+	                    // execute LDAP search request
+	                    SearchResult searchResult = connection.search(searchRequest);
+	
+	                    // add search entries from page to result list
+	                    searchResultEntries.addAll(searchResult.getSearchEntries());
+	
+	                    // get cookie for next page
+	                    cookie = null;
+	                    for (Control control : searchResult.getResponseControls()) {
+	                        if (control instanceof SimplePagedResultsControl) {
+	                            SimplePagedResultsControl simplePagedResultsControl = (SimplePagedResultsControl) control; 
+	                            cookie = simplePagedResultsControl.getCookie();
+	                        }
+	                    }
+	
+	                } 
+	                // do this as long as a cookie is returned
+	                while ((cookie != null) && (cookie.getValueLength() > 0));
+	            }
+	            else {
+	                // execute LDAP search request
+	                SearchResult searchResult = connection.search(baseDn, searchScope, filter, attributes);
+	
+	                // set search entries as result list
+	                searchResultEntries = searchResult.getSearchEntries();
+	            }
+        	}
         }
         catch (Exception e) {
             LOG.error(e.getMessage(), e);

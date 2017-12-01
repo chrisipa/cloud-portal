@@ -4,10 +4,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,7 +57,7 @@ public class ProvisionLogService {
 
 		try {
 
-			// get username;
+			// get username
 			User user = userService.getUser();
 			String username = user.getUsername();
 
@@ -66,19 +66,14 @@ public class ProvisionLogService {
 			ZipUtil.zip(tmpFolder, zipFile);
 			byte[] data = IOUtils.toByteArray(new FileInputStream(zipFile));
 
-			// remove credentials from variable map
-			Map<String, Object> variableMapWithoutCredentials = removeCredentialsFromMap(variableMap);
-
 			// create provision log
-			provisionLog = provisionLogDao.save(new ProvisionLog(new Date(), username, state, provider, success, variableMapWithoutCredentials, data));
+			provisionLog = provisionLogDao.save(new ProvisionLog(new Date(), username, state, provider, success, variableMap, data));
 		}
 		catch (Exception e) {
 			LOG.error(e.getMessage(), e);
 		}
 		finally {
-			if (zipFile != null) {
-				zipFile.delete();
-			}
+			FileUtils.deleteQuietly(zipFile);
 		}
 
 		return provisionLog;
@@ -89,27 +84,11 @@ public class ProvisionLogService {
 		// set date
 		provisionLog.setDate(new Date());
 		
-		// remove credentials from variable map
-		Map<String, Object> variableMapWithoutCredentials = removeCredentialsFromMap(provisionLog.getVariableMap());
-		provisionLog.setVariableMap(variableMapWithoutCredentials);
-		
+		// save
 		return provisionLogDao.save(provisionLog);
 	}
 
 	public void delete(String id) {
 		provisionLogDao.delete(id);
-	}
-
-	private Map<String, Object> removeCredentialsFromMap(Map<String, Object> variableMap) {
-
-		Map<String, Object> variableMapWithoutCredentials = new HashMap<>();
-		for (String key : variableMap.keySet()) {
-			if (!key.startsWith("credentials-")) {
-				Object value = variableMap.get(key);
-				variableMapWithoutCredentials.put(key, value);
-			}
-		}
-
-		return variableMapWithoutCredentials;
 	}
 }

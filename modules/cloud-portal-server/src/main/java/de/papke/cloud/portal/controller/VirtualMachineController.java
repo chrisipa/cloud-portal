@@ -1,7 +1,6 @@
 package de.papke.cloud.portal.controller;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -69,7 +68,7 @@ public class VirtualMachineController extends ApplicationController {
 	 * @return
 	 */
 	@GetMapping(path = PREFIX + "/list/form/{cloudProvider}")
-	public String vmList(Map<String, Object> model, @PathVariable String cloudProvider) throws IOException {
+	public String vmList(Map<String, Object> model, @PathVariable String cloudProvider) {
 
 		// fill model
 		fillModel(model, cloudProvider);
@@ -85,7 +84,7 @@ public class VirtualMachineController extends ApplicationController {
 	 * @return
 	 */
 	@GetMapping(path = PREFIX + "/create/form/{cloudProvider}")
-	public String vmCreate(Map<String, Object> model, @PathVariable String cloudProvider) throws IOException {
+	public String vmCreate(Map<String, Object> model, @PathVariable String cloudProvider) {
 
 		// fill model
 		fillModel(model, cloudProvider);

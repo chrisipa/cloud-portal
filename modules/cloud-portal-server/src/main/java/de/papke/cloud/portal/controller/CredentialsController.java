@@ -1,6 +1,5 @@
 package de.papke.cloud.portal.controller;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -35,7 +34,7 @@ public class CredentialsController extends ApplicationController {
 	@PostMapping(path = PREFIX + "/create/action/{provider}")
 	public String createAction(Map<String, Object> model,
 			@PathVariable String provider,
-			@RequestParam Map<String, String> variableMap) throws IOException {
+			@RequestParam Map<String, String> variableMap) {
 
 		if (userService.isAdmin()) {
 
@@ -79,7 +78,7 @@ public class CredentialsController extends ApplicationController {
 	 */
 	@GetMapping(value = PREFIX + "/create/form/{provider}")
 	public String createForm(Map<String, Object> model,
-			@PathVariable String provider) throws IOException {
+			@PathVariable String provider) {
 
 		if (userService.isAdmin()) {
 			
@@ -99,7 +98,7 @@ public class CredentialsController extends ApplicationController {
 	 */
 	@GetMapping(value = LIST_PATH_PREFIX + "/{provider}")
 	public String list(Map<String, Object> model,
-			@PathVariable String provider) throws IOException {
+			@PathVariable String provider) {
 
 		if (userService.isAdmin()) {
 		
@@ -114,7 +113,7 @@ public class CredentialsController extends ApplicationController {
 	@GetMapping(path = PREFIX + "/delete/action/{provider}/{id}")
 	public String deleteAction(Map<String, Object> model,
 			@PathVariable String provider,
-			@PathVariable String id) throws IOException {
+			@PathVariable String id) {
 
 		if (userService.isAdmin()) {
 		

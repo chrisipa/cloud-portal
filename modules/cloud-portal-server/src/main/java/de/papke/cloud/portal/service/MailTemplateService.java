@@ -37,13 +37,13 @@ public class MailTemplateService {
 				File[] mailFolderArray = mailFolder.listFiles();
 				for (File mailTemplateFile : mailFolderArray) {
 					String mailTemplateName = FilenameUtils.getBaseName(mailTemplateFile.getName());
-					String mailTemplatePath = TEMPLATE_FOLDER_NAME + "/" + mailTemplateFile.getName(); 
+					String mailTemplatePath = TEMPLATE_FOLDER_NAME + File.separator + mailTemplateFile.getName(); 
 					mailTemplateMap.put(mailTemplateName, mailTemplatePath);
 				}
 			}
 		}
 		catch (Exception e) {
-			LOG.error(e.getMessage());
+			LOG.error(e.getMessage(), e);
 		}
 	}
 	

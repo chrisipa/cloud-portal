@@ -15,15 +15,18 @@ import org.slf4j.LoggerFactory;
 public class AES {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(AES.class);
+	private static final String ECB_PKCS5_PADDING = "AES/ECB/PKCS5Padding";
+	private static final String ECB_PKCS5PADDING = "AES/ECB/PKCS5PADDING";
 	 
-    private static SecretKeySpec secretKey;
-    private static byte[] key;
+    private AES() {}
  
-    public static void setKey(String myKey) {
-        MessageDigest sha = null;
+    public static SecretKeySpec getSecretKey(String myKey) {
+    	
+    	SecretKeySpec secretKey = null;
+    	
         try {
-            key = myKey.getBytes(StandardCharsets.UTF_8);
-            sha = MessageDigest.getInstance("SHA-256");
+        	byte[] key = myKey.getBytes(StandardCharsets.UTF_8);
+            MessageDigest sha = MessageDigest.getInstance("SHA-256");
             key = sha.digest(key);
             key = Arrays.copyOf(key, 16);
             secretKey = new SecretKeySpec(key, "AES");
@@ -31,13 +34,15 @@ public class AES {
         catch (NoSuchAlgorithmException e) {
         	LOG.error(e.getMessage(), e);
         }
+        
+        return secretKey;
     }
  
     public static String encrypt(String strToEncrypt, String secret) {
         
     	try {
-            setKey(secret);
-            Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+            SecretKeySpec secretKey = getSecretKey(secret);
+            Cipher cipher = Cipher.getInstance(ECB_PKCS5_PADDING);
             cipher.init(Cipher.ENCRYPT_MODE, secretKey);
             return Base64.getEncoder().encodeToString(cipher.doFinal(strToEncrypt.getBytes("UTF-8")));
         }
@@ -50,8 +55,8 @@ public class AES {
     public static String decrypt(String strToDecrypt, String secret) {
         
     	try {
-            setKey(secret);
-            Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5PADDING");
+    		SecretKeySpec secretKey = getSecretKey(secret);
+            Cipher cipher = Cipher.getInstance(ECB_PKCS5PADDING);
             cipher.init(Cipher.DECRYPT_MODE, secretKey);
             return new String(cipher.doFinal(Base64.getDecoder().decode(strToDecrypt)));
         }

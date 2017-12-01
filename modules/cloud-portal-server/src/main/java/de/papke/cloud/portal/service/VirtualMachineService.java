@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import de.papke.cloud.portal.Constants;
+import de.papke.cloud.portal.constants.Constants;
 import de.papke.cloud.portal.pojo.CommandResult;
 import de.papke.cloud.portal.pojo.Credentials;
 import de.papke.cloud.portal.pojo.ProvisionLog;
@@ -119,7 +119,7 @@ public class VirtualMachineService {
 				if (variableMapEntry.getKey().endsWith("-file")) {
 					String filePath = (String) variableMapEntry.getValue();
 					File dummyFile = new File(filePath);
-					dummyFile.createNewFile();
+					dummyFile.createNewFile(); // NOSONAR
 					dummmyFileList.add(dummyFile);
 				}
 			}

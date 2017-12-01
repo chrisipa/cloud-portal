@@ -51,7 +51,7 @@ public class ApplicationController {
 		Map<String, Map<String, List<Variable>>> cloudProviderDefaultsMap = terraformService.getProviderDefaultsMap();
 
 		// set cloud providers
-		List<String> cloudProviderList = new ArrayList<String>();
+		List<String> cloudProviderList = new ArrayList<>();
 		cloudProviderList.addAll(cloudProviderDefaultsMap.keySet());
 		applicationModel.setCloudProviderList(cloudProviderList);
 		

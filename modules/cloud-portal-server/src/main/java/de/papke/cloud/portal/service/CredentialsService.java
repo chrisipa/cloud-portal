@@ -3,6 +3,7 @@ package de.papke.cloud.portal.service;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -77,8 +78,9 @@ public class CredentialsService {
 		Map<String, String> encryptedSecretMap = new HashMap<>();
 		
 		if (secretMap != null) {
-			for (String key : secretMap.keySet()) {
-				String value = secretMap.get(key);					
+			for (Entry<String, String> entry : secretMap.entrySet()) {
+				String key = entry.getKey();
+				String value = entry.getValue();
 				encryptedSecretMap.put(key, encryptionService.encrypt(value));
 			}
 		}
@@ -91,8 +93,9 @@ public class CredentialsService {
 		Map<String, String> decryptedSecretMap = new HashMap<>();
 		
 		if (secretMap != null) {
-			for (String key : secretMap.keySet()) {
-				String value = secretMap.get(key);					
+			for (Entry<String, String> entry : secretMap.entrySet()) {
+				String key = entry.getKey();
+				String value = entry.getValue();				
 				decryptedSecretMap.put(key, encryptionService.decrypt(value));
 			}
 		}

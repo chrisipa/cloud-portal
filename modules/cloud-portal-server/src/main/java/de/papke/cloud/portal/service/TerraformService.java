@@ -7,6 +7,7 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.annotation.PostConstruct;
 
@@ -17,9 +18,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import de.papke.cloud.portal.Constants;
 import de.papke.cloud.portal.constants.AwsConstants;
 import de.papke.cloud.portal.constants.AzureConstants;
+import de.papke.cloud.portal.constants.Constants;
 import de.papke.cloud.portal.constants.VSphereConstants;
 import de.papke.cloud.portal.pojo.CommandResult;
 import de.papke.cloud.portal.pojo.Credentials;
@@ -122,9 +123,10 @@ public class TerraformService {
 		commandStringBuilder.append(FLAG_NO_COLOR);
 
 
-		for (String variableName : variableMap.keySet()) {
+		for (Entry<String, Object> variableEntry : variableMap.entrySet()) {
 
-			String variableValue = (String) variableMap.get(variableName);
+			String variableName = variableEntry.getKey();
+			String variableValue = (String) variableEntry.getValue();
 
 			commandStringBuilder.append(Constants.CHAR_WHITESPACE);
 			commandStringBuilder.append(FLAG_VAR);
@@ -143,18 +145,18 @@ public class TerraformService {
 		
 		Map<String, Object> executionMap = new HashMap<>();
 
-		String cloudProvider = credentials.getProvider();
-		if (cloudProvider.equals(AzureConstants.PROVIDER)) {
+		String provider = credentials.getProvider();
+		if (provider.equals(AzureConstants.PROVIDER)) {
 			executionMap.put("credentials-subscription-id-string", credentials.getSecretMap().get(AzureConstants.SUBSCRIPTION_ID));
 			executionMap.put("credentials-tenant-id-string", credentials.getSecretMap().get(AzureConstants.TENANT_ID));
 			executionMap.put("credentials-client-id-string", credentials.getSecretMap().get(AzureConstants.CLIENT_ID));
 			executionMap.put("credentials-client-secret-string", credentials.getSecretMap().get(AzureConstants.CLIENT_SECRET));
 		}
-		else if (cloudProvider.equals(AwsConstants.PROVIDER)) {
+		else if (provider.equals(AwsConstants.PROVIDER)) {
 			executionMap.put("credentials-access-key-string", credentials.getSecretMap().get(AwsConstants.ACCESS_KEY));
 			executionMap.put("credentials-secret-key-string", credentials.getSecretMap().get(AwsConstants.SECRET_KEY));
 		}
-		else if (cloudProvider.equals(VSphereConstants.PROVIDER)) {
+		else if (provider.equals(VSphereConstants.PROVIDER)) {
 			executionMap.put("credentials-vcenter-hostname-string", credentials.getSecretMap().get(VSphereConstants.VCENTER_HOSTNAME));
 			executionMap.put("credentials-vcenter-username-string", credentials.getSecretMap().get(VSphereConstants.VCENTER_USERNAME));
 			executionMap.put("credentials-vcenter-password-string", credentials.getSecretMap().get(VSphereConstants.VCENTER_PASSWORD));

@@ -1,6 +1,5 @@
 package de.papke.cloud.portal.controller;
 
-import java.io.IOException;
 import java.util.Map;
 
 import org.springframework.stereotype.Controller;
@@ -18,7 +17,7 @@ public class UserProfileController extends ApplicationController {
 	 * @return
 	 */
 	@GetMapping(path = PREFIX + "/profile")
-	public String userProfile(Map<String, Object> model) throws IOException {
+	public String userProfile(Map<String, Object> model) {
 		
 		// fill
 		fillModel(model);
