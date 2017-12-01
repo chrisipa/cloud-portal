@@ -15,7 +15,7 @@ import de.papke.cloud.portal.constants.AzureConstants;
 import de.papke.cloud.portal.constants.VSphereConstants;
 import de.papke.cloud.portal.model.CredentialsModel;
 import de.papke.cloud.portal.service.CredentialsService;
-import de.papke.cloud.portal.service.UserService;
+import de.papke.cloud.portal.service.SessionUserService;
 
 @Controller
 public class CredentialsController extends ApplicationController {
@@ -29,14 +29,14 @@ public class CredentialsController extends ApplicationController {
 	private CredentialsService credentialsService;
 
 	@Autowired
-	private UserService userService;
+	private SessionUserService sessionUserService;
 
 	@PostMapping(path = PREFIX + "/create/action/{provider}")
 	public String createAction(Map<String, Object> model,
 			@PathVariable String provider,
 			@RequestParam Map<String, String> variableMap) {
 
-		if (userService.isAdmin()) {
+		if (sessionUserService.isAdmin()) {
 
 			// get group
 			String group = variableMap.get("group");
@@ -80,7 +80,7 @@ public class CredentialsController extends ApplicationController {
 	public String createForm(Map<String, Object> model,
 			@PathVariable String provider) {
 
-		if (userService.isAdmin()) {
+		if (sessionUserService.isAdmin()) {
 			
 			// fill model
 			fillModel(model, provider);
@@ -100,7 +100,7 @@ public class CredentialsController extends ApplicationController {
 	public String list(Map<String, Object> model,
 			@PathVariable String provider) {
 
-		if (userService.isAdmin()) {
+		if (sessionUserService.isAdmin()) {
 		
 			// fill model
 			fillModel(model, provider);
@@ -115,7 +115,7 @@ public class CredentialsController extends ApplicationController {
 			@PathVariable String provider,
 			@PathVariable String id) {
 
-		if (userService.isAdmin()) {
+		if (sessionUserService.isAdmin()) {
 		
 			// delete credentials
 			credentialsService.delete(id);

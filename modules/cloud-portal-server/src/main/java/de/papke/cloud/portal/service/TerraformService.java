@@ -65,7 +65,7 @@ public class TerraformService {
 			}
 		}
 		catch (Exception e) {
-			LOG.error(e.getMessage());
+			LOG.error(e.getMessage(), e);
 		}
 	}
 

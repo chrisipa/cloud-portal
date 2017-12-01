@@ -1,5 +1,6 @@
 package de.papke.cloud.portal.service;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -18,6 +19,7 @@ import org.apache.commons.lang.WordUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import de.papke.cloud.portal.constants.Constants;
@@ -42,7 +44,7 @@ public class VirtualMachineService {
 	private ProvisionLogService provisionLogService;
 
 	@Autowired
-	private UserService userService;
+	private SessionUserService sessionUserService;
 
 	@Autowired
 	private TerraformService terraformService;
@@ -55,6 +57,25 @@ public class VirtualMachineService {
 
 	@Autowired
 	private FileService fileService;
+	
+	@Autowired
+	private CredentialsService credentialsService;
+	
+	@Autowired
+	private UserService userService;
+	
+	@Scheduled(cron = "${application.expiration.cron.expression}")
+	public void schedule() {
+		List<ProvisionLog> provisionLogList = provisionLogService.getExpired();
+		for (ProvisionLog provisionLog : provisionLogList) {
+			String username = provisionLog.getUsername();
+			User user = userService.getUser(username);
+			String provider = provisionLog.getProvider();
+			Credentials credentials = credentialsService.getCredentials(user, provider);
+			OutputStream outputStream = new ByteArrayOutputStream();
+			deprovision(user, provisionLog, credentials, outputStream);
+		}
+	}
 
 	public void provision(String action, Credentials credentials, Map<String, Object> variableMap, OutputStream outputStream) {
 
@@ -96,6 +117,10 @@ public class VirtualMachineService {
 	}
 
 	public void deprovision(ProvisionLog provisionLog, Credentials credentials, OutputStream outputStream) {
+		deprovision(sessionUserService.getUser(), provisionLog, credentials, outputStream);
+	}
+	
+	public void deprovision(User user, ProvisionLog provisionLog, Credentials credentials, OutputStream outputStream) {
 		
 		File attachment = null;
 		File zipFile = null; 
@@ -142,7 +167,7 @@ public class VirtualMachineService {
 			String provider = provisionLog.getProvider();
 			
 			// send mail
-			attachment = sendMail(action, provider, commandResult);
+			attachment = sendMail(user, action, provider, commandResult);
 		}
 		catch (Exception e) {
 			LOG.error(e.getMessage(), e);
@@ -166,6 +191,10 @@ public class VirtualMachineService {
 	}
 	
 	private File sendMail(String action, String provider, CommandResult commandResult) throws IOException {
+		return sendMail(sessionUserService.getUser(), action, provider, commandResult);
+	}
+	
+	private File sendMail(User user, String action, String provider, CommandResult commandResult) throws IOException {
 		
 		File attachment = null;
 		
@@ -181,7 +210,6 @@ public class VirtualMachineService {
 		}
 
 		// get mail address
-		User user = userService.getUser();
 		String email = user.getEmail(); 
 
 		// send mail

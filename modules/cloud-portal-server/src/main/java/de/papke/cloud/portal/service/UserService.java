@@ -1,39 +1,53 @@
 package de.papke.cloud.portal.service;
 
-import java.util.ArrayList;
+import java.util.List;
 
-import javax.servlet.http.HttpSession;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import de.papke.cloud.portal.pojo.User;
 
 @Service
 public class UserService {
-	
-	private static final String SESSION_ATTRIBUTE_USER = "user";
-	private static final User DUMMY_USER = new User("anonymous", "dummy@dummy.com", new ArrayList<>(), false);
-	
+
+	private static final Logger LOG = LoggerFactory.getLogger(UserService.class);
+
+	@Value("${application.admin.group}")
+	private String adminGroup;	
+
 	@Autowired
-	private HttpSession session;
+	private DirectoryService directoryService;
 
-	public User getUser() {
-		
-		User user = (User) session.getAttribute(SESSION_ATTRIBUTE_USER);
-		
-		if (user == null) {
-			user = DUMMY_USER; 
+	public User getUser(String username) {
+
+		User user = null;
+
+		try {
+
+			Boolean isAdmin = false;
+
+			List<String> groupList = directoryService.getGroupList(username);
+			for (String group : groupList) {
+				if (group.equals(adminGroup)) {
+					isAdmin = true;
+				}
+			}
+
+			user = new User(username, username, groupList, isAdmin);
+
 		}
-		
-		return user;
-	}
+		catch(Exception e) {
+			LOG.error(e.getMessage(), e);
+		}
 
-	public boolean isAdmin() {
-		return getUser().getIsAdmin();
+		return user;
+
 	}
 	
-	public void setUser(User user) {
-		session.setAttribute(SESSION_ATTRIBUTE_USER, user);
-	}
+	public boolean authenticate(String username, String password) {
+		return directoryService.authenticate(username, password);
+	}	
 }

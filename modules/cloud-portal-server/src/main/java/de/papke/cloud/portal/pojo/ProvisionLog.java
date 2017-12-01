@@ -10,6 +10,7 @@ public class ProvisionLog {
 	@Id
 	private String id;
 	private Date date;
+	private Date expirationDate;
 	private String username;
 	private String command;
 	private String provider;
@@ -18,10 +19,11 @@ public class ProvisionLog {
 	private byte[] result;
 	
 	public ProvisionLog() {}
-
-	public ProvisionLog(Date date, String username, String command, String provider, Boolean success, Map<String, Object> variableMap, byte[] result) {
+	
+	public ProvisionLog(Date date, Date expirationDate, String username, String command, String provider, Boolean success, Map<String, Object> variableMap, byte[] result) {
 		super();
 		this.date = date;
+		this.expirationDate = expirationDate;
 		this.username = username;
 		this.command = command;
 		this.provider = provider;
@@ -41,9 +43,17 @@ public class ProvisionLog {
 	public Date getDate() {
 		return date;
 	}
-
+	
 	public void setDate(Date date) {
 		this.date = date;
+	}
+	
+	public Date getExpirationDate() {
+		return expirationDate;
+	}
+
+	public void setExpirationDate(Date expirationDate) {
+		this.expirationDate = expirationDate;
 	}
 	
 	public String getUsername() {

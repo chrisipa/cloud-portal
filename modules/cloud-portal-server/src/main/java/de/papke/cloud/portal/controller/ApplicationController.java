@@ -11,7 +11,7 @@ import org.springframework.stereotype.Controller;
 import de.papke.cloud.portal.model.ApplicationModel;
 import de.papke.cloud.portal.service.MenuService;
 import de.papke.cloud.portal.service.TerraformService;
-import de.papke.cloud.portal.service.UserService;
+import de.papke.cloud.portal.service.SessionUserService;
 import de.papke.cloud.portal.terraform.Variable;
 
 @Controller
@@ -24,7 +24,7 @@ public class ApplicationController {
 	private String applicationTitle;
 	
 	@Autowired
-	private UserService userService;
+	private SessionUserService sessionUserService;
 
 	@Autowired
 	private TerraformService terraformService;
@@ -45,7 +45,7 @@ public class ApplicationController {
 		applicationModel.setApplicationTitle(applicationTitle);
 		
 		// set username
-		applicationModel.setUser(userService.getUser());
+		applicationModel.setUser(sessionUserService.getUser());
 
 		// get cloud provider defaults map
 		Map<String, Map<String, List<Variable>>> cloudProviderDefaultsMap = terraformService.getProviderDefaultsMap();

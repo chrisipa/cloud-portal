@@ -23,6 +23,11 @@ variable "general-region-string" {
   default = "westeurope"
 }
 
+variable "vm-expiration-days-string" {
+  description = "Days till virtual machine will be removed automatically."
+  default = "-1"
+}
+
 variable "vm-size-string" {
   description = "Size of the vm to create."
   default = "Standard_A0"

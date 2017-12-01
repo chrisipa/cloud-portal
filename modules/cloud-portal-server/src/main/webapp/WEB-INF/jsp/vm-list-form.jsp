@@ -24,6 +24,7 @@
                                 <th>Command</th>
                                 <th>Success</th>
                                 <th>Variables</th>
+                                <th>Expiration Date</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -38,6 +39,7 @@
                                         <p><c:out value="${variable.key}" /> = <c:out value="${variable.value}" /></p>
                                     </c:forEach>
                                     </td>
+                                    <td data-order="<fmt:formatDate pattern="yyyy-MM-dd HH:mm" value="${provisionLog.expirationDate}"/>"><fmt:formatDate pattern="dd.MM.yyyy HH:mm:ss" value="${provisionLog.expirationDate}"/></td>
                                     <td>
                                         <c:if test="${provisionLog.success == true && provisionLog.command == 'apply'}">
                                             <button id="delete/action/${virtualMachine.cloudProvider}/${provisionLog.id}" type="submit" class="btn btn-danger btn-circle"><i class="fa fa-times"></i></button>

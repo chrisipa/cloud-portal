@@ -20,6 +20,11 @@ variable "general-availability-zone-string" {
   default = "eu-central-1a"
 }
 
+variable "vm-expiration-days-string" {
+  description = "Days till virtual machine will be removed automatically."
+  default = "-1"
+}
+
 variable "vm-size-string" {
   description = "Size of the virtual machine to create."
   default = "t2.micro"

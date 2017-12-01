@@ -60,7 +60,7 @@ public class DirectoryService {
     private String[] urls;
 
     @PostConstruct
-    private void init() {
+    public void init() {
         if (StringUtils.isNoneEmpty(urlString)) {
             urls = urlString.split(",");
         }

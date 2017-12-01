@@ -15,5 +15,7 @@ public class Constants {
 	public static final String ACTION_APPLY = "apply";
 	public static final String ACTION_DESTROY = "destroy";
 	
+	public static final String VM_EXPIRATION_DAYS_STRING = "vm-expiration-days-string";
+	
 	private Constants() {}
 }

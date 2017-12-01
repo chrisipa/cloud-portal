@@ -19,7 +19,7 @@ public class CredentialsService {
 	private EncryptionService encryptionService;
 	
 	@Autowired
-	private UserService userService;
+	private SessionUserService sessionUserService;
 	
 	@Autowired
 	private CredentialsDao credentialsDao;
@@ -38,8 +38,10 @@ public class CredentialsService {
 	}
 	
 	public Credentials getCredentials(String provider) {
-		
-		User user = userService.getUser();
+		return getCredentials(sessionUserService.getUser(), provider);
+	}
+	
+	public Credentials getCredentials(User user, String provider) {
 		
 		if (user != null) {
 			

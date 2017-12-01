@@ -31,7 +31,7 @@ import de.papke.cloud.portal.pojo.User;
 import de.papke.cloud.portal.service.CredentialsService;
 import de.papke.cloud.portal.service.ProvisionLogService;
 import de.papke.cloud.portal.service.TerraformService;
-import de.papke.cloud.portal.service.UserService;
+import de.papke.cloud.portal.service.SessionUserService;
 import de.papke.cloud.portal.service.VirtualMachineService;
 import de.papke.cloud.portal.terraform.Variable;
 
@@ -59,7 +59,7 @@ public class VirtualMachineController extends ApplicationController {
 	private ProvisionLogService provisionLogService;
 	
 	@Autowired
-	private UserService userService;
+	private SessionUserService sessionUserService;
 
 	/**
 	 * Method for returning the model and view for the create vm page.
@@ -68,7 +68,7 @@ public class VirtualMachineController extends ApplicationController {
 	 * @return
 	 */
 	@GetMapping(path = PREFIX + "/list/form/{cloudProvider}")
-	public String vmList(Map<String, Object> model, @PathVariable String cloudProvider) {
+	public String list(Map<String, Object> model, @PathVariable String cloudProvider) {
 
 		// fill model
 		fillModel(model, cloudProvider);
@@ -84,7 +84,7 @@ public class VirtualMachineController extends ApplicationController {
 	 * @return
 	 */
 	@GetMapping(path = PREFIX + "/create/form/{cloudProvider}")
-	public String vmCreate(Map<String, Object> model, @PathVariable String cloudProvider) {
+	public String create(Map<String, Object> model, @PathVariable String cloudProvider) {
 
 		// fill model
 		fillModel(model, cloudProvider);
@@ -172,7 +172,7 @@ public class VirtualMachineController extends ApplicationController {
 			if (credentials != null) {
 
 				// get username
-				User user = userService.getUser();
+				User user = sessionUserService.getUser();
 				String username = user.getUsername();
 				
 				// get provision log entry
@@ -202,7 +202,7 @@ public class VirtualMachineController extends ApplicationController {
 		fillModel(model, cloudProvider);
 	} 
 
-	private File writeMultipartFile(MultipartFile multipartFile) {
+	private static File writeMultipartFile(MultipartFile multipartFile) {
 
 		File file = null;
 

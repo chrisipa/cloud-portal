@@ -43,7 +43,7 @@ public class FileService {
             tmpFile.setExecutable(true); // NOSONAR
         }
         catch (Exception e) {
-            LOG.error(e.getMessage());
+            LOG.error(e.getMessage(), e);
         }
 
         return tmpFile;

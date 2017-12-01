@@ -9,11 +9,14 @@ import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.time.DateUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import de.papke.cloud.portal.constants.Constants;
 import de.papke.cloud.portal.dao.ProvisionLogDao;
 import de.papke.cloud.portal.pojo.ProvisionLog;
 import de.papke.cloud.portal.pojo.User;
@@ -28,7 +31,7 @@ public class ProvisionLogService {
 	private static final String TMP_FILE_SUFFIX = ".zip";
 
 	@Autowired
-	private UserService userService;
+	private SessionUserService sessionUserService;
 
 	@Autowired
 	private ProvisionLogDao provisionLogDao;
@@ -37,7 +40,7 @@ public class ProvisionLogService {
 
 		List<ProvisionLog> provisionLogList = new ArrayList<>();
 
-		User user = userService.getUser();
+		User user = sessionUserService.getUser();
 		if (user != null) {
 			String username = user.getUsername();
 			provisionLogList = provisionLogDao.findByUsernameAndProvider(username, provider);
@@ -45,9 +48,13 @@ public class ProvisionLogService {
 
 		return provisionLogList;
 	}
-
+	
 	public ProvisionLog get(String username, String id) {
 		return provisionLogDao.findByUsernameAndId(username, id);
+	}
+	
+	public List<ProvisionLog> getExpired() {
+		return provisionLogDao.findByCommandAndExpirationDate(Constants.ACTION_APPLY, new Date());
 	}
 
 	public ProvisionLog create(String state, String provider, Boolean success, Map<String, Object> variableMap, File tmpFolder) {
@@ -58,16 +65,27 @@ public class ProvisionLogService {
 		try {
 
 			// get username
-			User user = userService.getUser();
+			User user = sessionUserService.getUser();
 			String username = user.getUsername();
 
 			// zip temp folder
 			zipFile = File.createTempFile(TMP_FILE_PREFIX, TMP_FILE_SUFFIX);
 			ZipUtil.zip(tmpFolder, zipFile);
 			byte[] data = IOUtils.toByteArray(new FileInputStream(zipFile));
-
+			
+			// get expiration date
+			Date expirationDate = null;
+			String expirationDaysString = (String) variableMap.get(Constants.VM_EXPIRATION_DAYS_STRING);
+			if (StringUtils.isNotEmpty(expirationDaysString)) {
+				int expirationDays = Integer.parseInt(expirationDaysString);
+				if (expirationDays != -1) {
+					long now = System.currentTimeMillis();
+					expirationDate = new Date(now + (expirationDays * DateUtils.MILLIS_PER_DAY));
+				}
+			}
+			
 			// create provision log
-			provisionLog = provisionLogDao.save(new ProvisionLog(new Date(), username, state, provider, success, variableMap, data));
+			provisionLog = provisionLogDao.save(new ProvisionLog(new Date(), expirationDate, username, state, provider, success, variableMap, data));
 		}
 		catch (Exception e) {
 			LOG.error(e.getMessage(), e);
