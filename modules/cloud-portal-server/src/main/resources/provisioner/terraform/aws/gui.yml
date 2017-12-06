@@ -51,7 +51,7 @@
     type: list
     required: true
     defaults: [ Ubuntu Server 16.04, Windows Server 2016 ]
-    index: 93
+    index: 0
     
 - title: Storage
   variables:    
