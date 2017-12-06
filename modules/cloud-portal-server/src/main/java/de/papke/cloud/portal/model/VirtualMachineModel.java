@@ -1,15 +1,14 @@
 package de.papke.cloud.portal.model;
 
 import java.util.List;
-import java.util.Map;
 
 import de.papke.cloud.portal.pojo.ProvisionLog;
-import de.papke.cloud.portal.terraform.Variable;
+import de.papke.cloud.portal.pojo.VariableGroup;
 
 public class VirtualMachineModel {
 
 	private String cloudProvider;
-    private Map<String, List<Variable>> cloudProviderDefaultsMap;
+    private List<VariableGroup> cloudProviderDefaultsList;
     private List<ProvisionLog> provisionLogList;
     
 	public String getCloudProvider() {
@@ -20,12 +19,12 @@ public class VirtualMachineModel {
 		this.cloudProvider = cloudProvider;
 	}
 	
-	public Map<String, List<Variable>> getCloudProviderDefaultsMap() {
-		return cloudProviderDefaultsMap;
+	public List<VariableGroup> getCloudProviderDefaultsList() {
+		return cloudProviderDefaultsList;
 	}
 	
-	public void setCloudProviderDefaultsMap(Map<String, List<Variable>> cloudProviderDefaultsMap) {
-		this.cloudProviderDefaultsMap = cloudProviderDefaultsMap;
+	public void setCloudProviderDefaultsList(List<VariableGroup> cloudProviderDefaultsList) {
+		this.cloudProviderDefaultsList = cloudProviderDefaultsList;
 	}
 
 	public List<ProvisionLog> getProvisionLogList() {

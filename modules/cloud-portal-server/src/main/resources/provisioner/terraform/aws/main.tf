@@ -32,11 +32,24 @@ resource "aws_key_pair" "auth" {
   public_key = "${file("${var.bootstrap-public-key-file}")}"
 }
 
+data "aws_ami" "image" {
+  most_recent = true
+  filter {
+      name   = "name"
+      values = ["${lookup(var.image-names-map, var.image-ami-string)}"]
+  }
+  filter {
+      name   = "virtualization-type"
+      values = ["hvm"]
+  }  
+  owners = ["${lookup(var.image-owners-map, var.image-ami-string)}"]
+}
+
 resource "aws_instance" "vm" {
 
-  ami = "${var.image-ami-string}"
+  ami = "${data.aws_ami.image.id}"
   instance_type = "${var.vm-size-string}"
-  availability_zone = "${var.general-availability-zone-string}"
+  availability_zone = "${var.general-region-string}${var.general-availability-zone-string}"
   key_name = "${aws_key_pair.auth.id}"
   associate_public_ip_address = true
   vpc_security_group_ids = ["${aws_security_group.nsg.id}"]

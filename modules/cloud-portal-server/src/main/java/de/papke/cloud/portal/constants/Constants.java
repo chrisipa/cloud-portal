@@ -7,7 +7,8 @@ public class Constants {
 	public static final String CHAR_EQUAL = "=";
 	public static final String CHAR_DASH = "-";
 	public static final String CHAR_WHITESPACE = " ";
-	public static final String CHAR_QUOTE = "\"";
+	public static final String CHAR_DOUBLE_QUOTE = "\"";
+	public static final String CHAR_SINGLE_QUOTE = "'";
 	public static final String CHAR_NEW_LINE = "\n";
 	public static final String CHAR_DOT = ".";
 	

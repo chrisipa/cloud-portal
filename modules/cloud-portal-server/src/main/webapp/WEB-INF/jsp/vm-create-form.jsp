@@ -20,7 +20,7 @@
 				</div>    
 			</div>	
 			<div class="row">
-					<c:forEach items="${virtualMachine.cloudProviderDefaultsMap}"
+					<c:forEach items="${virtualMachine.cloudProviderDefaultsList}"
 						var="variableGroup" varStatus="loop">
 						<c:if test="${loop.index % 2 == 0}">
 	                        <div class="col-lg-4">
@@ -29,40 +29,49 @@
 							<div class="panel-heading">
 								<h4 class="panel-title">
 									<a data-toggle="collapse" data-parent="#accordion"
-										href="#${variableGroup.key}Content" class="collapsed"
+										href="#${variableGroup.title}Content" class="collapsed"
 										aria-expanded="false"><i class="fa fa-plus-square"
 										aria-hidden="true"></i>&nbsp;<c:out
-											value="${fn:toUpperCase(fn:substring(variableGroup.key, 0, 1))}${fn:toLowerCase(fn:substring(variableGroup.key, 1,fn:length(variableGroup.key)))}" /></a>
+											value="${variableGroup.title}" /></a>
 								</h4>
 							</div>
-							<div id="${variableGroup.key}Content"
+							<div id="${variableGroup.title}Content"
 								class="panel-body panel-collapse collapse in"
 								aria-expanded="true" style="">
-								<c:forEach items="${variableGroup.value}" var="variable">
+								<c:forEach items="${variableGroup.variables}" var="variable">
 									<label><c:out value="${variable.title}" /></label>
 									<c:choose>
-										<c:when test="${fn:endsWith(variable.name, 'file')}">
-											<input type="file" name="${variable.name}"
-												required="required">
-										</c:when>
-										<c:otherwise>
-											<c:choose>
-												<c:when test="${fn:endsWith(variable.name, 'boolean')}">
-													<br />
-													<c:choose>
-														<c:when test="${variable.defaultValue == 'true'}">
-															<input type="checkbox" name="${variable.name}"
-																required="required" checked="checked">
-														</c:when>
-														<c:otherwise>
-															<input type="checkbox" name="${variable.name}"
-																required="required">
-														</c:otherwise>
-													</c:choose>
+									    <c:when test="${variable.type == 'string'}">
+									       <input class="form-control" name="${variable.name}" value="${variable.defaults[0]}"<c:if test="${variable.required}"> required="required"</c:if>>
+									    </c:when>
+									    <c:otherwise>
+										    <c:choose> 
+												<c:when test="${variable.type == 'file'}">
+													<input type="file" name="${variable.name}"<c:if test="${variable.required}"> required="required"</c:if>>
 												</c:when>
 												<c:otherwise>
-													<input class="form-control" name="${variable.name}"
-														value="${variable.defaultValue}" required="required">
+													<c:choose>
+														<c:when test="${variable.type == 'boolean'}">
+															<br />
+															<c:choose>
+																<c:when test="${variable.defaults[0] == 'true'}">
+																	<input type="checkbox" name="${variable.name}" checked="checked"<c:if test="${variable.required}"> required="required"</c:if>>
+																</c:when>
+																<c:otherwise>
+																	<input type="checkbox" name="${variable.name}"<c:if test="${variable.required}"> required="required"</c:if>>
+																</c:otherwise>
+															</c:choose>
+														</c:when>
+														<c:otherwise>
+														    <c:if test="${variable.type == 'list'}">
+														        <select name="${variable.name}" class="form-control"<c:if test="${variable.required}"> required="required"</c:if>>
+														            <c:forEach items="${variable.defaults}" var="value" varStatus="count">
+														                <option<c:if test="${count.index == variable.index}"> selected="selected"</c:if>><c:out value="${value}" /></option>
+														            </c:forEach>
+					                                            </select>
+														    </c:if>
+														</c:otherwise>
+													</c:choose>
 												</c:otherwise>
 											</c:choose>
 										</c:otherwise>

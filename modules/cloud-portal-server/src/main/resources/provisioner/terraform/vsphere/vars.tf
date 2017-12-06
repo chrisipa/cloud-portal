@@ -1,54 +1,19 @@
-variable "credentials-vcenter-hostname-string" {
-  description = "VMWare vCenter hostname."
-}
+variable "credentials-vcenter-hostname-string" {}
+variable "credentials-vcenter-username-string" {}
+variable "credentials-vcenter-password-string" {}
+variable "vm-name-string" {}
+variable "vm-resource-pool-string" {}
+variable "vm-image-string" {}
+variable "vm-vcores-string" {}
+variable "vm-ram-string" {}
+variable "bootstrap-username-string" {}
+variable "bootstrap-password-string" {}
+variable "bootstrap-script-file" {}
 
-variable "credentials-vcenter-username-string" {
-  description = "VMWare vCenter username."
-}
-
-variable "credentials-vcenter-password-string" {
-  description = "VMWare vCenter password."
-}
-
-variable "vm-name-string" {
-  description = "Name of the virtual machine."  
-}
-
-variable "vm-expiration-days-string" {
-  description = "Days till virtual machine will be removed automatically."
-  default = "-1"
-}
-
-variable "vm-resource-pool-string" {
-  description = "Virtual machine resource pool to use."
-  default = "DevOps EMEA POC"
-}
-
-variable "vm-image-string" {
-  description = "Virtual machine image to use."
-  default = "TPL_UBUNTU_SERVER_16.04.3_LTS"
-}
-
-variable "vm-vcores-string" {
-  description = "Number of virtual cores of the virtual machine."  
-  default = "1"
-}
-
-variable "vm-ram-string" {
-  description = "RAM (in MB) of the virtual machine."
-  default = "1024"  
-}
-
-variable "bootstrap-username-string" {
-  description = "Username for SSH access."
-  default = "devops"
-}
-
-variable "bootstrap-password-string" {
-  description = "Password for SSH access."
-  default = "devops"
-}
-
-variable "bootstrap-script-file" {
-  description = "Bootstrap script file to execute after vm has been created."
+variable "image-templates-map" {
+  type = "map"
+  default = {
+    "Ubuntu Server 16.04" = "TPL_UBUNTU_SERVER_16.04.3_LTS"
+    "Windows Server 2016" = "TPL_WIN_2016"
+  }
 }

@@ -21,23 +21,20 @@ import de.papke.cloud.portal.pojo.CommandResult;
 public class CommandExecutorService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(CommandExecutorService.class);
-
-	public CommandResult execute(String command) {
-		return execute(command, null);
+	
+	public CommandResult execute(CommandLine commandLine) {
+		return execute(commandLine, null);
 	}
 
-	public CommandResult execute(String command, File workingDirectory) {
-		return execute(command, workingDirectory, new ByteArrayOutputStream());
+	public CommandResult execute(CommandLine commandLine, File workingDirectory) {
+		return execute(commandLine, workingDirectory, new ByteArrayOutputStream());
 	}
 
-	public CommandResult execute(String command, File workingDirectory, OutputStream outputStream) {
+	public CommandResult execute(CommandLine commandLine, File workingDirectory, OutputStream outputStream) {
 
 		CommandResult commandResult = new CommandResult();
 
 		try {
-
-			// create command line from command string
-			CommandLine commandLine = CommandLine.parse(command);
 
 			// create executor for command
 			DefaultExecutor executor = new DefaultExecutor();

@@ -1,6 +1,7 @@
 package de.papke.cloud.portal.service;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.OutputStream;
 import java.net.URI;
 import java.net.URL;
@@ -11,12 +12,14 @@ import java.util.Map.Entry;
 
 import javax.annotation.PostConstruct;
 
+import org.apache.commons.exec.CommandLine;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.yaml.snakeyaml.Yaml;
 
 import de.papke.cloud.portal.constants.AwsConstants;
 import de.papke.cloud.portal.constants.AzureConstants;
@@ -24,8 +27,7 @@ import de.papke.cloud.portal.constants.Constants;
 import de.papke.cloud.portal.constants.VSphereConstants;
 import de.papke.cloud.portal.pojo.CommandResult;
 import de.papke.cloud.portal.pojo.Credentials;
-import de.papke.cloud.portal.terraform.HCLParser;
-import de.papke.cloud.portal.terraform.Variable;
+import de.papke.cloud.portal.pojo.VariableGroup;
 
 /**
  * Created by chris on 16.10.17.
@@ -47,20 +49,25 @@ public class TerraformService {
 	@Value("${terraform.path}")
 	private String terraformPath;
 
-	private Map<String, Map<String, List<Variable>>> providerDefaultsMap = new HashMap<>();
+	private Map<String, List<VariableGroup>> providerDefaults = new HashMap<>();
 
+	@SuppressWarnings("unchecked")
 	@PostConstruct
 	public void init() {
 
 		try {
+			Yaml yaml = new Yaml();
 			URL url = getClass().getClassLoader().getResource("terraform");
 			File terraformFolder = new File(url.toURI());
 			if (!terraformFolder.isFile()) {
 				File[] providerFolderArray = terraformFolder.listFiles();
 				for (File providerFolder : providerFolderArray) {
-					File variableFile = new File(new URI(providerFolder.toURI() + "/vars.tf"));
-					Map<String, List<Variable>> variableMap = getProviderDefaults(variableFile);
-					providerDefaultsMap.put(providerFolder.getName(), variableMap);
+					File variableFile = new File(new URI(providerFolder.toURI() + "/gui.yml"));
+					if (variableFile.exists()) {
+						List<VariableGroup> variableGroupList = yaml.loadAs(new FileInputStream(variableFile), List.class);
+						providerDefaults.put(providerFolder.getName(), variableGroupList);
+					}
+
 				}
 			}
 		}
@@ -78,9 +85,9 @@ public class TerraformService {
 			// print waiting message
 			outputStream.write(TEXT_INTRODUCTION.getBytes());
 			outputStream.flush();
-			
+
 			// execute init command
-			String initCommand = buildInitCommand(terraformPath);
+			CommandLine initCommand = buildInitCommand(terraformPath);
 			commandExecutorService.execute(initCommand, tmpFolder, outputStream);
 
 			// get action to execute
@@ -88,12 +95,12 @@ public class TerraformService {
 
 				// get execution map
 				Map<String, Object> executionMap = getExecutionMap(credentials, variableMap);
-				
+
 				// build the command string
-				String commandString = buildActionCommand(terraformPath, action, executionMap);
+				CommandLine actionCommand = buildActionCommand(terraformPath, action, executionMap);
 
 				// execute action command
-				commandResult = commandExecutorService.execute(commandString, tmpFolder, outputStream);
+				commandResult = commandExecutorService.execute(actionCommand, tmpFolder, outputStream);
 			}
 		}
 		catch (Exception e) {
@@ -103,46 +110,41 @@ public class TerraformService {
 		return commandResult;
 	}
 
-	private String buildInitCommand(String terraformPath) {
-		return terraformPath + Constants.CHAR_WHITESPACE + Constants.ACTION_INIT + Constants.CHAR_WHITESPACE + FLAG_NO_COLOR;
+	private CommandLine buildInitCommand(String terraformPath) {
+		
+		CommandLine initCommand = new CommandLine(terraformPath);
+		initCommand.addArgument(Constants.ACTION_INIT);
+		initCommand.addArgument(FLAG_NO_COLOR);
+		
+		return initCommand;
 	}
 
-	private String buildActionCommand(String terraformPath, String action, Map<String, Object> variableMap) {
-
-		StringBuilder commandStringBuilder = new StringBuilder();
-		commandStringBuilder.append(terraformPath);
-		commandStringBuilder.append(Constants.CHAR_WHITESPACE);
-		commandStringBuilder.append(action);
+	private CommandLine buildActionCommand(String terraformPath, String action, Map<String, Object> variableMap) {
+		
+		CommandLine actionCommand = new CommandLine(terraformPath);
+		actionCommand.addArgument(action);
 		
 		if (action.equals(Constants.ACTION_DESTROY)) {
-			commandStringBuilder.append(Constants.CHAR_WHITESPACE);
-			commandStringBuilder.append(FLAG_FORCE);
+			actionCommand.addArgument(FLAG_FORCE);
 		}
-		
-		commandStringBuilder.append(Constants.CHAR_WHITESPACE);
-		commandStringBuilder.append(FLAG_NO_COLOR);
 
+		actionCommand.addArgument(FLAG_NO_COLOR);
 
 		for (Entry<String, Object> variableEntry : variableMap.entrySet()) {
 
 			String variableName = variableEntry.getKey();
 			String variableValue = (String) variableEntry.getValue();
+			String variableString = variableName + Constants.CHAR_EQUAL + (variableValue.equals("on") ? "true" : variableValue);
 
-			commandStringBuilder.append(Constants.CHAR_WHITESPACE);
-			commandStringBuilder.append(FLAG_VAR);
-			commandStringBuilder.append(Constants.CHAR_WHITESPACE);
-			commandStringBuilder.append(Constants.CHAR_QUOTE);
-			commandStringBuilder.append(variableName);
-			commandStringBuilder.append(Constants.CHAR_EQUAL);
-			commandStringBuilder.append(variableValue.equals("on") ? "true" : variableValue);
-			commandStringBuilder.append(Constants.CHAR_QUOTE);
+			actionCommand.addArgument(FLAG_VAR);
+			actionCommand.addArgument(variableString, false);
 		}
 
-		return commandStringBuilder.toString();
+		return actionCommand;
 	}
-	
+
 	private Map<String, Object> getExecutionMap(Credentials credentials, Map<String, Object> variableMap) {
-		
+
 		Map<String, Object> executionMap = new HashMap<>();
 
 		String provider = credentials.getProvider();
@@ -161,29 +163,13 @@ public class TerraformService {
 			executionMap.put("credentials-vcenter-username-string", credentials.getSecretMap().get(VSphereConstants.VCENTER_USERNAME));
 			executionMap.put("credentials-vcenter-password-string", credentials.getSecretMap().get(VSphereConstants.VCENTER_PASSWORD));
 		}
-		
+
 		executionMap.putAll(variableMap);
-		
+
 		return executionMap;
 	}
 
-	public Map<String, List<Variable>> getProviderDefaults(File providerDefaultsFile) {
-
-		Map<String, List<Variable>> variableMap = new HashMap<>();
-
-		try {
-			HCLParser hclParser = new HCLParser(providerDefaultsFile);
-			variableMap = hclParser.parse();
-			variableMap.remove("credentials");
-		}
-		catch (Exception e) {
-			LOG.error(e.getMessage(), e);
-		}
-
-		return variableMap;
-	}
-
-	public Map<String, Map<String, List<Variable>>> getProviderDefaultsMap() {
-		return providerDefaultsMap;
+	public Map<String, List<VariableGroup>> getProviderDefaults() {
+		return providerDefaults;
 	}
 }

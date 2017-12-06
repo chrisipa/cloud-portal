@@ -28,12 +28,12 @@ import de.papke.cloud.portal.model.VirtualMachineModel;
 import de.papke.cloud.portal.pojo.Credentials;
 import de.papke.cloud.portal.pojo.ProvisionLog;
 import de.papke.cloud.portal.pojo.User;
+import de.papke.cloud.portal.pojo.VariableGroup;
 import de.papke.cloud.portal.service.CredentialsService;
 import de.papke.cloud.portal.service.ProvisionLogService;
-import de.papke.cloud.portal.service.TerraformService;
 import de.papke.cloud.portal.service.SessionUserService;
+import de.papke.cloud.portal.service.TerraformService;
 import de.papke.cloud.portal.service.VirtualMachineService;
-import de.papke.cloud.portal.terraform.Variable;
 
 /**
  * Created by chris on 16.10.17.
@@ -229,7 +229,7 @@ public class VirtualMachineController extends ApplicationController {
 		fillModel(model);
 
 		// get cloud provider defaults map
-		Map<String, Map<String, List<Variable>>> cloudProviderDefaultsMap = terraformService.getProviderDefaultsMap();
+		Map<String, List<VariableGroup>> cloudProviderDefaultsMap = terraformService.getProviderDefaults();
 
 		// create virtual machine model
 		VirtualMachineModel virtualMachineModel = new VirtualMachineModel();
@@ -238,7 +238,7 @@ public class VirtualMachineController extends ApplicationController {
 		virtualMachineModel.setCloudProvider(cloudProvider);
 
 		// set cloud provider defaults
-		virtualMachineModel.setCloudProviderDefaultsMap(cloudProviderDefaultsMap.get(cloudProvider));
+		virtualMachineModel.setCloudProviderDefaultsList(cloudProviderDefaultsMap.get(cloudProvider));
 
 		// set provision log list
 		virtualMachineModel.setProvisionLogList(provisionLogService.getList(cloudProvider));

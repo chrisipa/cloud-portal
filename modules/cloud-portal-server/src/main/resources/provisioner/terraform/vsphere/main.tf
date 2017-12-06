@@ -9,7 +9,7 @@ provider "vmware" {
 resource "vmware_virtual_machine" "vm" {
 
   name = "${var.vm-name-string}"
-  image = "${var.vm-resource-pool-string}/${var.vm-image-string}"
+  image = "${var.vm-resource-pool-string}/${lookup(var.image-templates-map, var.vm-image-string)}"
   cpus = "${var.vm-vcores-string}"
   memory = "${var.vm-ram-string}"
   

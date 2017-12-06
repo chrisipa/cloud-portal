@@ -9,10 +9,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 
 import de.papke.cloud.portal.model.ApplicationModel;
+import de.papke.cloud.portal.pojo.VariableGroup;
 import de.papke.cloud.portal.service.MenuService;
-import de.papke.cloud.portal.service.TerraformService;
 import de.papke.cloud.portal.service.SessionUserService;
-import de.papke.cloud.portal.terraform.Variable;
+import de.papke.cloud.portal.service.TerraformService;
 
 @Controller
 public class ApplicationController {
@@ -48,7 +48,7 @@ public class ApplicationController {
 		applicationModel.setUser(sessionUserService.getUser());
 
 		// get cloud provider defaults map
-		Map<String, Map<String, List<Variable>>> cloudProviderDefaultsMap = terraformService.getProviderDefaultsMap();
+		Map<String, List<VariableGroup>> cloudProviderDefaultsMap = terraformService.getProviderDefaults();
 
 		// set cloud providers
 		List<String> cloudProviderList = new ArrayList<>();

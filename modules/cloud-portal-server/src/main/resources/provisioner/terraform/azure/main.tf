@@ -92,10 +92,10 @@ resource "azurerm_virtual_machine" "vm" {
   network_interface_ids = ["${azurerm_network_interface.nic.id}"]
 
   storage_image_reference {
-    publisher = "${var.image-publisher-string}"
-    offer = "${var.image-offer-string}"
-    sku = "${var.image-sku-string}"
-    version = "${var.image-version-string}"
+    publisher = "${element(split(":", lookup(var.image-names-map, var.vm-image-string)), 0)}"
+    offer = "${element(split(":", lookup(var.image-names-map, var.vm-image-string)), 1)}"
+    sku = "${element(split(":", lookup(var.image-names-map, var.vm-image-string)), 2)}"
+    version = "${element(split(":", lookup(var.image-names-map, var.vm-image-string)), 3)}"
   }
 
   storage_os_disk {
