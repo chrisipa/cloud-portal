@@ -1,0 +1,71 @@
+- title: General
+  variables:
+  
+  - title: Name
+    name: vm-name-string
+    description: Name of the virtual machine.
+    type: string   
+    required: true
+    defaults: []
+  
+  - title: Expiration Days
+    name: vm-expiration-days-string
+    description: Days till virtual machine will be removed automatically.
+    type: string   
+    required: true
+    defaults: [ -1 ]
+    
+  - title: Resource Pool
+    name: vm-resource-pool-string
+    description: Virtual machine resource pool to use.
+    type: list
+    required: true
+    defaults: [ DevOps EMEA POC ] 
+
+- title: VM
+  variables:
+    
+  - title: Image
+    name: vm-image-string
+    description: Virtual machine image to use.
+    type: list   
+    required: true
+    defaults: [ Ubuntu Server 16.04, Windows Server 2016 ]
+    
+  - title: vCores
+    name: vm-vcores-string
+    description: Number of virtual cores of the virtual machine. 
+    type: list   
+    required: true
+    defaults: [ 1, 2, 3, 4, 5, 6, 7, 8 ]
+    
+  - title: vRAM
+    name: vm-ram-string
+    description: RAM (in MB) of the virtual machine.
+    type: list   
+    required: true
+    defaults: [ 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536 ]
+    index: 1
+    
+- title: Bootstrap
+  variables:
+  
+  - title: Username
+    name: bootstrap-username-string
+    description: Username for SSH access.
+    type: string   
+    required: true
+    defaults: [ devops ]
+         
+  - title: Password
+    name: bootstrap-password-string
+    description: Password for SSH access.
+    type: string   
+    required: true
+    defaults: [ devops ]     
+    
+  - title: Script
+    name: bootstrap-script-file
+    description: Bootstrap script file to execute after vm has been created. 
+    type: file   
+    required: true
