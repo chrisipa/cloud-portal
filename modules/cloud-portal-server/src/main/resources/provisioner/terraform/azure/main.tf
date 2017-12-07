@@ -31,9 +31,54 @@ resource "azurerm_network_security_group" "nsg" {
   resource_group_name = "${azurerm_resource_group.rg.name}"
 }
 
-resource "azurerm_network_security_rule" "ruleports" {
-  name = "${var.general-hostname-string}ruleports"
+resource "azurerm_network_security_rule" "rulessh" {
+  count = "${var.vm-image-string == "Ubuntu Server 16.04" ? 1 : 0}"
+  name = "${var.general-hostname-string}rulessh"
   priority = 100
+  direction = "Inbound"
+  access = "Allow"
+  protocol = "Tcp"
+  source_port_range = "*"
+  destination_port_range = "22"
+  source_address_prefix = "*"
+  destination_address_prefix = "*"
+  resource_group_name = "${azurerm_resource_group.rg.name}"
+  network_security_group_name = "${azurerm_network_security_group.nsg.name}"
+}
+
+resource "azurerm_network_security_rule" "rulerdp" {
+  count = "${var.vm-image-string == "Windows Server 2016" ? 1 : 0}"
+  name = "${var.general-hostname-string}rulerdp"
+  priority = 101
+  direction = "Inbound"
+  access = "Allow"
+  protocol = "Tcp"
+  source_port_range = "*"
+  destination_port_range = "3389"
+  source_address_prefix = "*"
+  destination_address_prefix = "*"
+  resource_group_name = "${azurerm_resource_group.rg.name}"
+  network_security_group_name = "${azurerm_network_security_group.nsg.name}"
+}
+
+resource "azurerm_network_security_rule" "rulerm" {
+  count = "${var.vm-image-string == "Windows Server 2016" ? 1 : 0}"
+  name = "${var.general-hostname-string}rulerm"
+  priority = 102
+  direction = "Inbound"
+  access = "Allow"
+  protocol = "Tcp"
+  source_port_range = "*"
+  destination_port_range = "5985-5986"
+  source_address_prefix = "*"
+  destination_address_prefix = "*"
+  resource_group_name = "${azurerm_resource_group.rg.name}"
+  network_security_group_name = "${azurerm_network_security_group.nsg.name}"
+}
+
+resource "azurerm_network_security_rule" "rulecustom" {
+  name = "${var.general-hostname-string}rulecustom"
+  priority = 103
   direction = "Inbound"
   access = "Allow"
   protocol = "Tcp"
@@ -84,7 +129,9 @@ resource "azurerm_storage_container" "storc" {
   container_access_type = "private"
 }
 
-resource "azurerm_virtual_machine" "vm" {
+resource "azurerm_virtual_machine" "ubuntu" {
+
+  count = "${var.vm-image-string == "Ubuntu Server 16.04" ? 1 : 0}"
   name = "${var.general-hostname-string}vm"
   location = "${var.general-region-string}"
   resource_group_name = "${azurerm_resource_group.rg.name}"
@@ -138,6 +185,62 @@ resource "azurerm_virtual_machine" "vm" {
     inline = [
       "bash /tmp/bootstrap.sh",
       "rm /tmp/bootstrap.sh"
+    ]
+  }
+
+  depends_on = ["azurerm_storage_account.stor"]
+}
+
+resource "azurerm_virtual_machine" "windows" {
+
+  count = "${var.vm-image-string == "Windows Server 2016" ? 1 : 0}"
+  name = "${var.general-hostname-string}vm"
+  location = "${var.general-region-string}"
+  resource_group_name = "${azurerm_resource_group.rg.name}"
+  vm_size = "${var.vm-size-string}"
+  network_interface_ids = ["${azurerm_network_interface.nic.id}"]
+
+  storage_image_reference {
+    publisher = "${element(split(":", lookup(var.image-names-map, var.vm-image-string)), 0)}"
+    offer = "${element(split(":", lookup(var.image-names-map, var.vm-image-string)), 1)}"
+    sku = "${element(split(":", lookup(var.image-names-map, var.vm-image-string)), 2)}"
+    version = "${element(split(":", lookup(var.image-names-map, var.vm-image-string)), 3)}"
+  }
+
+  storage_os_disk {
+    name = "${var.general-hostname-string}osdisk"
+    vhd_uri = "${azurerm_storage_account.stor.primary_blob_endpoint}${azurerm_storage_container.storc.name}/${var.general-hostname-string}osdisk.vhd"
+    caching = "ReadWrite"
+    create_option = "FromImage"
+  }
+
+  os_profile {
+    computer_name = "${var.general-hostname-string}"
+    admin_username = "${var.vm-username-string}"
+    admin_password = "${var.vm-password-string}"
+  }
+  
+  os_profile_windows_config {
+    enable_automatic_upgrades = true
+  }
+
+  connection {
+    type = "winrm"
+    host = "${azurerm_public_ip.pip.fqdn}"
+    user = "${var.vm-username-string}"
+    password = "${var.vm-password-string}"          
+    timeout = "10m"      
+  }
+
+  provisioner "file" {
+    source = "${var.bootstrap-script-file}"
+    destination = "C:\\bootstrap.ps1" 
+  }  
+
+  provisioner "remote-exec" {
+    inline = [
+      "Powershell.exe -File C:\\bootstrap.ps1",
+      "del C:\\bootstrap.ps1"      
     ]
   }
 
