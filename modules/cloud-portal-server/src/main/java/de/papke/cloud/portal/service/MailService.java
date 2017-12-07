@@ -42,6 +42,9 @@ public class MailService {
 
 	@Value("${mail.smtp.starttls.enable}")
 	private boolean starttls;
+	
+	@Value("${mail.smtp.timeout}")
+	private int timeout;
 
 	@Value("${mail.from}")
 	private String from;
@@ -80,6 +83,8 @@ public class MailService {
 		Properties mailProperties = new Properties();
 		mailProperties.put("mail.smtp.auth", auth);
 		mailProperties.put("mail.smtp.starttls.enable", starttls);
+		mailProperties.put("mail.smtp.timeout", timeout);    
+		mailProperties.put("mail.smtp.connectiontimeout", timeout);  
 
 		// set java mail properties
 		mailSender.setJavaMailProperties(mailProperties);
