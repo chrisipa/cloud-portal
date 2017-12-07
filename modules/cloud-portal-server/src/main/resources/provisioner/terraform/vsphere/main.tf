@@ -9,7 +9,7 @@ provider "vmware" {
 resource "vmware_virtual_machine" "vm" {
 
   name = "${var.vm-name-string}"
-  image = "${var.vm-resource-pool-string}/${lookup(var.image-templates-map, var.vm-image-string)}"
+  image = "${lookup(var.image-templates-map, var.vm-image-string)}"
   cpus = "${var.vm-vcores-string}"
   memory = "${var.vm-ram-string}"
   
@@ -25,7 +25,6 @@ resource "vmware_virtual_machine" "vm" {
   provisioner "file" {
     source      = "${var.bootstrap-script-file}"
     destination = "/tmp/bootstrap.sh"  
-    on_failure = "continue"              
   }
 
   provisioner "remote-exec" {
@@ -33,14 +32,5 @@ resource "vmware_virtual_machine" "vm" {
       "echo '${var.bootstrap-password-string}' | sudo -S bash /tmp/bootstrap.sh",
       "rm /tmp/bootstrap.sh"
     ]
-    on_failure = "continue"
   }
-}
-
-output "host" {
-  value = "${vmware_virtual_machine.vm.ip_address}"
-}
-
-output "username" {
-  value = "${var.bootstrap-username-string}"
 }

@@ -15,13 +15,6 @@
     required: true
     defaults: [ -1 ]
     
-  - title: Resource Pool
-    name: vm-resource-pool-string
-    description: Virtual machine resource pool to use.
-    type: list
-    required: true
-    defaults: [ DevOps EMEA POC ] 
-
 - title: VM
   variables:
     

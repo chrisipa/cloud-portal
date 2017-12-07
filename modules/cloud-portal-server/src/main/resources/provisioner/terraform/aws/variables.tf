@@ -5,6 +5,7 @@ variable "general-region-string" {}
 variable "general-availability-zone-string" {}
 variable "vm-expiration-days-string" {}
 variable "vm-size-string" {}
+variable "vm-password-string" {}
 variable "storage-size-string" {}
 variable "storage-type-string" {}
 variable "network-incoming-port-start-string" {}

@@ -24,6 +24,16 @@
     defaults: [ a, b, c, d, e, f ]
     index: 0
     
+- title: Authentication
+  variables:      
+    
+  - title: Password
+    name: vm-password-string
+    description: Administrator password.
+    type: string   
+    required: true
+    defaults: [ "P@ssword1" ]       
+    
 - title: VM
   variables:
   
