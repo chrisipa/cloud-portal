@@ -222,8 +222,39 @@ resource "azurerm_virtual_machine" "windows" {
   
   os_profile_windows_config {
     enable_automatic_upgrades = true
+    provision_vm_agent = true
   }
 
+  depends_on = ["azurerm_storage_account.stor"]
+}
+
+resource "azurerm_virtual_machine_extension" "windowsvmext" {
+  
+  count = "${var.vm-image-string == "Windows Server 2016" ? 1 : 0}"
+  name = "${var.general-hostname-string}vmext"
+  location = "${var.general-region-string}"
+  resource_group_name = "${azurerm_resource_group.rg.name}"  
+  virtual_machine_name = "${azurerm_virtual_machine.windows.name}"  
+  publisher = "Microsoft.Compute"
+  type = "CustomScriptExtension"
+  type_handler_version = "1.8"
+  
+  settings = <<SETTINGS
+  {
+    "fileUris": [
+      "https://raw.githubusercontent.com/chrisipa/cloud-portal/master/public/bootstrap/allow-winrm.cmd"
+    ],
+    "commandToExecute": "cmd.exe /c allow-winrm.cmd"
+  }
+SETTINGS
+
+  depends_on = ["azurerm_virtual_machine.windows"]
+}
+
+resource "null_resource" "windowsprovisioning" {
+  
+  count = "${var.vm-image-string == "Windows Server 2016" ? 1 : 0}"
+  
   connection {
     type = "winrm"
     host = "${azurerm_public_ip.pip.fqdn}"
@@ -243,6 +274,6 @@ resource "azurerm_virtual_machine" "windows" {
       "del C:\\bootstrap.ps1"      
     ]
   }
-
-  depends_on = ["azurerm_storage_account.stor"]
+  
+  depends_on = ["azurerm_virtual_machine_extension.windowsvmext"]
 }
