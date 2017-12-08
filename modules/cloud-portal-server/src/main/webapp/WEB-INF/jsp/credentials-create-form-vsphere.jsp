@@ -24,6 +24,14 @@
                             required="required">
                     </div>
 					<div class="form-group">
+                        <label>vCenter Image Folder</label> <input type="text" class="form-control" name="vCenterImageFolder"
+                            required="required">
+                    </div>
+					<div class="form-group">
+                        <label>vCenter Target Folder</label> <input type="text" class="form-control" name="vCenterTargetFolder"
+                            required="required">
+                    </div>
+					<div class="form-group">
                         <label>vCenter Username</label> <input type="text" class="form-control" name="vCenterUsername"
                             required="required">
                     </div>

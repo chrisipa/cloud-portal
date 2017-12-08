@@ -19,23 +19,21 @@
 					<table id="datatable" class="table table-striped table-bordered" cellspacing="0" width="100%">
 						<thead>
 							<tr>
-								<th>ID</th>
+								<th>Actions</th>
 								<th>Group</th>
 								<th>Access Key</th>
 								<th>Secret Key</th>
-								<th>Actions</th>
 							</tr>
 						</thead>
 						<tbody>
 							<c:forEach items="${credentials.credentialsList}" var="cred">
 								<tr>
-									<td><c:out value="${cred.id}" /></td>
-									<td><c:out value="${cred.group}" /></td>
-									<td><c:out value="${cred.secretMap['accessKey']}" /></td>
-									<td><c:out value="${cred.secretMap['secretKey']}" /></td>
 									<td>
 									   <button id="delete/action/aws/${cred.id}" type="submit" class="btn btn-danger btn-circle"><i class="fa fa-times"></i></button>
 									</td>
+									<td><c:out value="${cred.group}" /></td>
+									<td><c:out value="${cred.secretMap['accessKey']}" /></td>
+									<td><c:out value="${cred.secretMap['secretKey']}" /></td>
 								</tr>
 							</c:forEach>
 						</tbody>

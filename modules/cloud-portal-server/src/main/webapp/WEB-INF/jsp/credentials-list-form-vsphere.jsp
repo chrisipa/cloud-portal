@@ -19,25 +19,27 @@
 					<table id="datatable" class="table table-striped table-bordered" cellspacing="0" width="100%">
 						<thead>
 							<tr>
-								<th>ID</th>
+								<th>Actions</th>
 								<th>Group</th>
 								<th>vCenter Hostname</th>
+								<th>vCenter Image Folder</th>
+								<th>vCenter Target Folder</th>
 								<th>vCenter Username</th>
 								<th>vCenter Password</th>
-								<th>Actions</th>
 							</tr>
 						</thead>
 						<tbody>
 							<c:forEach items="${credentials.credentialsList}" var="cred">
 								<tr>
-									<td><c:out value="${cred.id}" /></td>
-									<td><c:out value="${cred.group}" /></td>
-									<td><c:out value="${cred.secretMap['vCenterHostname']}" /></td>
-									<td><c:out value="${cred.secretMap['vCenterUsername']}" /></td>
-									<td><c:out value="${cred.secretMap['vCenterPassword']}" /></td>
 									<td>
 									   <button id="delete/action/vsphere/${cred.id}" type="submit" class="btn btn-danger btn-circle"><i class="fa fa-times"></i></button>
 									</td>
+									<td><c:out value="${cred.group}" /></td>
+									<td><c:out value="${cred.secretMap['vCenterHostname']}" /></td>
+									<td><c:out value="${cred.secretMap['vCenterImageFolder']}" /></td>
+									<td><c:out value="${cred.secretMap['vCenterTargetFolder']}" /></td>
+									<td><c:out value="${cred.secretMap['vCenterUsername']}" /></td>
+									<td><c:out value="${cred.secretMap['vCenterPassword']}" /></td>
 								</tr>
 							</c:forEach>
 						</tbody>

@@ -19,27 +19,25 @@
 					<table id="datatable" class="table table-striped table-bordered" cellspacing="0" width="100%">
 						<thead>
 							<tr>
-								<th>ID</th>
+								<th>Actions</th>
 								<th>Group</th>
 								<th>Subscription ID</th>
 								<th>Tenant ID</th>
 								<th>Client ID</th>
 								<th>Client Secret</th>
-								<th>Actions</th>
 							</tr>
 						</thead>
 						<tbody>
 							<c:forEach items="${credentials.credentialsList}" var="cred">
 								<tr>
-									<td><c:out value="${cred.id}" /></td>
+									<td>
+									   <button id="delete/action/azure/${cred.id}" type="submit" class="btn btn-danger btn-circle"><i class="fa fa-times"></i></button>
+									</td>
 									<td><c:out value="${cred.group}" /></td>
 									<td><c:out value="${cred.secretMap['subscriptionId']}" /></td>
 									<td><c:out value="${cred.secretMap['tenantId']}" /></td>
 									<td><c:out value="${cred.secretMap['clientId']}" /></td>
 									<td><c:out value="${cred.secretMap['clientSecret']}" /></td>
-									<td>
-									   <button id="delete/action/azure/${cred.id}" type="submit" class="btn btn-danger btn-circle"><i class="fa fa-times"></i></button>
-									</td>
 								</tr>
 							</c:forEach>
 						</tbody>

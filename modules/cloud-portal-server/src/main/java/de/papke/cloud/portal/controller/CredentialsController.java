@@ -55,6 +55,8 @@ public class CredentialsController extends ApplicationController {
 			}
 			else if (provider.equals(VSphereConstants.PROVIDER)) {
 				secretMap.put(VSphereConstants.VCENTER_HOSTNAME, variableMap.get(VSphereConstants.VCENTER_HOSTNAME));
+				secretMap.put(VSphereConstants.VCENTER_IMAGE_FOLDER, variableMap.get(VSphereConstants.VCENTER_IMAGE_FOLDER));
+				secretMap.put(VSphereConstants.VCENTER_TARGET_FOLDER, variableMap.get(VSphereConstants.VCENTER_TARGET_FOLDER));
 				secretMap.put(VSphereConstants.VCENTER_USERNAME, variableMap.get(VSphereConstants.VCENTER_USERNAME));
 				secretMap.put(VSphereConstants.VCENTER_PASSWORD, variableMap.get(VSphereConstants.VCENTER_PASSWORD));
 			}

@@ -160,6 +160,8 @@ public class TerraformService {
 		}
 		else if (provider.equals(VSphereConstants.PROVIDER)) {
 			executionMap.put("credentials-vcenter-hostname-string", credentials.getSecretMap().get(VSphereConstants.VCENTER_HOSTNAME));
+			executionMap.put("credentials-vcenter-image-folder-string", credentials.getSecretMap().get(VSphereConstants.VCENTER_IMAGE_FOLDER));
+			executionMap.put("credentials-vcenter-target-folder-string", credentials.getSecretMap().get(VSphereConstants.VCENTER_TARGET_FOLDER));
 			executionMap.put("credentials-vcenter-username-string", credentials.getSecretMap().get(VSphereConstants.VCENTER_USERNAME));
 			executionMap.put("credentials-vcenter-password-string", credentials.getSecretMap().get(VSphereConstants.VCENTER_PASSWORD));
 		}

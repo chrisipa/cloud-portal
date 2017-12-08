@@ -49,6 +49,6 @@ $(function() {
 	
 	$('#datatable').DataTable({
         responsive: true,
-        order: [[ 0, 'desc' ]]
+        order: [[ 1, 'desc' ]]
     });
 });

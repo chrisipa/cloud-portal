@@ -20,17 +20,22 @@
 					<table id="datatable" class="table table-striped table-bordered" cellspacing="0" width="100%">
                         <thead>
                             <tr>
+                                <th>Actions</th>
                                 <th>Date</th>
                                 <th>Command</th>
                                 <th>Success</th>
                                 <th>Variables</th>
                                 <th>Expiration Date</th>
-                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             <c:forEach items="${virtualMachine.provisionLogList}" var="provisionLog">
                                 <tr>
+                                    <td>
+                                        <c:if test="${provisionLog.success == true && provisionLog.command == 'apply'}">
+                                            <button id="delete/action/${virtualMachine.cloudProvider}/${provisionLog.id}" type="submit" class="btn btn-danger btn-circle"><i class="fa fa-times"></i></button>
+                                        </c:if>                                            
+                                    </td>
                                     <td data-order="<fmt:formatDate pattern="yyyy-MM-dd HH:mm" value="${provisionLog.date}"/>"><fmt:formatDate pattern="dd.MM.yyyy HH:mm:ss" value="${provisionLog.date}"/></td>
                                     <td><c:out value="${provisionLog.command}" /></td>
                                     <td><c:out value="${provisionLog.success}" /></td>
@@ -40,11 +45,6 @@
                                     </c:forEach>
                                     </td>
                                     <td data-order="<fmt:formatDate pattern="yyyy-MM-dd HH:mm" value="${provisionLog.expirationDate}"/>"><fmt:formatDate pattern="dd.MM.yyyy HH:mm:ss" value="${provisionLog.expirationDate}"/></td>
-                                    <td>
-                                        <c:if test="${provisionLog.success == true && provisionLog.command == 'apply'}">
-                                            <button id="delete/action/${virtualMachine.cloudProvider}/${provisionLog.id}" type="submit" class="btn btn-danger btn-circle"><i class="fa fa-times"></i></button>
-                                        </c:if>                                            
-                                    </td>
                                 </tr>
                             </c:forEach>
                         </tbody>
