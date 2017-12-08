@@ -1,5 +1,5 @@
 output "host" {
-  value = "${vmware_virtual_machine.vm.ip_address}"
+  value = "${element(flatten(list(vmware_virtual_machine.ubuntu.*.ip_address, vmware_virtual_machine.windows.*.ip_address)), 0)}"  
 }
 
 output "username" {
