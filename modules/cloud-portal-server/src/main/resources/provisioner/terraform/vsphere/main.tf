@@ -3,7 +3,7 @@ provider "vmware" {
   user = "${var.credentials-vcenter-username-string}"
   password = "${var.credentials-vcenter-password-string}"
   insecure_connection = "true"
-  version = "1.2"
+  version = "1.2.0"
 }
 
 resource "vmware_virtual_machine" "ubuntu" {
@@ -61,7 +61,7 @@ resource "vmware_virtual_machine" "windows" {
 
   provisioner "remote-exec" {
     inline = [
-      "Powershell.exe -File C:\\bootstrap.ps1",
+      "Powershell.exe -ExecutionPolicy Unrestricted -File C:\\bootstrap.ps1",
       "del C:\\bootstrap.ps1"      
     ]
   }

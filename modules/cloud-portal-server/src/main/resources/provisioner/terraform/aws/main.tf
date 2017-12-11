@@ -3,7 +3,7 @@ provider "aws" {
   access_key = "${var.credentials-access-key-string}"
   secret_key = "${var.credentials-secret-key-string}"
   region     = "${var.general-region-string}"
-  version    = "1.3"
+  version    = "1.3.0"
 }
 
 resource "aws_security_group" "nsg" {
@@ -37,7 +37,7 @@ resource "aws_security_group_rule" "remoting-ports-windows-rm" {
   cidr_blocks       = ["0.0.0.0/0"]
   protocol          = "tcp"
   from_port         = "5985"
-  to_port           = "5986"
+  to_port           = "5985"
 }
 
 resource "aws_security_group_rule" "incoming-ports" {
@@ -152,7 +152,7 @@ resource "aws_instance" "windows" {
 
   provisioner "remote-exec" {
     inline = [
-      "Powershell.exe -File C:\\bootstrap.ps1",
+      "Powershell.exe -ExecutionPolicy Unrestricted -File C:\\bootstrap.ps1",
       "del C:\\bootstrap.ps1"      
     ]
   }

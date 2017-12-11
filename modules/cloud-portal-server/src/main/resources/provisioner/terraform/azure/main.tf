@@ -1,9 +1,13 @@
+provider "null" {
+  version = "1.0.0"
+}
+
 provider "azurerm" {
   subscription_id = "${var.credentials-subscription-id-string}"
   tenant_id = "${var.credentials-tenant-id-string}"
   client_id = "${var.credentials-client-id-string}"
   client_secret = "${var.credentials-client-secret-string}"
-  version = "0.3"
+  version = "0.3.0"
 }
 
 resource "azurerm_resource_group" "rg" {
@@ -69,7 +73,7 @@ resource "azurerm_network_security_rule" "rulerm" {
   access = "Allow"
   protocol = "Tcp"
   source_port_range = "*"
-  destination_port_range = "5985-5986"
+  destination_port_range = "5985"
   source_address_prefix = "*"
   destination_address_prefix = "*"
   resource_group_name = "${azurerm_resource_group.rg.name}"
@@ -270,7 +274,7 @@ resource "null_resource" "windowsprovisioning" {
 
   provisioner "remote-exec" {
     inline = [
-      "Powershell.exe -File C:\\bootstrap.ps1",
+      "Powershell.exe -ExecutionPolicy Unrestricted -File C:\\bootstrap.ps1",
       "del C:\\bootstrap.ps1"      
     ]
   }
