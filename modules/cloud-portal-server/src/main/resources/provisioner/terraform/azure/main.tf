@@ -104,13 +104,14 @@ resource "azurerm_network_security_rule" "rulerm" {
 }
 
 resource "azurerm_network_security_rule" "rulecustom" {
+  count = "${length(split(",", var.network-incoming-ports-string))}"
   name = "${random_id.id.hex}rulecustom"
-  priority = 103
+  priority = "${103 + count.index}"
   direction = "Inbound"
   access = "Allow"
   protocol = "Tcp"
   source_port_range = "*"
-  destination_port_range = "${var.network-incoming-port-range-string}"
+  destination_port_range = "${element(split(",", var.network-incoming-ports-string), count.index)}"
   source_address_prefix = "*"
   destination_address_prefix = "*"
   resource_group_name = "${azurerm_resource_group.rg.name}"

@@ -7,8 +7,7 @@ variable "vm-size-string" {}
 variable "vm-password-string" {}
 variable "storage-size-string" {}
 variable "storage-type-string" {}
-variable "network-incoming-port-start-string" {}
-variable "network-incoming-port-end-string" {}
+variable "network-incoming-ports-string" {}
 variable "bootstrap-public-key-file" {}
 variable "bootstrap-private-key-file" {}
 variable "bootstrap-script-file" {}

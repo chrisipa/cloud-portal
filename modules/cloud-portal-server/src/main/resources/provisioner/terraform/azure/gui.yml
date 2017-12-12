@@ -102,13 +102,13 @@
     required: true
     defaults: [ 10.0.10.0/24 ]
     
-  - title: Incoming Port Range
-    name: network-incoming-port-range-string
-    description: The allowed port range for incoming connections.
-    type: string
+  - title: Incoming Ports
+    name: network-incoming-ports-string
+    description: "Comma separated list of ports for incoming connections. * means all ports are allowed."
+    type: string   
     required: true
-    defaults: [ 1-1024 ]    
-    
+    defaults: [ "80,443" ]
+  
 - title: Bootstrap
   variables:
   

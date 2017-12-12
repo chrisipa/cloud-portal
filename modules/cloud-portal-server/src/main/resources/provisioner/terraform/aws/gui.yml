@@ -88,20 +88,13 @@
 - title: Network
   variables:    
   
-  - title: Incoming Port Start
-    name: network-incoming-port-start-string
-    description: Start port for incoming connections.
+  - title: Incoming Ports
+    name: network-incoming-ports-string
+    description: Comma separated list of ports for incoming connections. 0 means all ports are allowed
     type: string   
     required: true
-    defaults: [ 1 ]        
-    
-  - title: Incoming Port End
-    name: network-incoming-port-end-string
-    description: End port for incoming connections.
-    type: string   
-    required: true
-    defaults: [ 1024 ]  
-    
+    defaults: [ "80,443" ]
+  
 - title: Bootstrap
   variables:
   

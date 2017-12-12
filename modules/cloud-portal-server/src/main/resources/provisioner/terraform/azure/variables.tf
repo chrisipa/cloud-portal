@@ -11,7 +11,7 @@ variable "storage-account-tier-string" {}
 variable "storage-replication-type-string" {}
 variable "network-vnet-address-space-string" {}
 variable "network-subnet-address-space-string" {}
-variable "network-incoming-port-range-string" {}
+variable "network-incoming-ports-string" {}
 variable "bootstrap-public-key-file" {}
 variable "bootstrap-private-key-file" {}
 variable "bootstrap-script-file" {}

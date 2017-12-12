@@ -54,12 +54,13 @@ resource "aws_security_group_rule" "remoting-ports-windows-rm" {
 }
 
 resource "aws_security_group_rule" "incoming-ports" {
+  count             = "${length(split(",", var.network-incoming-ports-string))}"
   security_group_id = "${aws_security_group.nsg.id}"
   type              = "ingress"
   cidr_blocks       = ["0.0.0.0/0"]
   protocol          = "tcp"
-  from_port         = "${var.network-incoming-port-start-string}"
-  to_port           = "${var.network-incoming-port-end-string}"
+  from_port         = "${element(split(",", var.network-incoming-ports-string), count.index)}"
+  to_port           = "${element(split(",", var.network-incoming-ports-string), count.index)}"
 }
 
 resource "aws_security_group_rule" "outgoing-ports" {
