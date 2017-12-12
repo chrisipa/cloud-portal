@@ -1,10 +1,17 @@
 - title: General
   variables:
   
-  - title: Name
-    name: vm-name-string
-    description: Name of the virtual machine.
+  - title: Title
+    name: title
+    description: Title of the virtual machine.
     type: string   
+    required: true
+    defaults: []
+    
+  - title: Description
+    name: description
+    description: Description of the virtual machine.
+    type: text   
     required: true
     defaults: []
   

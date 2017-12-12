@@ -1,6 +1,5 @@
 variable "credentials-access-key-string" {}
 variable "credentials-secret-key-string" {}
-variable "general-name-string" {}
 variable "general-region-string" {}
 variable "general-availability-zone-string" {}
 variable "vm-expiration-days-string" {}
@@ -13,6 +12,8 @@ variable "network-incoming-port-end-string" {}
 variable "bootstrap-public-key-file" {}
 variable "bootstrap-private-key-file" {}
 variable "bootstrap-script-file" {}
+variable "title" {}
+variable "description" {}
 
 variable "image-ami-string" {}
 

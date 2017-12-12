@@ -1,10 +1,17 @@
 - title: General
   variables:
   
-  - title: Hostname
-    name: general-hostname-string
-    description: Name of the machine to create.
+  - title: Title
+    name: title
+    description: Title of the virtual machine.
     type: string   
+    required: true
+    defaults: []
+    
+  - title: Description
+    name: description
+    description: Description of the virtual machine.
+    type: text   
     required: true
     defaults: []
     
@@ -38,14 +45,7 @@
     description: Administrator password (recommended to disable password auth).
     type: string   
     required: true
-    defaults: [ notused ]     
-    
-  - title: Disable Password Authentication
-    name: vm-disable-password-authentication-boolean
-    description: Disable password authentication for vm (recommended to keep enabled).
-    type: boolean   
-    required: true
-    defaults: [ true ]  
+    defaults: [ notused ]      
 
 - title: VM
   variables:

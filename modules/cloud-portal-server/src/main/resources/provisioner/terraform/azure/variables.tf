@@ -2,13 +2,11 @@ variable "credentials-subscription-id-string" {}
 variable "credentials-tenant-id-string" {}
 variable "credentials-client-id-string" {}
 variable "credentials-client-secret-string" {}
-variable "general-hostname-string" {}
 variable "general-region-string" {}
 variable "vm-image-string" {}
 variable "vm-size-string" {}
 variable "vm-username-string" {}
 variable "vm-password-string" {}
-variable "vm-disable-password-authentication-boolean" {}
 variable "storage-account-tier-string" {}
 variable "storage-replication-type-string" {}
 variable "network-vnet-address-space-string" {}
@@ -17,6 +15,8 @@ variable "network-incoming-port-range-string" {}
 variable "bootstrap-public-key-file" {}
 variable "bootstrap-private-key-file" {}
 variable "bootstrap-script-file" {}
+variable "title" {}
+variable "description" {}
 
 variable "image-names-map" {
   type = "map"

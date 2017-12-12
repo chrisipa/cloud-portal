@@ -50,28 +50,35 @@
 													<input type="file" name="${variable.name}"<c:if test="${variable.required}"> required="required"</c:if>>
 												</c:when>
 												<c:otherwise>
-													<c:choose>
-														<c:when test="${variable.type == 'boolean'}">
-															<br />
+												    <c:choose>
+												        <c:when test="${variable.type == 'text'}">
+												            <textarea name="${variable.name}" class="form-control" rows="3"<c:if test="${variable.required}"> required="required"</c:if>></textarea>
+												        </c:when>
+														<c:otherwise>
 															<c:choose>
-																<c:when test="${variable.defaults[0] == 'true'}">
-																	<input type="checkbox" name="${variable.name}" checked="checked"<c:if test="${variable.required}"> required="required"</c:if>>
+																<c:when test="${variable.type == 'boolean'}">
+																	<br />
+																	<c:choose>
+																		<c:when test="${variable.defaults[0] == 'true'}">
+																			<input type="checkbox" name="${variable.name}" checked="checked"<c:if test="${variable.required}"> required="required"</c:if>>
+																		</c:when>
+																		<c:otherwise>
+																			<input type="checkbox" name="${variable.name}"<c:if test="${variable.required}"> required="required"</c:if>>
+																		</c:otherwise>
+																	</c:choose>
 																</c:when>
 																<c:otherwise>
-																	<input type="checkbox" name="${variable.name}"<c:if test="${variable.required}"> required="required"</c:if>>
+																    <c:if test="${variable.type == 'list'}">
+																        <select name="${variable.name}" class="form-control"<c:if test="${variable.required}"> required="required"</c:if>>
+																            <c:forEach items="${variable.defaults}" var="value" varStatus="count">
+																                <option<c:if test="${count.index == variable.index}"> selected="selected"</c:if>><c:out value="${value}" /></option>
+																            </c:forEach>
+							                                            </select>
+																    </c:if>
 																</c:otherwise>
 															</c:choose>
-														</c:when>
-														<c:otherwise>
-														    <c:if test="${variable.type == 'list'}">
-														        <select name="${variable.name}" class="form-control"<c:if test="${variable.required}"> required="required"</c:if>>
-														            <c:forEach items="${variable.defaults}" var="value" varStatus="count">
-														                <option<c:if test="${count.index == variable.index}"> selected="selected"</c:if>><c:out value="${value}" /></option>
-														            </c:forEach>
-					                                            </select>
-														    </c:if>
 														</c:otherwise>
-													</c:choose>
+												    </c:choose>
 												</c:otherwise>
 											</c:choose>
 										</c:otherwise>

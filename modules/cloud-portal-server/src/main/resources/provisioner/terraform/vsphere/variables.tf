@@ -3,13 +3,14 @@ variable "credentials-vcenter-image-folder-string" {}
 variable "credentials-vcenter-target-folder-string" {}
 variable "credentials-vcenter-username-string" {}
 variable "credentials-vcenter-password-string" {}
-variable "vm-name-string" {}
 variable "vm-image-string" {}
 variable "vm-vcores-string" {}
 variable "vm-ram-string" {}
 variable "bootstrap-username-string" {}
 variable "bootstrap-password-string" {}
 variable "bootstrap-script-file" {}
+variable "title" {}
+variable "description" {}
 
 variable "image-templates-map" {
   type = "map"

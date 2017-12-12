@@ -1,3 +1,7 @@
+provider "random" {
+  version = "1.1.0"
+}
+
 provider "aws" {
   profile    = "default"
   access_key = "${var.credentials-access-key-string}"
@@ -6,8 +10,17 @@ provider "aws" {
   version    = "1.3.0"
 }
 
+resource "random_id" "id" {
+  byte_length = 6
+}
+
 resource "aws_security_group" "nsg" {
-  name        = "${var.general-name-string}-nsg"
+  name        = "${random_id.id.hex}-nsg"
+  
+  tags {
+    Name = "${var.title}"
+    Description = "${var.description}"
+  }  
 }
 
 resource "aws_security_group_rule" "remoting-ports-ubuntu-ssh" {
@@ -92,7 +105,8 @@ resource "aws_instance" "ubuntu" {
   }
 
   tags {
-    Name = "${var.general-name-string}"
+    Name = "${var.title}"
+    Description = "${var.description}"
   }
   
   connection {
@@ -134,7 +148,8 @@ resource "aws_instance" "windows" {
   }
 
   tags {
-    Name = "${var.general-name-string}"
+    Name = "${var.title}"
+    Description = "${var.description}"
   }
   
   connection {

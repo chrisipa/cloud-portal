@@ -1,3 +1,7 @@
+provider "random" {
+  version = "1.1.0"
+}
+
 provider "vmware" {
   vcenter_server = "${var.credentials-vcenter-hostname-string}"
   user = "${var.credentials-vcenter-username-string}"
@@ -6,10 +10,14 @@ provider "vmware" {
   version = "1.2.0"
 }
 
+resource "random_id" "id" {
+  byte_length = 6
+}
+
 resource "vmware_virtual_machine" "ubuntu" {
 
   count = "${var.vm-image-string == "Ubuntu Server 16.04" ? 1 : 0}"
-  name = "${var.vm-name-string}"
+  name = "${random_id.id.hex}"
   image = "${var.credentials-vcenter-image-folder-string}/${lookup(var.image-templates-map, var.vm-image-string)}"
   folder = "${var.credentials-vcenter-target-folder-string}"
   cpus = "${var.vm-vcores-string}"
@@ -40,7 +48,7 @@ resource "vmware_virtual_machine" "ubuntu" {
 resource "vmware_virtual_machine" "windows" {
 
   count = "${var.vm-image-string == "Windows Server 2016" ? 1 : 0}"
-  name = "${var.vm-name-string}"
+  name = "${random_id.id.hex}"
   image = "${var.credentials-vcenter-image-folder-string}/${lookup(var.image-templates-map, var.vm-image-string)}"
   folder = "${var.credentials-vcenter-target-folder-string}"
   cpus = "${var.vm-vcores-string}"

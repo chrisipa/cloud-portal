@@ -94,12 +94,25 @@ public class VirtualMachineService {
 			CommandResult commandResult = terraformService.execute(action, credentials, variableMap, outputStream, tmpFolder);
 
 			if (action.equals(Constants.ACTION_APPLY)) {
-			
+				
+				// get success flag
+				boolean success = commandResult.isSuccess();
+				
+				// get variables from output
+				Map<String, String> commandVariableMap = getCommandVariableMap(commandResult);
+				commandVariableMap.put("provider", provider);
+				
+				// add command output variables to map
+				variableMap.putAll(commandVariableMap);
+
 				// create provision log
-				provisionLogService.create(action, provider, commandResult.isSuccess(), variableMap, tmpFolder);
+				provisionLogService.create(action, provider, success, variableMap, tmpFolder);
+
+				// get attachment for mail
+				attachment = getAttachment(commandResult);
 	
 				// send mail
-				attachment = sendMail(action, provider, commandResult);
+				sendMail(action, success, commandVariableMap, attachment);
 			}
 		}
 		catch (Exception e) {
@@ -166,8 +179,18 @@ public class VirtualMachineService {
 			// get provider
 			String provider = provisionLog.getProvider();
 			
+			// get variables from output
+			Map<String, String> mailVariableMap = getCommandVariableMap(commandResult);
+			mailVariableMap.put("provider", provider);
+
+			// get attachment for mail
+			attachment = getAttachment(commandResult);
+		
+			// get success flag
+			boolean success = commandResult.isSuccess();
+			
 			// send mail
-			attachment = sendMail(user, action, provider, commandResult);
+			sendMail(user, action, success, mailVariableMap, attachment);
 		}
 		catch (Exception e) {
 			LOG.error(e.getMessage(), e);
@@ -184,40 +207,27 @@ public class VirtualMachineService {
 	
 	private static final File getTmpFolder() {
 
-		File tmpFolder = new File(System.getProperty("java.io.tmpdir") + "/tmp" + System.nanoTime());
+		File tmpFolder = new File(Constants.TMP_FOLDER_PREFIX + System.nanoTime());
 		tmpFolder.mkdirs();
 
 		return tmpFolder;
 	}
 	
-	private File sendMail(String action, String provider, CommandResult commandResult) throws IOException {
-		return sendMail(sessionUserService.getUser(), action, provider, commandResult);
+	private File sendMail(String action, boolean success, Map<String, String> variableMap, File attachment) throws IOException {
+		return sendMail(sessionUserService.getUser(), action, success, variableMap, attachment);
 	}
 	
-	private File sendMail(User user, String action, String provider, CommandResult commandResult) throws IOException {
+	private File sendMail(User user, String action, boolean success, Map<String, String> variableMap, File attachment) {
 		
-		File attachment = null;
-		
-		// get variables from output
-		Map<String, String> mailVariableMap = parseOutput(commandResult.getOutput());
-		mailVariableMap.put("provider", provider);
-
-		// write command output to attachment file
-		String output = commandResult.getOutput();
-		if (StringUtils.isNotEmpty(output)) {
-			attachment = File.createTempFile(ATTACHMENT_PREFIX, ATTACHMENT_SUFFIX);
-			FileUtils.writeStringToFile(attachment, commandResult.getOutput(), StandardCharsets.UTF_8);
-		}
-
 		// get mail address
 		String email = user.getEmail(); 
 
 		// send mail
 		if (StringUtils.isNotEmpty(email)) {
-			String mailTemplateName = getMailTemplateName(action, commandResult.isSuccess());
+			String mailTemplateName = getMailTemplateName(action, success);
 			String mailSubject = getMailSubject(mailTemplateName);
 			String mailTemplatePath = mailTemplateService.getMailTemplatePath(mailTemplateName);
-			mailService.send(email, mailSubject, mailTemplatePath, attachment, mailVariableMap);
+			mailService.send(email, mailSubject, mailTemplatePath, attachment, variableMap);
 		}
 		
 		return attachment;
@@ -242,20 +252,25 @@ public class VirtualMachineService {
 		return MAIL_TEMPLATE_PREFIX + Constants.CHAR_DASH + action + Constants.CHAR_DASH + (success ? "success" : "error"); 
 	}
 
-	private Map<String, String> parseOutput(String output) {
+	private Map<String, String> getCommandVariableMap(CommandResult commandResult) {
 
 		Map<String, String> variableMap = new HashMap<>();
-
-		if (StringUtils.isNotEmpty(output)) {
-			String[] outputArray = output.split(PATTERN_OUTPUTS);
-			if (outputArray.length == 2) {
-				String outputVariablePart = outputArray[1].replaceAll(PATTERN_EMPTY_LINE, StringUtils.EMPTY);
-				for (String line : outputVariablePart.split(Constants.CHAR_NEW_LINE)) {
-					String[] variablePart = line.split(Constants.CHAR_EQUAL);
-					if (variablePart.length == 2) {
-						String key = variablePart[0].trim();
-						String value = variablePart[1].trim();
-						variableMap.put(key, value);
+		
+		if (commandResult != null) {
+		
+			String output = commandResult.getOutput();
+	
+			if (StringUtils.isNotEmpty(output)) {
+				String[] outputArray = output.split(PATTERN_OUTPUTS);
+				if (outputArray.length == 2) {
+					String outputVariablePart = outputArray[1].replaceAll(PATTERN_EMPTY_LINE, StringUtils.EMPTY);
+					for (String line : outputVariablePart.split(Constants.CHAR_NEW_LINE)) {
+						String[] variablePart = line.split(Constants.CHAR_EQUAL);
+						if (variablePart.length == 2) {
+							String key = variablePart[0].trim();
+							String value = variablePart[1].trim();
+							variableMap.put(key, value);
+						}
 					}
 				}
 			}
@@ -263,4 +278,20 @@ public class VirtualMachineService {
 
 		return variableMap;
 	}
+	
+	private File getAttachment(CommandResult commandResult) throws IOException {
+		
+		File attachment = null;
+		
+		// write command output to attachment file
+		if (commandResult != null) {
+			String output = commandResult.getOutput();
+			if (StringUtils.isNotEmpty(output)) {
+				attachment = File.createTempFile(ATTACHMENT_PREFIX, ATTACHMENT_SUFFIX);
+				FileUtils.writeStringToFile(attachment, commandResult.getOutput(), StandardCharsets.UTF_8);
+			}
+		}
+		
+		return attachment;
+	}	
 }
