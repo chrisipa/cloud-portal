@@ -30,7 +30,7 @@
     description: Virtual machine image to use.
     type: list   
     required: true
-    defaults: [ Ubuntu Server 16.04, Windows Server 2016 ]
+    defaults: [ Ubuntu Server Linux 16.04, Windows Server 2016 ]
     
   - title: vCores
     name: vm-vcores-string

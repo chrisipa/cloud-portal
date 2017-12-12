@@ -19,7 +19,7 @@ variable "image-ami-string" {}
 variable "image-names-map" {
   type = "map"
   default = {
-    "Ubuntu Server 16.04" = "ubuntu/images/hvm-ssd/ubuntu-xenial-16.04-amd64-server-*"
+    "Ubuntu Server Linux 16.04" = "ubuntu/images/hvm-ssd/ubuntu-xenial-16.04-amd64-server-*"
     "Windows Server 2016" = "Windows_Server-2016-English-Full-Base-*"
   }
 }
@@ -27,7 +27,7 @@ variable "image-names-map" {
 variable "image-owners-map" {
   type = "map"
   default = {
-    "Ubuntu Server 16.04" = "099720109477"
+    "Ubuntu Server Linux 16.04" = "099720109477"
     "Windows Server 2016" = "801119661308"
   }
 }

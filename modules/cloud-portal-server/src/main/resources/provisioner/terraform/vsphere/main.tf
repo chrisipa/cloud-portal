@@ -14,9 +14,9 @@ resource "random_id" "id" {
   byte_length = 6
 }
 
-resource "vmware_virtual_machine" "ubuntu" {
+resource "vmware_virtual_machine" "linux" {
 
-  count = "${var.vm-image-string == "Ubuntu Server 16.04" ? 1 : 0}"
+  count = "${replace(var.vm-image-string, "Linux", "") != var.vm-image-string ? 1 : 0}"
   name = "${random_id.id.hex}"
   image = "${var.credentials-vcenter-image-folder-string}/${lookup(var.image-templates-map, var.vm-image-string)}"
   folder = "${var.credentials-vcenter-target-folder-string}"
@@ -26,7 +26,7 @@ resource "vmware_virtual_machine" "ubuntu" {
   connection {
     type = "ssh"
     agent = false  
-    host = "${vmware_virtual_machine.ubuntu.ip_address}"
+    host = "${vmware_virtual_machine.linux.ip_address}"
     user = "${var.bootstrap-username-string}" 
     password = "${var.bootstrap-password-string}"     
     timeout = "1m"      
@@ -47,7 +47,7 @@ resource "vmware_virtual_machine" "ubuntu" {
 
 resource "vmware_virtual_machine" "windows" {
 
-  count = "${var.vm-image-string == "Windows Server 2016" ? 1 : 0}"
+  count = "${replace(var.vm-image-string, "Windows", "") != var.vm-image-string ? 1 : 0}"
   name = "${random_id.id.hex}"
   image = "${var.credentials-vcenter-image-folder-string}/${lookup(var.image-templates-map, var.vm-image-string)}"
   folder = "${var.credentials-vcenter-target-folder-string}"

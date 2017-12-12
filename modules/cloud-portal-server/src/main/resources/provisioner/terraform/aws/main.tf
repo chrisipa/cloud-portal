@@ -23,8 +23,8 @@ resource "aws_security_group" "nsg" {
   }  
 }
 
-resource "aws_security_group_rule" "remoting-ports-ubuntu-ssh" {
-  count             = "${var.image-ami-string == "Ubuntu Server 16.04" ? 1 : 0}"
+resource "aws_security_group_rule" "remoting-ports-linux-ssh" {
+  count             = "${replace(var.image-ami-string, "Linux", "") != var.image-ami-string ? 1 : 0}"
   security_group_id = "${aws_security_group.nsg.id}"
   type              = "ingress"
   cidr_blocks       = ["0.0.0.0/0"]
@@ -34,7 +34,7 @@ resource "aws_security_group_rule" "remoting-ports-ubuntu-ssh" {
 }
 
 resource "aws_security_group_rule" "remoting-ports-windows-rdp" {
-  count             = "${var.image-ami-string == "Windows Server 2016" ? 1 : 0}"
+  count             = "${replace(var.image-ami-string, "Windows", "") != var.image-ami-string ? 1 : 0}"
   security_group_id = "${aws_security_group.nsg.id}"
   type              = "ingress"
   cidr_blocks       = ["0.0.0.0/0"]
@@ -44,7 +44,7 @@ resource "aws_security_group_rule" "remoting-ports-windows-rdp" {
 }
 
 resource "aws_security_group_rule" "remoting-ports-windows-rm" {
-  count             = "${var.image-ami-string == "Windows Server 2016" ? 1 : 0}"
+  count             = "${replace(var.image-ami-string, "Windows", "") != var.image-ami-string ? 1 : 0}"
   security_group_id = "${aws_security_group.nsg.id}"
   type              = "ingress"
   cidr_blocks       = ["0.0.0.0/0"]
@@ -89,9 +89,9 @@ data "aws_ami" "image" {
   owners = ["${lookup(var.image-owners-map, var.image-ami-string)}"]
 }
 
-resource "aws_instance" "ubuntu" {
+resource "aws_instance" "linux" {
 
-  count = "${var.image-ami-string == "Ubuntu Server 16.04" ? 1 : 0}"
+  count = "${replace(var.image-ami-string, "Linux", "") != var.image-ami-string ? 1 : 0}"
   ami = "${data.aws_ami.image.id}"
   instance_type = "${var.vm-size-string}"
   availability_zone = "${var.general-region-string}${var.general-availability-zone-string}"
@@ -113,7 +113,7 @@ resource "aws_instance" "ubuntu" {
   connection {
     type = "ssh"
     agent = false  
-    host = "${aws_instance.ubuntu.public_dns}"
+    host = "${aws_instance.linux.public_dns}"
     user = "ubuntu"      
     private_key = "${file("${var.bootstrap-private-key-file}")}"
     timeout = "1m"      
@@ -134,7 +134,7 @@ resource "aws_instance" "ubuntu" {
 
 resource "aws_instance" "windows" {
 
-  count = "${var.image-ami-string == "Windows Server 2016" ? 1 : 0}"
+  count = "${replace(var.image-ami-string, "Windows", "") != var.image-ami-string ? 1 : 0}"
   ami = "${data.aws_ami.image.id}"
   instance_type = "${var.vm-size-string}"
   availability_zone = "${var.general-region-string}${var.general-availability-zone-string}"

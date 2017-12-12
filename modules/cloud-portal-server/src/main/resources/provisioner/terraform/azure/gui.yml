@@ -42,10 +42,10 @@
     
   - title: Password
     name: vm-password-string
-    description: Administrator password (recommended to disable password auth).
+    description: Administrator password.
     type: string   
     required: true
-    defaults: [ notused ]      
+    defaults: [ "P@ssword1" ]      
 
 - title: VM
   variables:
@@ -55,7 +55,7 @@
     description: Name of the virtual machine image to use. 
     type: list   
     required: true
-    defaults: [ Ubuntu Server 16.04, Windows Server 2016 ]
+    defaults: [ Ubuntu Server Linux 16.04, Windows Server 2016 ]
     index: 0  
     
   - title: Size

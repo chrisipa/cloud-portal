@@ -59,7 +59,7 @@ resource "azurerm_network_security_group" "nsg" {
 }
 
 resource "azurerm_network_security_rule" "rulessh" {
-  count = "${var.vm-image-string == "Ubuntu Server 16.04" ? 1 : 0}"
+  count = "${replace(var.vm-image-string, "Linux", "") != var.vm-image-string ? 1 : 0}"
   name = "${random_id.id.hex}rulessh"
   priority = 100
   direction = "Inbound"
@@ -74,7 +74,7 @@ resource "azurerm_network_security_rule" "rulessh" {
 }
 
 resource "azurerm_network_security_rule" "rulerdp" {
-  count = "${var.vm-image-string == "Windows Server 2016" ? 1 : 0}"
+  count = "${replace(var.vm-image-string, "Windows", "") != var.vm-image-string ? 1 : 0}"
   name = "${random_id.id.hex}rulerdp"
   priority = 101
   direction = "Inbound"
@@ -89,7 +89,7 @@ resource "azurerm_network_security_rule" "rulerdp" {
 }
 
 resource "azurerm_network_security_rule" "rulerm" {
-  count = "${var.vm-image-string == "Windows Server 2016" ? 1 : 0}"
+  count = "${replace(var.vm-image-string, "Windows", "") != var.vm-image-string ? 1 : 0}"
   name = "${random_id.id.hex}rulerm"
   priority = 102
   direction = "Inbound"
@@ -172,9 +172,9 @@ resource "azurerm_storage_container" "storc" {
   container_access_type = "private"
 }
 
-resource "azurerm_virtual_machine" "ubuntu" {
+resource "azurerm_virtual_machine" "linux" {
 
-  count = "${var.vm-image-string == "Ubuntu Server 16.04" ? 1 : 0}"
+  count = "${replace(var.vm-image-string, "Linux", "") != var.vm-image-string ? 1 : 0}"
   name = "${random_id.id.hex}vm"
   location = "${var.general-region-string}"
   resource_group_name = "${azurerm_resource_group.rg.name}"
@@ -241,7 +241,7 @@ resource "azurerm_virtual_machine" "ubuntu" {
 
 resource "azurerm_virtual_machine" "windows" {
 
-  count = "${var.vm-image-string == "Windows Server 2016" ? 1 : 0}"
+  count = "${replace(var.vm-image-string, "Windows", "") != var.vm-image-string ? 1 : 0}"
   name = "${random_id.id.hex}vm"
   location = "${var.general-region-string}"
   resource_group_name = "${azurerm_resource_group.rg.name}"
@@ -283,7 +283,7 @@ resource "azurerm_virtual_machine" "windows" {
 
 resource "azurerm_virtual_machine_extension" "windowsvmext" {
   
-  count = "${var.vm-image-string == "Windows Server 2016" ? 1 : 0}"
+  count = "${replace(var.vm-image-string, "Windows", "") != var.vm-image-string ? 1 : 0}"
   name = "${random_id.id.hex}vmext"
   location = "${var.general-region-string}"
   resource_group_name = "${azurerm_resource_group.rg.name}"  
@@ -306,7 +306,7 @@ SETTINGS
 
 resource "null_resource" "windowsprovisioning" {
   
-  count = "${var.vm-image-string == "Windows Server 2016" ? 1 : 0}"
+  count = "${replace(var.vm-image-string, "Windows", "") != var.vm-image-string ? 1 : 0}"
   
   connection {
     type = "winrm"

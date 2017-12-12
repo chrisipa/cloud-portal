@@ -21,7 +21,7 @@ variable "description" {}
 variable "image-names-map" {
   type = "map"
   default = {
-    "Ubuntu Server 16.04" = "Canonical:UbuntuServer:16.04-LTS:latest"
+    "Ubuntu Server Linux 16.04" = "Canonical:UbuntuServer:16.04-LTS:latest"
     "Windows Server 2016" = "MicrosoftWindowsServer:WindowsServer:2016-Datacenter:latest"
   }
 }

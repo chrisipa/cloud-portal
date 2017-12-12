@@ -42,7 +42,7 @@
     description: Amazon machine image to use.
     type: list
     required: true
-    defaults: [ Ubuntu Server 16.04, Windows Server 2016 ]
+    defaults: [ Ubuntu Server Linux 16.04, Windows Server 2016 ]
     index: 0  
   
   - title: Password
@@ -75,7 +75,7 @@
     description: Size of the virtual machine storage in GB.
     type: string   
     required: true
-    defaults: [ 8 ]  
+    defaults: [ 30 ]  
     
   - title: Type
     name: storage-type-string

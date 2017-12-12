@@ -3,7 +3,7 @@ output "id" {
 }
 
 output "host" {
-  value = "${element(flatten(list(vmware_virtual_machine.ubuntu.*.ip_address, vmware_virtual_machine.windows.*.ip_address)), 0)}"  
+  value = "${element(flatten(list(vmware_virtual_machine.linux.*.ip_address, vmware_virtual_machine.windows.*.ip_address)), 0)}"  
 }
 
 output "username" {
