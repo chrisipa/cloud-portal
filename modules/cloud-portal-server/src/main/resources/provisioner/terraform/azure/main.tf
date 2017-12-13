@@ -21,7 +21,9 @@ locals {
   image_publisher = "${element(split(":", lookup(var.image_names_map, var.image_name)), 0)}"
   image_offer = "${element(split(":", lookup(var.image_names_map, var.image_name)), 1)}"
   image_sku = "${element(split(":", lookup(var.image_names_map, var.image_name)), 2)}"
-  image_version = "${element(split(":", lookup(var.image_names_map, var.image_name)), 3)}"  
+  image_version = "${element(split(":", lookup(var.image_names_map, var.image_name)), 3)}"
+  linux_script_path = "/tmp/bootstrap.sh"
+  windows_script_path = "C:\\bootstrap.ps1"  
 }
 
 resource "random_id" "id" {
@@ -231,13 +233,13 @@ resource "azurerm_virtual_machine" "linux" {
 
   provisioner "file" {
     source = "${var.script_file}"
-    destination = "/tmp/bootstrap.sh"         
+    destination = "${local.linux_script_path}"         
   }
 
   provisioner "remote-exec" {
     inline = [
-      "bash /tmp/bootstrap.sh",
-      "rm /tmp/bootstrap.sh"
+      "bash ${local.linux_script_path}",
+      "rm ${local.linux_script_path}"
     ]
   }
   
@@ -328,13 +330,13 @@ resource "null_resource" "windowsprovisioning" {
 
   provisioner "file" {
     source = "${var.script_file}"
-    destination = "C:\\bootstrap.ps1" 
+    destination = "${local.windows_script_path}" 
   }  
 
   provisioner "remote-exec" {
     inline = [
-      "Powershell.exe -ExecutionPolicy Unrestricted -File C:\\bootstrap.ps1",
-      "del C:\\bootstrap.ps1"      
+      "Powershell.exe -ExecutionPolicy Unrestricted -File ${local.windows_script_path}",
+      "del ${local.windows_script_path}"      
     ]
   }
   

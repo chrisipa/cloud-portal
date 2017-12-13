@@ -13,6 +13,8 @@ provider "vmware" {
 locals {
   is_linux = "${replace(var.image_name, "Linux", "") != var.image_name ? 1 : 0}"
   is_windows = "${replace(var.image_name, "Windows", "") != var.image_name ? 1 : 0}"
+  linux_script_path = "/tmp/bootstrap.sh"
+  windows_script_path = "C:\\bootstrap.ps1"  
 }
 
 resource "random_id" "id" {
@@ -39,13 +41,13 @@ resource "vmware_virtual_machine" "linux" {
   
   provisioner "file" {
     source      = "${var.script_file}"
-    destination = "/tmp/bootstrap.sh"  
+    destination = "${local.linux_script_path}"  
   }
 
   provisioner "remote-exec" {
     inline = [
-      "echo '${var.password}' | sudo -S bash /tmp/bootstrap.sh",
-      "rm /tmp/bootstrap.sh"
+      "echo '${var.password}' | sudo -S bash ${local.linux_script_path}",
+      "rm ${local.linux_script_path}"
     ]
   }
 }
@@ -69,13 +71,13 @@ resource "vmware_virtual_machine" "windows" {
 
   provisioner "file" {
     source = "${var.script_file}"
-    destination = "C:\\bootstrap.ps1" 
+    destination = "${local.windows_script_path}" 
   }  
 
   provisioner "remote-exec" {
     inline = [
-      "Powershell.exe -ExecutionPolicy Unrestricted -File C:\\bootstrap.ps1",
-      "del C:\\bootstrap.ps1"      
+      "Powershell.exe -ExecutionPolicy Unrestricted -File ${local.windows_script_path}",
+      "del ${local.windows_script_path}"      
     ]
   }
 }

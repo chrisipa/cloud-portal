@@ -16,6 +16,8 @@ locals {
   incoming_ports_list = "${split(",", var.incoming_ports)}"
   ami_name = "${lookup(var.image_names_map, var.image_name)}"
   ami_owner = "${lookup(var.image_owners_map, var.image_name)}"
+  linux_script_path = "/tmp/bootstrap.sh"
+  windows_script_path = "C:\\bootstrap.ps1"
 }
 
 resource "random_id" "id" {
@@ -129,13 +131,13 @@ resource "aws_instance" "linux" {
 
   provisioner "file" {
     source      = "${var.script_file}"
-    destination = "/tmp/bootstrap.sh"     
+    destination = "${local.linux_script_path}"     
   }
 
   provisioner "remote-exec" {
     inline = [
-      "bash /tmp/bootstrap.sh",
-      "rm /tmp/bootstrap.sh"
+      "bash ${local.linux_script_path}",
+      "rm ${local.linux_script_path}"
     ]
   }
 }
@@ -171,13 +173,13 @@ resource "aws_instance" "windows" {
 
   provisioner "file" {
     source = "${var.script_file}"
-    destination = "C:\\bootstrap.ps1" 
+    destination = "${local.windows_script_path}" 
   }  
 
   provisioner "remote-exec" {
     inline = [
-      "Powershell.exe -ExecutionPolicy Unrestricted -File C:\\bootstrap.ps1",
-      "del C:\\bootstrap.ps1"      
+      "Powershell.exe -ExecutionPolicy Unrestricted -File ${local.windows_script_path}",
+      "del ${local.windows_script_path}"      
     ]
   }
   
