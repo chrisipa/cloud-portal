@@ -4,6 +4,10 @@
 <p>Hello,<br /><br />your VM from <strong>${provider}</strong> was destroyed successfully.</p>
 <p>See log file for additional details.<p>
 <hr />
+<p>ID: <strong>${id}</strong></p>
+<p>Host: <strong>${host}</strong></p>
+<p>Username: <strong>${username}</strong></p>
+<hr />
 <p>Best regards</p>
 <p>Your Self Service Cloud Portal</p>
 </body>

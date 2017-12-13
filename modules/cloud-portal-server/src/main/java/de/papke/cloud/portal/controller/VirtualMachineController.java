@@ -67,11 +67,11 @@ public class VirtualMachineController extends ApplicationController {
 	 * @param model
 	 * @return
 	 */
-	@GetMapping(path = PREFIX + "/list/form/{cloudProvider}")
-	public String list(Map<String, Object> model, @PathVariable String cloudProvider) {
+	@GetMapping(path = PREFIX + "/list/form/{provider}")
+	public String list(Map<String, Object> model, @PathVariable String provider) {
 
 		// fill model
-		fillModel(model, cloudProvider);
+		fillModel(model, provider);
 
 		// return view name
 		return "vm-list-form";
@@ -83,11 +83,11 @@ public class VirtualMachineController extends ApplicationController {
 	 * @param model
 	 * @return
 	 */
-	@GetMapping(path = PREFIX + "/create/form/{cloudProvider}")
-	public String create(Map<String, Object> model, @PathVariable String cloudProvider) {
+	@GetMapping(path = PREFIX + "/create/form/{provider}")
+	public String create(Map<String, Object> model, @PathVariable String provider) {
 
 		// fill model
-		fillModel(model, cloudProvider);
+		fillModel(model, provider);
 
 		// return view name
 		return "vm-create-form";
@@ -103,7 +103,7 @@ public class VirtualMachineController extends ApplicationController {
 	@ResponseBody
 	public void provision(
 			@PathVariable String action,
-			@RequestParam String cloudProvider,
+			@RequestParam String provider,
 			@RequestParam Map<String, Object> variableMap,
 			HttpServletRequest request,
 			HttpServletResponse response) {
@@ -134,7 +134,7 @@ public class VirtualMachineController extends ApplicationController {
 			}
 
 			// get credentials
-			Credentials credentials = credentialsService.getCredentials(cloudProvider);
+			Credentials credentials = credentialsService.getCredentials(provider);
 			if (credentials != null) {
 
 				// get response output stream
@@ -144,7 +144,7 @@ public class VirtualMachineController extends ApplicationController {
 				virtualMachineService.provision(action, credentials, variableMap, outputStream);
 			}
 			else {
-				response.getWriter().println(String.format("No credentials found for cloud provider '%s'. Please contact your administrator.", cloudProvider));
+				response.getWriter().println(String.format("No credentials found for cloud provider '%s'. Please contact your administrator.", provider));
 			}
 		}
 		catch (Exception e) {
@@ -159,16 +159,16 @@ public class VirtualMachineController extends ApplicationController {
 		}
 	}    
 
-	@GetMapping(path = PREFIX + "/delete/action/{cloudProvider}/{id}")
+	@GetMapping(path = PREFIX + "/delete/action/{provider}/{id}")
 	public void deprovision(Map<String, Object> model,
-			@PathVariable String cloudProvider,
+			@PathVariable String provider,
 			@PathVariable String id,
 			HttpServletResponse response) {
 
 		try {
 
 			// get credentials
-			Credentials credentials = credentialsService.getCredentials(cloudProvider);
+			Credentials credentials = credentialsService.getCredentials(provider);
 			if (credentials != null) {
 
 				// get username
@@ -190,7 +190,7 @@ public class VirtualMachineController extends ApplicationController {
 				}
 			}
 			else {
-				response.getWriter().println(String.format("No credentials found for cloud provider '%s'. Please contact your administrator.", cloudProvider));
+				response.getWriter().println(String.format("No credentials found for cloud provider '%s'. Please contact your administrator.", provider));
 			}
 
 		}
@@ -199,7 +199,7 @@ public class VirtualMachineController extends ApplicationController {
 		}
 
 		// fill model
-		fillModel(model, cloudProvider);
+		fillModel(model, provider);
 	} 
 
 	private static File writeMultipartFile(MultipartFile multipartFile) {
@@ -224,7 +224,7 @@ public class VirtualMachineController extends ApplicationController {
 		return file;
 	}
 
-	private void fillModel(Map<String, Object> model, String cloudProvider) {
+	private void fillModel(Map<String, Object> model, String provider) {
 
 		fillModel(model);
 
@@ -235,13 +235,13 @@ public class VirtualMachineController extends ApplicationController {
 		VirtualMachineModel virtualMachineModel = new VirtualMachineModel();
 
 		// set cloud provider
-		virtualMachineModel.setCloudProvider(cloudProvider);
+		virtualMachineModel.setProvider(provider);
 
 		// set cloud provider defaults
-		virtualMachineModel.setCloudProviderDefaultsList(cloudProviderDefaultsMap.get(cloudProvider));
+		virtualMachineModel.setProviderDefaultsList(cloudProviderDefaultsMap.get(provider));
 
 		// set provision log list
-		virtualMachineModel.setProvisionLogList(provisionLogService.getList(cloudProvider));
+		virtualMachineModel.setProvisionLogList(provisionLogService.getList(provider));
 
 		model.put(MODEL_VAR_NAME, virtualMachineModel);
 	}	

@@ -7,24 +7,24 @@ import de.papke.cloud.portal.pojo.VariableGroup;
 
 public class VirtualMachineModel {
 
-	private String cloudProvider;
-    private List<VariableGroup> cloudProviderDefaultsList;
+	private String provider;
+    private List<VariableGroup> providerDefaultsList;
     private List<ProvisionLog> provisionLogList;
     
-	public String getCloudProvider() {
-		return cloudProvider;
+	public String getProvider() {
+		return provider;
 	}
 	
-	public void setCloudProvider(String cloudProvider) {
-		this.cloudProvider = cloudProvider;
+	public void setProvider(String provider) {
+		this.provider = provider;
 	}
 	
-	public List<VariableGroup> getCloudProviderDefaultsList() {
-		return cloudProviderDefaultsList;
+	public List<VariableGroup> getProviderDefaultsList() {
+		return providerDefaultsList;
 	}
 	
-	public void setCloudProviderDefaultsList(List<VariableGroup> cloudProviderDefaultsList) {
-		this.cloudProviderDefaultsList = cloudProviderDefaultsList;
+	public void setProviderDefaultsList(List<VariableGroup> providerDefaultsList) {
+		this.providerDefaultsList = providerDefaultsList;
 	}
 
 	public List<ProvisionLog> getProvisionLogList() {

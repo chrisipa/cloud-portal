@@ -100,8 +100,7 @@ public class VirtualMachineService {
 				boolean success = commandResult.isSuccess();
 				
 				// get variables from output
-				Map<String, String> commandVariableMap = getCommandVariableMap(commandResult);
-				commandVariableMap.put("provider", provider);
+				Map<String, Object> commandVariableMap = getCommandVariableMap(commandResult);
 				
 				// add command output variables to map
 				variableMap.putAll(commandVariableMap);
@@ -113,7 +112,7 @@ public class VirtualMachineService {
 				attachment = getAttachment(commandResult);
 	
 				// send mail
-				sendMail(action, success, commandVariableMap, attachment);
+				sendMail(action, success, variableMap, attachment);
 			}
 		}
 		catch (Exception e) {
@@ -177,13 +176,6 @@ public class VirtualMachineService {
 				provisionLogService.update(provisionLog);
 			}
 			
-			// get provider
-			String provider = provisionLog.getProvider();
-			
-			// get variables from output
-			Map<String, String> mailVariableMap = getCommandVariableMap(commandResult);
-			mailVariableMap.put("provider", provider);
-
 			// get attachment for mail
 			attachment = getAttachment(commandResult);
 		
@@ -191,7 +183,7 @@ public class VirtualMachineService {
 			boolean success = commandResult.isSuccess();
 			
 			// send mail
-			sendMail(user, action, success, mailVariableMap, attachment);
+			sendMail(user, action, success, variableMap, attachment);
 		}
 		catch (Exception e) {
 			LOG.error(e.getMessage(), e);
@@ -214,11 +206,11 @@ public class VirtualMachineService {
 		return tmpFolder;
 	}
 	
-	private File sendMail(String action, boolean success, Map<String, String> variableMap, File attachment) {
+	private File sendMail(String action, boolean success, Map<String, Object> variableMap, File attachment) {
 		return sendMail(sessionUserService.getUser(), action, success, variableMap, attachment);
 	}
 	
-	private File sendMail(User user, String action, boolean success, Map<String, String> variableMap, File attachment) {
+	private File sendMail(User user, String action, boolean success, Map<String, Object> variableMap, File attachment) {
 		
 		// get mail address
 		String email = user.getEmail(); 
@@ -253,9 +245,9 @@ public class VirtualMachineService {
 		return MAIL_TEMPLATE_PREFIX + Constants.CHAR_DASH + action + Constants.CHAR_DASH + (success ? "success" : "error"); 
 	}
 
-	private Map<String, String> getCommandVariableMap(CommandResult commandResult) {
+	private Map<String, Object> getCommandVariableMap(CommandResult commandResult) {
 
-		Map<String, String> variableMap = new HashMap<>();
+		Map<String, Object> variableMap = new HashMap<>();
 		
 		if (commandResult != null) {
 		

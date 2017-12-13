@@ -20,7 +20,7 @@
 				</div>    
 			</div>	
 			<div class="row">
-					<c:forEach items="${virtualMachine.cloudProviderDefaultsList}"
+					<c:forEach items="${virtualMachine.providerDefaultsList}"
 						var="variableGroup" varStatus="loop">
 						<c:if test="${loop.index % 2 == 0}">
 	                        <div class="col-lg-4">
@@ -112,7 +112,7 @@
 	            </div>
 	        <div class="row">
 	            <div class="col-lg-12">				
-					<input type="hidden" name="cloudProvider" value="${virtualMachine.cloudProvider}" />
+					<input type="hidden" name="provider" value="${virtualMachine.provider}" />
 					<button type="submit" id="plan" class="btn btn-warning">Plan</button>
 					<button type="submit" id="apply" class="btn btn-danger">Apply</button>
 					<p>&nbsp;</p>
