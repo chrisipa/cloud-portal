@@ -7,5 +7,5 @@ output "host" {
 }
 
 output "username" {
-  value = "${replace(var.image_name, "Linux", "") != var.image_name ? "ubuntu" : "Administrator"}"
+  value = "${local.is_linux ? "ubuntu" : "Administrator"}"
 }
