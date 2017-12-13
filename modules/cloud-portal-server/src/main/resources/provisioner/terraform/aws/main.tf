@@ -4,10 +4,18 @@ provider "random" {
 
 provider "aws" {
   profile    = "default"
-  access_key = "${var.credentials-access-key-string}"
-  secret_key = "${var.credentials-secret-key-string}"
-  region     = "${var.general-region-string}"
+  access_key = "${var.access_key}"
+  secret_key = "${var.secret_key}"
+  region     = "${var.region}"
   version    = "1.3.0"
+}
+
+locals {
+  is_linux = "${replace(var.image_name, "Linux", "") != var.image_name ? 1 : 0}"
+  is_windows = "${replace(var.image_name, "Windows", "") != var.image_name ? 1 : 0}"
+  incoming_ports_list = "${split(",", var.incoming_ports)}"
+  ami_name = "${lookup(var.image_names_map, var.image_name)}"
+  ami_owner = "${lookup(var.image_owners_map, var.image_name)}"
 }
 
 resource "random_id" "id" {
@@ -15,7 +23,7 @@ resource "random_id" "id" {
 }
 
 resource "aws_security_group" "nsg" {
-  name        = "${random_id.id.hex}-nsg"
+  name        = "${random_id.id.hex}_nsg"
   
   tags {
     Name = "${var.title}"
@@ -23,8 +31,8 @@ resource "aws_security_group" "nsg" {
   }  
 }
 
-resource "aws_security_group_rule" "remoting-ports-linux-ssh" {
-  count             = "${replace(var.image-ami-string, "Linux", "") != var.image-ami-string ? 1 : 0}"
+resource "aws_security_group_rule" "remoting_ports_linux_ssh" {
+  count             = "${local.is_linux}"
   security_group_id = "${aws_security_group.nsg.id}"
   type              = "ingress"
   cidr_blocks       = ["0.0.0.0/0"]
@@ -33,8 +41,8 @@ resource "aws_security_group_rule" "remoting-ports-linux-ssh" {
   to_port           = "22"
 }
 
-resource "aws_security_group_rule" "remoting-ports-windows-rdp" {
-  count             = "${replace(var.image-ami-string, "Windows", "") != var.image-ami-string ? 1 : 0}"
+resource "aws_security_group_rule" "remoting_ports_windows_rdp" {
+  count             = "${local.is_windows}"
   security_group_id = "${aws_security_group.nsg.id}"
   type              = "ingress"
   cidr_blocks       = ["0.0.0.0/0"]
@@ -43,8 +51,8 @@ resource "aws_security_group_rule" "remoting-ports-windows-rdp" {
   to_port           = "3389"
 }
 
-resource "aws_security_group_rule" "remoting-ports-windows-rm" {
-  count             = "${replace(var.image-ami-string, "Windows", "") != var.image-ami-string ? 1 : 0}"
+resource "aws_security_group_rule" "remoting_ports_windows_rm" {
+  count             = "${local.is_windows}"
   security_group_id = "${aws_security_group.nsg.id}"
   type              = "ingress"
   cidr_blocks       = ["0.0.0.0/0"]
@@ -53,17 +61,17 @@ resource "aws_security_group_rule" "remoting-ports-windows-rm" {
   to_port           = "5985"
 }
 
-resource "aws_security_group_rule" "incoming-ports" {
-  count             = "${length(split(",", var.network-incoming-ports-string))}"
+resource "aws_security_group_rule" "incoming_ports" {
+  count             = "${length(local.incoming_ports_list)}"
   security_group_id = "${aws_security_group.nsg.id}"
   type              = "ingress"
   cidr_blocks       = ["0.0.0.0/0"]
   protocol          = "tcp"
-  from_port         = "${element(split(",", var.network-incoming-ports-string), count.index)}"
-  to_port           = "${element(split(",", var.network-incoming-ports-string), count.index)}"
+  from_port         = "${element(local.incoming_ports_list, count.index)}"
+  to_port           = "${element(local.incoming_ports_list, count.index)}"
 }
 
-resource "aws_security_group_rule" "outgoing-ports" {
+resource "aws_security_group_rule" "outgoing_ports" {
   security_group_id = "${aws_security_group.nsg.id}"
   type              = "egress"
   cidr_blocks       = ["0.0.0.0/0"]
@@ -73,35 +81,35 @@ resource "aws_security_group_rule" "outgoing-ports" {
 }
 
 resource "aws_key_pair" "auth" {
-  public_key = "${file("${var.bootstrap-public-key-file}")}"
+  public_key = "${file("${var.public_key_file}")}"
 }
 
 data "aws_ami" "image" {
   most_recent = true
   filter {
       name   = "name"
-      values = ["${lookup(var.image-names-map, var.image-ami-string)}"]
+      values = ["${local.ami_name}"]
   }
   filter {
       name   = "virtualization-type"
       values = ["hvm"]
   }  
-  owners = ["${lookup(var.image-owners-map, var.image-ami-string)}"]
+  owners = ["${local.ami_owner}"]
 }
 
 resource "aws_instance" "linux" {
 
-  count = "${replace(var.image-ami-string, "Linux", "") != var.image-ami-string ? 1 : 0}"
+  count = "${local.is_linux}"
   ami = "${data.aws_ami.image.id}"
-  instance_type = "${var.vm-size-string}"
-  availability_zone = "${var.general-region-string}${var.general-availability-zone-string}"
+  instance_type = "${var.vm_size}"
+  availability_zone = "${var.region}${var.availability_zone}"
   key_name = "${aws_key_pair.auth.id}"
   associate_public_ip_address = true
   vpc_security_group_ids = ["${aws_security_group.nsg.id}"]
 
   root_block_device = {
-    "volume_type"           = "${var.storage-type-string}"
-    "volume_size"           = "${var.storage-size-string}"
+    "volume_type"           = "${var.storage_type}"
+    "volume_size"           = "${var.storage_size}"
     "delete_on_termination" = true
   }
 
@@ -115,12 +123,12 @@ resource "aws_instance" "linux" {
     agent = false  
     host = "${aws_instance.linux.public_dns}"
     user = "ubuntu"      
-    private_key = "${file("${var.bootstrap-private-key-file}")}"
+    private_key = "${file("${var.private_key_file}")}"
     timeout = "1m"      
   }
 
   provisioner "file" {
-    source      = "${var.bootstrap-script-file}"
+    source      = "${var.script_file}"
     destination = "/tmp/bootstrap.sh"     
   }
 
@@ -134,17 +142,17 @@ resource "aws_instance" "linux" {
 
 resource "aws_instance" "windows" {
 
-  count = "${replace(var.image-ami-string, "Windows", "") != var.image-ami-string ? 1 : 0}"
+  count = "${local.is_windows}"
   ami = "${data.aws_ami.image.id}"
-  instance_type = "${var.vm-size-string}"
-  availability_zone = "${var.general-region-string}${var.general-availability-zone-string}"
+  instance_type = "${var.vm_size}"
+  availability_zone = "${var.region}${var.availability_zone}"
   key_name = "${aws_key_pair.auth.id}"
   associate_public_ip_address = true
   vpc_security_group_ids = ["${aws_security_group.nsg.id}"]
 
   root_block_device = {
-    "volume_type"           = "${var.storage-type-string}"
-    "volume_size"           = "${var.storage-size-string}"
+    "volume_type"           = "${var.storage_type}"
+    "volume_size"           = "${var.storage_size}"
     "delete_on_termination" = true
   }
 
@@ -157,12 +165,12 @@ resource "aws_instance" "windows" {
     type = "winrm"
     host = "${aws_instance.windows.public_dns}"
     user = "Administrator"
-    password = "${var.vm-password-string}"          
+    password = "${var.password}"          
     timeout = "10m"      
   }
 
   provisioner "file" {
-    source = "${var.bootstrap-script-file}"
+    source = "${var.script_file}"
     destination = "C:\\bootstrap.ps1" 
   }  
 
@@ -181,7 +189,7 @@ resource "aws_instance" "windows" {
   netsh advfirewall firewall add rule name="WinRM in" protocol=TCP dir=in profile=any localport=5985 remoteip=any localip=any action=allow
   # Set Administrator password
   $admin = [adsi]("WinNT://./administrator, user")
-  $admin.psbase.invoke("SetPassword", "${var.vm-password-string}")
+  $admin.psbase.invoke("SetPassword", "${var.password}")
 </powershell>
 EOF
 }

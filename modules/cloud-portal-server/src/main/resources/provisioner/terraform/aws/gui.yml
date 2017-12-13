@@ -19,7 +19,7 @@
   variables:    
   
   - title: Region
-    name: general-region-string
+    name: region
     description: Region where the resources should exist.
     type: list   
     required: true
@@ -27,7 +27,7 @@
     index: 6
     
   - title: Availability Zone
-    name: general-availability-zone-string
+    name: availability_zone
     description: Availability zone where the resources should exist.
     type: list   
     required: true
@@ -38,7 +38,7 @@
   variables:
   
   - title: Ami
-    name: image-ami-string
+    name: image_name
     description: Amazon machine image to use.
     type: list
     required: true
@@ -46,21 +46,21 @@
     index: 0  
   
   - title: Password
-    name: vm-password-string
+    name: password
     description: Administrator password.
     type: string   
     required: true
     defaults: [ "P@ssword1" ]   
   
   - title: Expiration Days
-    name: vm-expiration-days-string
+    name: expiration_days
     description: Days till virtual machine will be removed automatically.
     type: string   
     required: true
     defaults: [ -1 ]
   
   - title: Size
-    name: vm-size-string
+    name: vm_size
     description: Size of the virtual machine to create.
     type: list   
     required: true
@@ -71,14 +71,14 @@
   variables:    
   
   - title: Size
-    name: storage-size-string
+    name: storage_size
     description: Size of the virtual machine storage in GB.
     type: string   
     required: true
     defaults: [ 30 ]  
     
   - title: Type
-    name: storage-type-string
+    name: storage_type
     description: Type of the virtual machine storage.
     type: list   
     required: true
@@ -89,7 +89,7 @@
   variables:    
   
   - title: Incoming Ports
-    name: network-incoming-ports-string
+    name: incoming_ports
     description: Comma separated list of ports for incoming connections. 0 means all ports are allowed
     type: string   
     required: true
@@ -99,19 +99,19 @@
   variables:
   
   - title: Public Key
-    name: bootstrap-public-key-file
+    name: public_key_file
     description: Public key file for SSH access. 
     type: file   
     required: true    
   
   - title: Private Key
-    name: bootstrap-private-key-file
+    name: private_key_file
     description: Private key file for SSH access. 
     type: file   
     required: true    
       
   - title: Script
-    name: bootstrap-script-file
+    name: script_file
     description: Bootstrap script file to execute after vm has been created. 
     type: file   
     required: true           

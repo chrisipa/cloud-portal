@@ -35,6 +35,7 @@ public class VirtualMachineService {
 	private static final Logger LOG = LoggerFactory.getLogger(VirtualMachineService.class);
 
 	private static final String MAIL_TEMPLATE_PREFIX = "vm";
+	private static final String PATTERN_FILE = "_file";
 	private static final String PATTERN_OUTPUTS = "Outputs:";
 	private static final String PATTERN_EMPTY_LINE = "(?m)^\\s";
 	private static final String ATTACHMENT_SUFFIX = ".txt";
@@ -154,7 +155,7 @@ public class VirtualMachineService {
 			
 			// create dummy files
 			for (Entry<String, Object> variableMapEntry : variableMap.entrySet()) {
-				if (variableMapEntry.getKey().endsWith("-file")) {
+				if (variableMapEntry.getKey().endsWith(PATTERN_FILE)) {
 					String filePath = (String) variableMapEntry.getValue();
 					File dummyFile = new File(filePath);
 					dummyFile.createNewFile(); // NOSONAR
@@ -213,7 +214,7 @@ public class VirtualMachineService {
 		return tmpFolder;
 	}
 	
-	private File sendMail(String action, boolean success, Map<String, String> variableMap, File attachment) throws IOException {
+	private File sendMail(String action, boolean success, Map<String, String> variableMap, File attachment) {
 		return sendMail(sessionUserService.getUser(), action, success, variableMap, attachment);
 	}
 	

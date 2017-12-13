@@ -7,11 +7,21 @@ provider "random" {
 }
 
 provider "azurerm" {
-  subscription_id = "${var.credentials-subscription-id-string}"
-  tenant_id = "${var.credentials-tenant-id-string}"
-  client_id = "${var.credentials-client-id-string}"
-  client_secret = "${var.credentials-client-secret-string}"
+  subscription_id = "${var.subscription_id}"
+  tenant_id = "${var.tenant_id}"
+  client_id = "${var.client_id}"
+  client_secret = "${var.client_secret}"
   version = "0.3.0"
+}
+
+locals {
+  is_linux = "${replace(var.image_name, "Linux", "") != var.image_name ? 1 : 0}"
+  is_windows = "${replace(var.image_name, "Windows", "") != var.image_name ? 1 : 0}"
+  incoming_ports_list = "${split(",", var.incoming_ports)}"
+  image_publisher = "${element(split(":", lookup(var.image_names_map, var.image_name)), 0)}"
+  image_offer = "${element(split(":", lookup(var.image_names_map, var.image_name)), 1)}"
+  image_sku = "${element(split(":", lookup(var.image_names_map, var.image_name)), 2)}"
+  image_version = "${element(split(":", lookup(var.image_names_map, var.image_name)), 3)}"  
 }
 
 resource "random_id" "id" {
@@ -20,7 +30,7 @@ resource "random_id" "id" {
 
 resource "azurerm_resource_group" "rg" {
   name = "${random_id.id.hex}rg"
-  location = "${var.general-region-string}"
+  location = "${var.region}"
   
   tags {
     Name = "${var.title}"
@@ -30,8 +40,8 @@ resource "azurerm_resource_group" "rg" {
 
 resource "azurerm_virtual_network" "vnet" {
   name = "${random_id.id.hex}vnet"
-  location = "${var.general-region-string}"
-  address_space = ["${var.network-vnet-address-space-string}"]
+  location = "${var.region}"
+  address_space = ["${var.vnet_address_space}"]
   resource_group_name = "${azurerm_resource_group.rg.name}"
   
   tags {
@@ -44,12 +54,12 @@ resource "azurerm_subnet" "subnet" {
   name = "${random_id.id.hex}subnet"
   virtual_network_name = "${azurerm_virtual_network.vnet.name}"
   resource_group_name = "${azurerm_resource_group.rg.name}"
-  address_prefix = "${var.network-subnet-address-space-string}"
+  address_prefix = "${var.subnet_address_space}"
 }
 
 resource "azurerm_network_security_group" "nsg" {
   name = "${random_id.id.hex}nsg"
-  location = "${var.general-region-string}"
+  location = "${var.region}"
   resource_group_name = "${azurerm_resource_group.rg.name}"
   
   tags {
@@ -59,7 +69,7 @@ resource "azurerm_network_security_group" "nsg" {
 }
 
 resource "azurerm_network_security_rule" "rulessh" {
-  count = "${replace(var.vm-image-string, "Linux", "") != var.vm-image-string ? 1 : 0}"
+  count = "${local.is_linux}"
   name = "${random_id.id.hex}rulessh"
   priority = 100
   direction = "Inbound"
@@ -74,7 +84,7 @@ resource "azurerm_network_security_rule" "rulessh" {
 }
 
 resource "azurerm_network_security_rule" "rulerdp" {
-  count = "${replace(var.vm-image-string, "Windows", "") != var.vm-image-string ? 1 : 0}"
+  count = "${local.is_windows}"
   name = "${random_id.id.hex}rulerdp"
   priority = 101
   direction = "Inbound"
@@ -89,7 +99,7 @@ resource "azurerm_network_security_rule" "rulerdp" {
 }
 
 resource "azurerm_network_security_rule" "rulerm" {
-  count = "${replace(var.vm-image-string, "Windows", "") != var.vm-image-string ? 1 : 0}"
+  count = "${local.is_windows}"
   name = "${random_id.id.hex}rulerm"
   priority = 102
   direction = "Inbound"
@@ -104,14 +114,14 @@ resource "azurerm_network_security_rule" "rulerm" {
 }
 
 resource "azurerm_network_security_rule" "rulecustom" {
-  count = "${length(split(",", var.network-incoming-ports-string))}"
+  count = "${length(split(",", var.incoming_ports))}"
   name = "${random_id.id.hex}rulecustom"
   priority = "${103 + count.index}"
   direction = "Inbound"
   access = "Allow"
   protocol = "Tcp"
   source_port_range = "*"
-  destination_port_range = "${element(split(",", var.network-incoming-ports-string), count.index)}"
+  destination_port_range = "${element(split(",", var.incoming_ports), count.index)}"
   source_address_prefix = "*"
   destination_address_prefix = "*"
   resource_group_name = "${azurerm_resource_group.rg.name}"
@@ -120,7 +130,7 @@ resource "azurerm_network_security_rule" "rulecustom" {
 
 resource "azurerm_network_interface" "nic" {
   name = "${random_id.id.hex}nic"
-  location = "${var.general-region-string}"
+  location = "${var.region}"
   resource_group_name = "${azurerm_resource_group.rg.name}"
   network_security_group_id = "${azurerm_network_security_group.nsg.id}"
 
@@ -141,7 +151,7 @@ resource "azurerm_network_interface" "nic" {
 
 resource "azurerm_public_ip" "pip" {
   name = "${random_id.id.hex}ip"
-  location = "${var.general-region-string}"
+  location = "${var.region}"
   resource_group_name = "${azurerm_resource_group.rg.name}"
   public_ip_address_allocation = "dynamic"
   domain_name_label = "d${random_id.id.hex}"
@@ -154,10 +164,10 @@ resource "azurerm_public_ip" "pip" {
 
 resource "azurerm_storage_account" "stor" {
   name = "${random_id.id.hex}stor"
-  location = "${var.general-region-string}"
+  location = "${var.region}"
   resource_group_name = "${azurerm_resource_group.rg.name}"
-  account_tier = "${var.storage-account-tier-string}"
-  account_replication_type = "${var.storage-replication-type-string}"  
+  account_tier = "${var.storage_account_tier}"
+  account_replication_type = "${var.storage_account_replication_type}"  
   
   tags {
     Name = "${var.title}"
@@ -174,18 +184,18 @@ resource "azurerm_storage_container" "storc" {
 
 resource "azurerm_virtual_machine" "linux" {
 
-  count = "${replace(var.vm-image-string, "Linux", "") != var.vm-image-string ? 1 : 0}"
+  count = "${local.is_linux}"
   name = "${random_id.id.hex}vm"
-  location = "${var.general-region-string}"
+  location = "${var.region}"
   resource_group_name = "${azurerm_resource_group.rg.name}"
-  vm_size = "${var.vm-size-string}"
+  vm_size = "${var.vm_size}"
   network_interface_ids = ["${azurerm_network_interface.nic.id}"]
 
   storage_image_reference {
-    publisher = "${element(split(":", lookup(var.image-names-map, var.vm-image-string)), 0)}"
-    offer = "${element(split(":", lookup(var.image-names-map, var.vm-image-string)), 1)}"
-    sku = "${element(split(":", lookup(var.image-names-map, var.vm-image-string)), 2)}"
-    version = "${element(split(":", lookup(var.image-names-map, var.vm-image-string)), 3)}"
+    publisher = "${local.image_publisher}"
+    offer = "${local.image_offer}"
+    sku = "${local.image_sku}"
+    version = "${local.image_version}"
   }
 
   storage_os_disk {
@@ -197,16 +207,16 @@ resource "azurerm_virtual_machine" "linux" {
 
   os_profile {
     computer_name = "${random_id.id.hex}"
-    admin_username = "${var.vm-username-string}"
-    admin_password = "${var.vm-password-string}"
+    admin_username = "${var.username}"
+    admin_password = "${var.password}"
   }
 
   os_profile_linux_config {
     disable_password_authentication = "true"
 
     ssh_keys = [{
-      path = "/home/${var.vm-username-string}/.ssh/authorized_keys"
-      key_data = "${file("${var.bootstrap-public-key-file}")}"
+      path = "/home/${var.username}/.ssh/authorized_keys"
+      key_data = "${file("${var.public_key_file}")}"
     }]
   }
 
@@ -214,13 +224,13 @@ resource "azurerm_virtual_machine" "linux" {
     type = "ssh"
     agent = false  
     host = "${azurerm_public_ip.pip.fqdn}"
-    user = "${var.vm-username-string}"      
-    private_key = "${file("${var.bootstrap-private-key-file}")}"
+    user = "${var.username}"      
+    private_key = "${file("${var.private_key_file}")}"
     timeout = "1m"      
   }
 
   provisioner "file" {
-    source = "${var.bootstrap-script-file}"
+    source = "${var.script_file}"
     destination = "/tmp/bootstrap.sh"         
   }
 
@@ -241,18 +251,18 @@ resource "azurerm_virtual_machine" "linux" {
 
 resource "azurerm_virtual_machine" "windows" {
 
-  count = "${replace(var.vm-image-string, "Windows", "") != var.vm-image-string ? 1 : 0}"
+  count = "${local.is_windows}"
   name = "${random_id.id.hex}vm"
-  location = "${var.general-region-string}"
+  location = "${var.region}"
   resource_group_name = "${azurerm_resource_group.rg.name}"
-  vm_size = "${var.vm-size-string}"
+  vm_size = "${var.vm_size}"
   network_interface_ids = ["${azurerm_network_interface.nic.id}"]
 
   storage_image_reference {
-    publisher = "${element(split(":", lookup(var.image-names-map, var.vm-image-string)), 0)}"
-    offer = "${element(split(":", lookup(var.image-names-map, var.vm-image-string)), 1)}"
-    sku = "${element(split(":", lookup(var.image-names-map, var.vm-image-string)), 2)}"
-    version = "${element(split(":", lookup(var.image-names-map, var.vm-image-string)), 3)}"
+    publisher = "${local.image_publisher}"
+    offer = "${local.image_offer}"
+    sku = "${local.image_sku}"
+    version = "${local.image_version}"
   }
 
   storage_os_disk {
@@ -264,8 +274,8 @@ resource "azurerm_virtual_machine" "windows" {
 
   os_profile {
     computer_name = "${random_id.id.hex}"
-    admin_username = "${var.vm-username-string}"
-    admin_password = "${var.vm-password-string}"
+    admin_username = "${var.username}"
+    admin_password = "${var.password}"
   }
   
   os_profile_windows_config {
@@ -283,9 +293,9 @@ resource "azurerm_virtual_machine" "windows" {
 
 resource "azurerm_virtual_machine_extension" "windowsvmext" {
   
-  count = "${replace(var.vm-image-string, "Windows", "") != var.vm-image-string ? 1 : 0}"
+  count = "${local.is_windows}"
   name = "${random_id.id.hex}vmext"
-  location = "${var.general-region-string}"
+  location = "${var.region}"
   resource_group_name = "${azurerm_resource_group.rg.name}"  
   virtual_machine_name = "${azurerm_virtual_machine.windows.name}"  
   publisher = "Microsoft.Compute"
@@ -306,18 +316,18 @@ SETTINGS
 
 resource "null_resource" "windowsprovisioning" {
   
-  count = "${replace(var.vm-image-string, "Windows", "") != var.vm-image-string ? 1 : 0}"
+  count = "${local.is_windows}"
   
   connection {
     type = "winrm"
     host = "${azurerm_public_ip.pip.fqdn}"
-    user = "${var.vm-username-string}"
-    password = "${var.vm-password-string}"          
+    user = "${var.username}"
+    password = "${var.password}"          
     timeout = "10m"      
   }
 
   provisioner "file" {
-    source = "${var.bootstrap-script-file}"
+    source = "${var.script_file}"
     destination = "C:\\bootstrap.ps1" 
   }  
 

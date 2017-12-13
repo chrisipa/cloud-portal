@@ -7,5 +7,5 @@ output "host" {
 }
 
 output "username" {
-  value = "${replace(var.image-ami-string, "Linux", "") != var.image-ami-string ? "ubuntu" : "Administrator"}"
+  value = "${replace(var.image_name, "Linux", "") != var.image_name ? "ubuntu" : "Administrator"}"
 }

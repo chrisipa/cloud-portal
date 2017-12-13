@@ -7,5 +7,5 @@ output "host" {
 }
 
 output "username" {
-  value = "${var.bootstrap-username-string}"
+  value = "${var.username}"
 }

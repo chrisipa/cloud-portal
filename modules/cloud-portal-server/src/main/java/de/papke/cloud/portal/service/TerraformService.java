@@ -149,21 +149,21 @@ public class TerraformService {
 
 		String provider = credentials.getProvider();
 		if (provider.equals(AzureConstants.PROVIDER)) {
-			executionMap.put("credentials-subscription-id-string", credentials.getSecretMap().get(AzureConstants.SUBSCRIPTION_ID));
-			executionMap.put("credentials-tenant-id-string", credentials.getSecretMap().get(AzureConstants.TENANT_ID));
-			executionMap.put("credentials-client-id-string", credentials.getSecretMap().get(AzureConstants.CLIENT_ID));
-			executionMap.put("credentials-client-secret-string", credentials.getSecretMap().get(AzureConstants.CLIENT_SECRET));
+			executionMap.put("subscription_id", credentials.getSecretMap().get(AzureConstants.SUBSCRIPTION_ID));
+			executionMap.put("tenant_id", credentials.getSecretMap().get(AzureConstants.TENANT_ID));
+			executionMap.put("client_id", credentials.getSecretMap().get(AzureConstants.CLIENT_ID));
+			executionMap.put("client_secret", credentials.getSecretMap().get(AzureConstants.CLIENT_SECRET));
 		}
 		else if (provider.equals(AwsConstants.PROVIDER)) {
-			executionMap.put("credentials-access-key-string", credentials.getSecretMap().get(AwsConstants.ACCESS_KEY));
-			executionMap.put("credentials-secret-key-string", credentials.getSecretMap().get(AwsConstants.SECRET_KEY));
+			executionMap.put("access_key", credentials.getSecretMap().get(AwsConstants.ACCESS_KEY));
+			executionMap.put("secret_key", credentials.getSecretMap().get(AwsConstants.SECRET_KEY));
 		}
 		else if (provider.equals(VSphereConstants.PROVIDER)) {
-			executionMap.put("credentials-vcenter-hostname-string", credentials.getSecretMap().get(VSphereConstants.VCENTER_HOSTNAME));
-			executionMap.put("credentials-vcenter-image-folder-string", credentials.getSecretMap().get(VSphereConstants.VCENTER_IMAGE_FOLDER));
-			executionMap.put("credentials-vcenter-target-folder-string", credentials.getSecretMap().get(VSphereConstants.VCENTER_TARGET_FOLDER));
-			executionMap.put("credentials-vcenter-username-string", credentials.getSecretMap().get(VSphereConstants.VCENTER_USERNAME));
-			executionMap.put("credentials-vcenter-password-string", credentials.getSecretMap().get(VSphereConstants.VCENTER_PASSWORD));
+			executionMap.put("vcenter_hostname", credentials.getSecretMap().get(VSphereConstants.VCENTER_HOSTNAME));
+			executionMap.put("vcenter_image_folder", credentials.getSecretMap().get(VSphereConstants.VCENTER_IMAGE_FOLDER));
+			executionMap.put("vcenter_target_folder", credentials.getSecretMap().get(VSphereConstants.VCENTER_TARGET_FOLDER));
+			executionMap.put("vcenter_username", credentials.getSecretMap().get(VSphereConstants.VCENTER_USERNAME));
+			executionMap.put("vcenter_password", credentials.getSecretMap().get(VSphereConstants.VCENTER_PASSWORD));
 		}
 
 		executionMap.putAll(variableMap);

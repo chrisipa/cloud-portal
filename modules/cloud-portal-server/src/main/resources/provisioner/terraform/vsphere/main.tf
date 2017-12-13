@@ -3,11 +3,16 @@ provider "random" {
 }
 
 provider "vmware" {
-  vcenter_server = "${var.credentials-vcenter-hostname-string}"
-  user = "${var.credentials-vcenter-username-string}"
-  password = "${var.credentials-vcenter-password-string}"
+  vcenter_server = "${var.vcenter_hostname}"
+  user = "${var.vcenter_username}"
+  password = "${var.vcenter_password}"
   insecure_connection = "true"
   version = "1.2.0"
+}
+
+locals {
+  is_linux = "${replace(var.image_name, "Linux", "") != var.image_name ? 1 : 0}"
+  is_windows = "${replace(var.image_name, "Windows", "") != var.image_name ? 1 : 0}"
 }
 
 resource "random_id" "id" {
@@ -16,30 +21,30 @@ resource "random_id" "id" {
 
 resource "vmware_virtual_machine" "linux" {
 
-  count = "${replace(var.vm-image-string, "Linux", "") != var.vm-image-string ? 1 : 0}"
+  count = "${local.is_linux}"
   name = "${random_id.id.hex}"
-  image = "${var.credentials-vcenter-image-folder-string}/${lookup(var.image-templates-map, var.vm-image-string)}"
-  folder = "${var.credentials-vcenter-target-folder-string}"
-  cpus = "${var.vm-vcores-string}"
-  memory = "${var.vm-ram-string}"
+  image = "${var.vcenter_image_folder}/${lookup(var.image_templates_map, var.image_name)}"
+  folder = "${var.vcenter_target_folder}"
+  cpus = "${var.vm_cores}"
+  memory = "${var.vm_ram}"
   
   connection {
     type = "ssh"
     agent = false  
     host = "${vmware_virtual_machine.linux.ip_address}"
-    user = "${var.bootstrap-username-string}" 
-    password = "${var.bootstrap-password-string}"     
+    user = "${var.username}" 
+    password = "${var.password}"     
     timeout = "1m"      
   }
   
   provisioner "file" {
-    source      = "${var.bootstrap-script-file}"
+    source      = "${var.script_file}"
     destination = "/tmp/bootstrap.sh"  
   }
 
   provisioner "remote-exec" {
     inline = [
-      "echo '${var.bootstrap-password-string}' | sudo -S bash /tmp/bootstrap.sh",
+      "echo '${var.password}' | sudo -S bash /tmp/bootstrap.sh",
       "rm /tmp/bootstrap.sh"
     ]
   }
@@ -47,23 +52,23 @@ resource "vmware_virtual_machine" "linux" {
 
 resource "vmware_virtual_machine" "windows" {
 
-  count = "${replace(var.vm-image-string, "Windows", "") != var.vm-image-string ? 1 : 0}"
+  count = "${local.is_windows}"
   name = "${random_id.id.hex}"
-  image = "${var.credentials-vcenter-image-folder-string}/${lookup(var.image-templates-map, var.vm-image-string)}"
-  folder = "${var.credentials-vcenter-target-folder-string}"
-  cpus = "${var.vm-vcores-string}"
-  memory = "${var.vm-ram-string}"
+  image = "${var.vcenter_image_folder}/${lookup(var.image_templates_map, var.image_name)}"
+  folder = "${var.vcenter_target_folder}"
+  cpus = "${var.vm_cores}"
+  memory = "${var.vm_ram}"
   
   connection {
     type = "winrm"
     host = "${vmware_virtual_machine.windows.ip_address}"
-    user = "${var.bootstrap-username-string}"
-    password = "${var.bootstrap-password-string}"          
+    user = "${var.username}"
+    password = "${var.password}"          
     timeout = "10m"      
   }
 
   provisioner "file" {
-    source = "${var.bootstrap-script-file}"
+    source = "${var.script_file}"
     destination = "C:\\bootstrap.ps1" 
   }  
 

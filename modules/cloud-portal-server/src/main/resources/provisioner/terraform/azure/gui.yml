@@ -16,7 +16,7 @@
     defaults: []
     
   - title: Region
-    name: general-region-string
+    name: region
     description: Region where the resources should exist.
     type: list   
     required: true
@@ -24,7 +24,7 @@
     index: 22
 
   - title: Expiration Days
-    name: vm-expiration-days-string
+    name: expiration_days
     description: Days till virtual machine will be removed automatically. 
     type: string   
     required: true
@@ -34,14 +34,14 @@
   variables:      
     
   - title: Username
-    name: vm-username-string
+    name: username
     description: Administrator user name.
     type: string   
     required: true
     defaults: [ vmadmin ]    
     
   - title: Password
-    name: vm-password-string
+    name: password
     description: Administrator password.
     type: string   
     required: true
@@ -51,7 +51,7 @@
   variables:
   
   - title: Image
-    name: vm-image-string
+    name: image_name
     description: Name of the virtual machine image to use. 
     type: list   
     required: true
@@ -59,7 +59,7 @@
     index: 0  
     
   - title: Size
-    name: vm-size-string
+    name: vm_size
     description: Size of the vm to create.
     type: list   
     required: true
@@ -70,7 +70,7 @@
   variables:    
   
   - title: Account Tier
-    name: storage-account-tier-string
+    name: storage_account_tier
     description: Storage account Tier for the cluster. 
     type: list   
     required: true
@@ -78,7 +78,7 @@
     index: 0    
     
   - title: Replication Type
-    name: storage-replication-type-string
+    name: storage_account_replication_type
     description: Storage account replication type for the cluster. 
     type: list   
     required: true
@@ -89,21 +89,21 @@
   variables:     
   
   - title: VNET Address Space
-    name: network-vnet-address-space-string
+    name: vnet_address_space
     description: Full address space allowed to the virtual network.
     type: string   
     required: true
     defaults: [ 10.0.0.0/16 ]   
   
   - title: Subnet Address Space
-    name: network-subnet-address-space-string
+    name: subnet_address_space
     description: The subset of the virtual network for this subnet.
     type: string
     required: true
     defaults: [ 10.0.10.0/24 ]
     
   - title: Incoming Ports
-    name: network-incoming-ports-string
+    name: incoming_ports
     description: "Comma separated list of ports for incoming connections. * means all ports are allowed."
     type: string   
     required: true
@@ -113,19 +113,19 @@
   variables:
   
   - title: Public Key
-    name: bootstrap-public-key-file
+    name: public_key_file
     description: Public key file for SSH access. 
     type: file   
     required: true    
   
   - title: Private Key
-    name: bootstrap-private-key-file
+    name: private_key_file
     description: Private key file for SSH access. 
     type: file   
     required: true    
       
   - title: Script
-    name: bootstrap-script-file
+    name: script_file
     description: Bootstrap script file to execute after vm has been created. 
     type: file   
     required: true      

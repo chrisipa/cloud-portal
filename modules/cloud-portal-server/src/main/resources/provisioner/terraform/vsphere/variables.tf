@@ -1,18 +1,18 @@
-variable "credentials-vcenter-hostname-string" {}
-variable "credentials-vcenter-image-folder-string" {}
-variable "credentials-vcenter-target-folder-string" {}
-variable "credentials-vcenter-username-string" {}
-variable "credentials-vcenter-password-string" {}
-variable "vm-image-string" {}
-variable "vm-vcores-string" {}
-variable "vm-ram-string" {}
-variable "bootstrap-username-string" {}
-variable "bootstrap-password-string" {}
-variable "bootstrap-script-file" {}
 variable "title" {}
 variable "description" {}
+variable "vcenter_hostname" {}
+variable "vcenter_image_folder" {}
+variable "vcenter_target_folder" {}
+variable "vcenter_username" {}
+variable "vcenter_password" {}
+variable "image_name" {}
+variable "vm_cores" {}
+variable "vm_ram" {}
+variable "username" {}
+variable "password" {}
+variable "script_file" {}
 
-variable "image-templates-map" {
+variable "image_templates_map" {
   type = "map"
   default = {
     "Ubuntu Server Linux 16.04" = "TPL_UBUNTU_SERVER_16.04.3_LTS"

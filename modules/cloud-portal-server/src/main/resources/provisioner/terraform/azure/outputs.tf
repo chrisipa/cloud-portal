@@ -7,5 +7,5 @@ output "host" {
 }
 
 output "username" {
-  value = "${var.vm-username-string}"
+  value = "${var.username}"
 }
