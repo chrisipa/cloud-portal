@@ -24,6 +24,8 @@ locals {
   image_version = "${element(split(":", lookup(var.image_names_map, var.image_name)), 3)}"
   linux_script_path = "/tmp/bootstrap.sh"
   windows_script_path = "C:\\bootstrap.ps1"  
+  allow_win_rm_file = "allow-winrm.cmd"
+  allow_win_rm_url = "https://raw.githubusercontent.com/chrisipa/cloud-portal/master/public/bootstrap/${local.allow_win_rm_file}"
 }
 
 resource "random_id" "id" {
@@ -116,14 +118,14 @@ resource "azurerm_network_security_rule" "rulerm" {
 }
 
 resource "azurerm_network_security_rule" "rulecustom" {
-  count = "${length(split(",", var.incoming_ports))}"
+  count = "${var.incoming_ports != -1 ? length(local.incoming_ports_list) : 0}"
   name = "${random_id.id.hex}rulecustom"
   priority = "${103 + count.index}"
   direction = "Inbound"
   access = "Allow"
   protocol = "Tcp"
   source_port_range = "*"
-  destination_port_range = "${element(split(",", var.incoming_ports), count.index)}"
+  destination_port_range = "${element(local.incoming_ports_list, count.index)}"
   source_address_prefix = "*"
   destination_address_prefix = "*"
   resource_group_name = "${azurerm_resource_group.rg.name}"
@@ -307,9 +309,9 @@ resource "azurerm_virtual_machine_extension" "windowsvmext" {
   settings = <<SETTINGS
   {
     "fileUris": [
-      "https://raw.githubusercontent.com/chrisipa/cloud-portal/master/public/bootstrap/allow-winrm.cmd"
+      "${local.allow_win_rm_url}"
     ],
-    "commandToExecute": "cmd.exe /c allow-winrm.cmd"
+    "commandToExecute": "cmd.exe /c ${local.allow_win_rm_file}"
   }
 SETTINGS
 

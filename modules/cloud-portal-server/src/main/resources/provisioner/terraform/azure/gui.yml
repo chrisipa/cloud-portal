@@ -104,10 +104,10 @@
     
   - title: Incoming Ports
     name: incoming_ports
-    description: "Comma separated list of ports for incoming connections. * means all ports are allowed."
+    description: "Comma separated list of ports for incoming connections. -1 means no ports allowed. * means all ports allowed."
     type: string   
     required: true
-    defaults: [ "80,443" ]
+    defaults: [ -1 ]
   
 - title: Bootstrap
   variables:

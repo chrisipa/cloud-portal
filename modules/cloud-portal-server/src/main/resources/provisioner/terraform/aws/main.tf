@@ -64,7 +64,7 @@ resource "aws_security_group_rule" "remoting_ports_windows_rm" {
 }
 
 resource "aws_security_group_rule" "incoming_ports" {
-  count             = "${length(local.incoming_ports_list)}"
+  count             = "${var.incoming_ports != -1 ? length(local.incoming_ports_list) : 0}"
   security_group_id = "${aws_security_group.nsg.id}"
   type              = "ingress"
   cidr_blocks       = ["0.0.0.0/0"]
