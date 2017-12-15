@@ -16,11 +16,12 @@ public class ProvisionLog {
 	private String provider;
 	private Boolean success;
 	private Map<String, Object> variableMap;
+	private byte[] privateKey;
 	private byte[] result;
 	
 	public ProvisionLog() {}
 	
-	public ProvisionLog(Date date, Date expirationDate, String username, String command, String provider, Boolean success, Map<String, Object> variableMap, byte[] result) {
+	public ProvisionLog(Date date, Date expirationDate, String username, String command, String provider, Boolean success, Map<String, Object> variableMap, byte[] privateKey, byte[] result) {
 		super();
 		this.date = date;
 		this.expirationDate = expirationDate;
@@ -29,6 +30,7 @@ public class ProvisionLog {
 		this.provider = provider;
 		this.success = success;
 		this.variableMap = variableMap;
+		this.privateKey = privateKey;
 		this.result = result;
 	}
 
@@ -94,6 +96,14 @@ public class ProvisionLog {
 
 	public void setVariableMap(Map<String, Object> variableMap) {
 		this.variableMap = variableMap;
+	}
+
+	public byte[] getPrivateKey() {
+		return privateKey;
+	}
+
+	public void setPrivateKey(byte[] privateKey) {
+		this.privateKey = privateKey;
 	}
 
 	public byte[] getResult() {

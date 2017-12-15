@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.OutputStream;
 import java.net.URI;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,7 +20,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.yaml.snakeyaml.TypeDescription;
 import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.constructor.Constructor;
 
 import de.papke.cloud.portal.constants.AwsConstants;
 import de.papke.cloud.portal.constants.AzureConstants;
@@ -27,6 +30,8 @@ import de.papke.cloud.portal.constants.Constants;
 import de.papke.cloud.portal.constants.VSphereConstants;
 import de.papke.cloud.portal.pojo.CommandResult;
 import de.papke.cloud.portal.pojo.Credentials;
+import de.papke.cloud.portal.pojo.VariableConfig;
+import de.papke.cloud.portal.pojo.Variable;
 import de.papke.cloud.portal.pojo.VariableGroup;
 
 /**
@@ -51,12 +56,23 @@ public class TerraformService {
 
 	private Map<String, List<VariableGroup>> providerDefaults = new HashMap<>();
 
-	@SuppressWarnings("unchecked")
 	@PostConstruct
 	public void init() {
 
 		try {
-			Yaml yaml = new Yaml();
+			
+			Constructor constructor = new Constructor(VariableConfig.class);
+			
+			TypeDescription variableConfigTypeDescription = new TypeDescription(VariableConfig.class);
+			variableConfigTypeDescription.putListPropertyType("variableGroups", VariableGroup.class);
+			constructor.addTypeDescription(variableConfigTypeDescription);
+
+			TypeDescription variableGroupTypeDescription = new TypeDescription(VariableGroup.class);
+			variableGroupTypeDescription.putListPropertyType("variables", Variable.class);
+			constructor.addTypeDescription(variableGroupTypeDescription);
+			
+			Yaml yaml = new Yaml(constructor);
+			
 			URL url = getClass().getClassLoader().getResource("terraform");
 			File terraformFolder = new File(url.toURI());
 			if (!terraformFolder.isFile()) {
@@ -64,7 +80,8 @@ public class TerraformService {
 				for (File providerFolder : providerFolderArray) {
 					File variableFile = new File(new URI(providerFolder.toURI() + "/gui.yml"));
 					if (variableFile.exists()) {
-						List<VariableGroup> variableGroupList = yaml.loadAs(new FileInputStream(variableFile), List.class);
+						VariableConfig variableConfig = yaml.loadAs(new FileInputStream(variableFile), VariableConfig.class);
+						List<VariableGroup> variableGroupList = variableConfig.getVariableGroups();
 						providerDefaults.put(providerFolder.getName(), variableGroupList);
 					}
 
@@ -111,19 +128,19 @@ public class TerraformService {
 	}
 
 	private CommandLine buildInitCommand(String terraformPath) {
-		
+
 		CommandLine initCommand = new CommandLine(terraformPath);
 		initCommand.addArgument(Constants.ACTION_INIT);
 		initCommand.addArgument(FLAG_NO_COLOR);
-		
+
 		return initCommand;
 	}
 
 	private CommandLine buildActionCommand(String terraformPath, String action, Map<String, Object> variableMap) {
-		
+
 		CommandLine actionCommand = new CommandLine(terraformPath);
 		actionCommand.addArgument(action);
-		
+
 		if (action.equals(Constants.ACTION_DESTROY)) {
 			actionCommand.addArgument(FLAG_FORCE);
 		}
@@ -173,5 +190,25 @@ public class TerraformService {
 
 	public Map<String, List<VariableGroup>> getProviderDefaults() {
 		return providerDefaults;
+	}
+
+	public List<Variable> getOptionalVariables(String provider) {
+
+		List<Variable> optionalVariablesList = new ArrayList<>();
+
+		try {
+			for (VariableGroup variableGroup : providerDefaults.get(provider)) {
+				for (Variable variable : variableGroup.getVariables()) {
+					if (!variable.isRequired()) {
+						optionalVariablesList.add(variable);
+					}
+				}
+			}
+		}
+		catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+		}
+
+		return optionalVariablesList;
 	}
 }

@@ -78,7 +78,7 @@ public class VirtualMachineService {
 		}
 	}
 
-	public void provision(String action, Credentials credentials, Map<String, Object> variableMap, OutputStream outputStream) {
+	public void provision(String action, Credentials credentials, Map<String, Object> variableMap, File privateKeyFile, OutputStream outputStream) {
 
 		File tmpFolder = null;
 		File attachment = null;
@@ -106,7 +106,7 @@ public class VirtualMachineService {
 				variableMap.putAll(commandVariableMap);
 
 				// create provision log
-				provisionLogService.create(action, provider, success, variableMap, tmpFolder);
+				provisionLogService.create(action, provider, success, variableMap, privateKeyFile, tmpFolder);
 
 				// get attachment for mail
 				attachment = getAttachment(commandResult);

@@ -2,6 +2,7 @@ package de.papke.cloud.portal.controller;
 
 import java.io.File;
 import java.io.OutputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -24,14 +25,15 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.support.StandardMultipartHttpServletRequest;
 
+import de.papke.cloud.portal.constants.Constants;
 import de.papke.cloud.portal.model.VirtualMachineModel;
 import de.papke.cloud.portal.pojo.Credentials;
 import de.papke.cloud.portal.pojo.ProvisionLog;
-import de.papke.cloud.portal.pojo.User;
+import de.papke.cloud.portal.pojo.Variable;
 import de.papke.cloud.portal.pojo.VariableGroup;
 import de.papke.cloud.portal.service.CredentialsService;
+import de.papke.cloud.portal.service.KeyPairService;
 import de.papke.cloud.portal.service.ProvisionLogService;
-import de.papke.cloud.portal.service.SessionUserService;
 import de.papke.cloud.portal.service.TerraformService;
 import de.papke.cloud.portal.service.VirtualMachineService;
 
@@ -59,7 +61,7 @@ public class VirtualMachineController extends ApplicationController {
 	private ProvisionLogService provisionLogService;
 	
 	@Autowired
-	private SessionUserService sessionUserService;
+	private KeyPairService keyPairService;
 
 	/**
 	 * Method for returning the model and view for the create vm page.
@@ -132,6 +134,58 @@ public class VirtualMachineController extends ApplicationController {
 					variableMap.put(fileMapEntry.getKey(), file.getAbsolutePath());
 				}
 			}
+			
+			// fill up optional values
+			File privateKeyFile = null;
+			List<Variable> optionalVariablesList = terraformService.getOptionalVariables(provider);
+			for (Variable variable : optionalVariablesList) {
+				
+				String variableName = variable.getName();
+				Object variableValue = variableMap.get(variableName); 
+				
+				if (variableValue == null) {
+					
+					String variableType = variable.getType();
+					
+					if (variableType.equals("file")) {
+						
+						if (variableName.contains("key")) {
+						
+							List<File> keyFileList = keyPairService.createKeyPair();
+							
+							for (File keyFile : keyFileList) {
+								
+								String keyFilePath = keyFile.getAbsolutePath();
+								if (keyFilePath.endsWith(Constants.KEY_FILE_SUFFIX)) {
+									variableMap.put("public_key_file", keyFile.getAbsolutePath());
+								}
+								else {
+									variableMap.put("private_key_file", keyFile.getAbsolutePath());
+									privateKeyFile = keyFile;
+								}
+								
+								tempFileList.add(keyFile);
+							}
+						}
+						else if (variableName.contains("script")) {
+							
+							StringBuilder scriptPath = new StringBuilder("script/default.");
+							
+							String imageName = ((String) variableMap.get("image_name")).toLowerCase();
+							if (imageName.contains("windows")) {
+								scriptPath.append("ps1");
+							}
+							else if (imageName.contains("linux")) {
+								scriptPath.append("sh");
+							}
+							
+							URL scriptUrl = getClass().getClassLoader().getResource(scriptPath.toString());
+							File scriptFile = new File(scriptUrl.toURI());
+							variableMap.put("script_file", scriptFile.getAbsolutePath());
+						}
+					}
+				}
+			}
 
 			// get credentials
 			Credentials credentials = credentialsService.getCredentials(provider);
@@ -141,7 +195,7 @@ public class VirtualMachineController extends ApplicationController {
 				OutputStream outputStream = response.getOutputStream();
 
 				// provision VM
-				virtualMachineService.provision(action, credentials, variableMap, outputStream);
+				virtualMachineService.provision(action, credentials, variableMap, privateKeyFile, outputStream);
 			}
 			else {
 				response.getWriter().println(String.format("No credentials found for cloud provider '%s'. Please contact your administrator.", provider));
@@ -171,12 +225,8 @@ public class VirtualMachineController extends ApplicationController {
 			Credentials credentials = credentialsService.getCredentials(provider);
 			if (credentials != null) {
 
-				// get username
-				User user = sessionUserService.getUser();
-				String username = user.getUsername();
-				
 				// get provision log entry
-				ProvisionLog provisionLog = provisionLogService.get(username, id);
+				ProvisionLog provisionLog = provisionLogService.get(id);
 				if (provisionLog != null) {
 					
 					// get response output stream
@@ -186,7 +236,7 @@ public class VirtualMachineController extends ApplicationController {
 					virtualMachineService.deprovision(provisionLog, credentials, outputStream);
 				}
 				else {
-					response.getWriter().println(String.format("No provision log entry found for username '%s' and id '%s'.", username, id));
+					response.getWriter().println(String.format("No provision log entry found for id '%s'.", id));
 				}
 			}
 			else {

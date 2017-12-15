@@ -12,6 +12,6 @@ public interface ProvisionLogDao extends MongoRepository<ProvisionLog, String> {
 	
 	@Query("{ $and: [ { 'command' : ?0 }, { 'expirationDate' : { $lt: ?1 } } ] }")
 	public List<ProvisionLog> findByCommandAndExpirationDate(String command, Date expirationDate);
-	public ProvisionLog findByUsernameAndId(String username, String id);
+	public ProvisionLog findById(String id);
 	public List<ProvisionLog> findByUsernameAndProvider(String username, String provider);
 }

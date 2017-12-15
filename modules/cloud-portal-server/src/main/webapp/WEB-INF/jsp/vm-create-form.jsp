@@ -17,6 +17,7 @@
 			<div class="row">
 			    <div class="col-lg-12">
 				    <h4 class="page-header">Create Virtual Machine</h4>
+				    <p>All fields with an asterisk(*) are required.</p>
 				</div>    
 			</div>	
 			<div class="row">
@@ -39,7 +40,7 @@
 								class="panel-body panel-collapse collapse in"
 								aria-expanded="true" style="">
 								<c:forEach items="${variableGroup.variables}" var="variable">
-									<label><c:out value="${variable.title}" /></label>
+									<label><c:out value="${variable.title}" /><c:if test="${variable.required}">*</c:if></label>
 									<c:choose>
 									    <c:when test="${variable.type == 'string'}">
 									       <input class="form-control" name="${variable.name}" value="${variable.defaults[0]}"<c:if test="${variable.required}"> required="required"</c:if>>

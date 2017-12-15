@@ -1,71 +1,71 @@
-- title: General
-  variables:
-  
-  - title: Title
-    name: title
-    description: Title of the virtual machine.
-    type: string   
-    required: true
-    defaults: []
+variableGroups:
+  - title: General
+    variables:
     
-  - title: Description
-    name: description
-    description: Description of the virtual machine.
-    type: text   
-    required: true
-    defaults: []
-  
-  - title: Expiration Days
-    name: expiration_days
-    description: Days till virtual machine will be removed automatically.
-    type: string   
-    required: true
-    defaults: [ -1 ]
+    - title: Title
+      name: title
+      description: Title of the virtual machine.
+      type: string   
+      required: true
+      defaults: []
+      
+    - title: Description
+      name: description
+      description: Description of the virtual machine.
+      type: text   
+      required: true
+      defaults: []
     
-- title: VM
-  variables:
+    - title: Expiration Days
+      name: expiration_days
+      description: Days till virtual machine will be removed automatically.
+      type: string   
+      required: true
+      defaults: [ -1 ]
+      
+  - title: VM
+    variables:
+      
+    - title: Image
+      name: image_name
+      description: Virtual machine image to use.
+      type: list   
+      required: true
+      defaults: [ Ubuntu Server Linux 16.04, Windows Server 2016 ]
+      
+    - title: vCores
+      name: vm_cores
+      description: Number of virtual cores of the virtual machine. 
+      type: list   
+      required: true
+      defaults: [ 1, 2, 3, 4, 5, 6, 7, 8 ]
+      
+    - title: vRAM
+      name: vm_ram
+      description: RAM (in MB) of the virtual machine.
+      type: list   
+      required: true
+      defaults: [ 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536 ]
+      index: 1
+      
+  - title: Bootstrap
+    variables:
     
-  - title: Image
-    name: image_name
-    description: Virtual machine image to use.
-    type: list   
-    required: true
-    defaults: [ Ubuntu Server Linux 16.04, Windows Server 2016 ]
-    
-  - title: vCores
-    name: vm_cores
-    description: Number of virtual cores of the virtual machine. 
-    type: list   
-    required: true
-    defaults: [ 1, 2, 3, 4, 5, 6, 7, 8 ]
-    
-  - title: vRAM
-    name: vm_ram
-    description: RAM (in MB) of the virtual machine.
-    type: list   
-    required: true
-    defaults: [ 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536 ]
-    index: 1
-    
-- title: Bootstrap
-  variables:
-  
-  - title: Username
-    name: username
-    description: Username for SSH access.
-    type: string   
-    required: true
-    defaults: [ devops ]
-         
-  - title: Password
-    name: password
-    description: Password for SSH access.
-    type: string   
-    required: true
-    defaults: [ devops ]     
-    
-  - title: Script
-    name: script_file
-    description: Bootstrap script file to execute after vm has been created. 
-    type: file   
-    required: true
+    - title: Username
+      name: username
+      description: Username for SSH access.
+      type: string   
+      required: true
+      defaults: [ devops ]
+           
+    - title: Password
+      name: password
+      description: Password for SSH access.
+      type: string   
+      required: true
+      defaults: [ devops ]     
+      
+    - title: Script
+      name: script_file
+      description: Bootstrap script file to execute after vm has been created. 
+      type: file   

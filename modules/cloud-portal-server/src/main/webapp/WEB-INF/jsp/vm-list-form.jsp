@@ -33,7 +33,14 @@
                                 <tr>
                                     <td>
                                         <c:if test="${provisionLog.success == true && provisionLog.command == 'apply'}">
-                                            <button id="delete/action/${virtualMachine.provider}/${provisionLog.id}" type="submit" class="btn btn-danger btn-circle"><i class="fa fa-times"></i></button>
+                                            <button id="delete/action/${virtualMachine.provider}/${provisionLog.id}" type="submit" class="btn btn-danger btn-circle" data-toggle="tooltip" title="Delete item">
+                                                <i class="fa fa-times"></i>
+                                            </button>
+                                        </c:if>
+                                        <c:if test="${provisionLog.privateKey != null}">
+                                            <a href="<c:url value="/provision-log/private-key/${provisionLog.id}" />" class="btn btn-success btn-circle" data-toggle="tooltip" title="Download private key" target="_blank" role="button">
+                                                <i class="fa fa-key"></i>
+                                            </a>
                                         </c:if>                                            
                                     </td>
                                     <td data-order="<fmt:formatDate pattern="yyyy-MM-dd HH:mm" value="${provisionLog.date}"/>"><fmt:formatDate pattern="dd.MM.yyyy HH:mm:ss" value="${provisionLog.date}"/></td>

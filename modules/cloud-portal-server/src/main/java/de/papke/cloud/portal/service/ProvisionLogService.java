@@ -49,15 +49,15 @@ public class ProvisionLogService {
 		return provisionLogList;
 	}
 	
-	public ProvisionLog get(String username, String id) {
-		return provisionLogDao.findByUsernameAndId(username, id);
+	public ProvisionLog get(String id) {
+		return provisionLogDao.findById(id);
 	}
 	
 	public List<ProvisionLog> getExpired() {
 		return provisionLogDao.findByCommandAndExpirationDate(Constants.ACTION_APPLY, new Date());
 	}
 
-	public ProvisionLog create(String state, String provider, Boolean success, Map<String, Object> variableMap, File tmpFolder) {
+	public ProvisionLog create(String state, String provider, Boolean success, Map<String, Object> variableMap, File privateKeyFile, File tmpFolder) {
 
 		ProvisionLog provisionLog = null;
 		File zipFile = null;
@@ -72,6 +72,12 @@ public class ProvisionLogService {
 			zipFile = File.createTempFile(TMP_FILE_PREFIX, TMP_FILE_SUFFIX);
 			ZipUtil.zip(tmpFolder, zipFile);
 			byte[] data = IOUtils.toByteArray(new FileInputStream(zipFile));
+
+			// get private key as byte array
+			byte[] privateKey = null;
+			if (privateKeyFile != null) {
+				privateKey = IOUtils.toByteArray(new FileInputStream(privateKeyFile));
+			}
 			
 			// get expiration date
 			Date expirationDate = null;
@@ -85,7 +91,7 @@ public class ProvisionLogService {
 			}
 			
 			// create provision log
-			provisionLog = provisionLogDao.save(new ProvisionLog(new Date(), expirationDate, username, state, provider, success, variableMap, data));
+			provisionLog = provisionLogDao.save(new ProvisionLog(new Date(), expirationDate, username, state, provider, success, variableMap, privateKey, data));
 		}
 		catch (Exception e) {
 			LOG.error(e.getMessage(), e);

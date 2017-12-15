@@ -19,8 +19,6 @@ public class KeyPairService {
 	private static final Logger LOG = LoggerFactory.getLogger(KeyPairService.class); 
 
 	private static final JSch JSCH = new JSch();
-	private static final String FILE_PREFIX = "id_rsa";
-	private static final String FILE_SUFFIX = ".pub";
 	private static final String COMMENT = "keygen@cloud-portal";
 	
 	public List<File> createKeyPair() {
@@ -28,8 +26,8 @@ public class KeyPairService {
 		List<File> keyFileList = new ArrayList<>(); 
 		
 		try{
-			File privateKeyFile = File.createTempFile(FILE_PREFIX, Constants.CHAR_EMPTY);
-			File publicKeyFile = new File(privateKeyFile.getAbsolutePath() + FILE_SUFFIX);
+			File privateKeyFile = File.createTempFile(Constants.KEY_FILE_PREFIX, Constants.CHAR_EMPTY);
+			File publicKeyFile = new File(privateKeyFile.getAbsolutePath() + Constants.KEY_FILE_SUFFIX);
 			
 			KeyPair keyPair = KeyPair.genKeyPair(JSCH, KeyPair.RSA);
 			keyPair.writePrivateKey(privateKeyFile.getAbsolutePath());
