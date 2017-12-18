@@ -293,7 +293,7 @@ public class VirtualMachineController extends ApplicationController {
 		fillModel(model);
 
 		// get cloud provider defaults map
-		Map<String, List<VariableGroup>> cloudProviderDefaultsMap = terraformService.getProviderDefaults();
+		Map<String, List<VariableGroup>> cloudProviderDefaultsMap = terraformService.getVisibleProviderDefaults();
 
 		// create virtual machine model
 		VirtualMachineModel virtualMachineModel = new VirtualMachineModel();

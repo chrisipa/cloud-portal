@@ -1,4 +1,23 @@
 variableGroups: 
+  
+  - title: Credentials
+    hidden: true
+    variables:
+      
+      - title: Access Key
+        name: access_key
+        description: The AWS access key of your account.
+        type: string
+        required: true
+        defaults: []
+      
+      - title: Secret Key
+        name: secret_key
+        description: The AWS secret key of your account.
+        type: string
+        required: true
+        defaults: []
+
   - title: General
     variables:
     

@@ -48,7 +48,7 @@ public class ApplicationController {
 		applicationModel.setUser(sessionUserService.getUser());
 
 		// get cloud provider defaults map
-		Map<String, List<VariableGroup>> cloudProviderDefaultsMap = terraformService.getProviderDefaults();
+		Map<String, List<VariableGroup>> cloudProviderDefaultsMap = terraformService.getVisibleProviderDefaults();
 
 		// set cloud providers
 		List<String> cloudProviderList = new ArrayList<>();

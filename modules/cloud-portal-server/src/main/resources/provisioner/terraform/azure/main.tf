@@ -15,13 +15,19 @@ provider "azurerm" {
 }
 
 locals {
+
+  image_names_map = {
+    "Ubuntu Server Linux 16.04" = "Canonical:UbuntuServer:16.04-LTS:latest"
+    "Windows Server 2016" = "MicrosoftWindowsServer:WindowsServer:2016-Datacenter:latest"
+  }
+
   is_linux = "${replace(var.image_name, "Linux", "") != var.image_name ? 1 : 0}"
   is_windows = "${replace(var.image_name, "Windows", "") != var.image_name ? 1 : 0}"
   incoming_ports_list = "${split(",", var.incoming_ports)}"
-  image_publisher = "${element(split(":", lookup(var.image_names_map, var.image_name)), 0)}"
-  image_offer = "${element(split(":", lookup(var.image_names_map, var.image_name)), 1)}"
-  image_sku = "${element(split(":", lookup(var.image_names_map, var.image_name)), 2)}"
-  image_version = "${element(split(":", lookup(var.image_names_map, var.image_name)), 3)}"
+  image_publisher = "${element(split(":", lookup(local.image_names_map, var.image_name)), 0)}"
+  image_offer = "${element(split(":", lookup(local.image_names_map, var.image_name)), 1)}"
+  image_sku = "${element(split(":", lookup(local.image_names_map, var.image_name)), 2)}"
+  image_version = "${element(split(":", lookup(local.image_names_map, var.image_name)), 3)}"
   linux_script_path = "/tmp/bootstrap.sh"
   windows_script_path = "C:\\bootstrap.ps1"  
   allow_win_rm_file = "allow-winrm.cmd"

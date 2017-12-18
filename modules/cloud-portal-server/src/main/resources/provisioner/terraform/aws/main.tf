@@ -11,11 +11,22 @@ provider "aws" {
 }
 
 locals {
+
+  image_names_map = {
+    "Ubuntu Server Linux 16.04" = "ubuntu/images/hvm-ssd/ubuntu-xenial-16.04-amd64-server-*"
+    "Windows Server 2016" = "Windows_Server-2016-English-Full-Base-*"
+  }
+  
+  image_owners_map = {
+    "Ubuntu Server Linux 16.04" = "099720109477"
+    "Windows Server 2016" = "801119661308"
+  }
+
   is_linux = "${replace(var.image_name, "Linux", "") != var.image_name ? 1 : 0}"
   is_windows = "${replace(var.image_name, "Windows", "") != var.image_name ? 1 : 0}"
   incoming_ports_list = "${split(",", var.incoming_ports)}"
-  ami_name = "${lookup(var.image_names_map, var.image_name)}"
-  ami_owner = "${lookup(var.image_owners_map, var.image_name)}"
+  ami_name = "${lookup(local.image_names_map, var.image_name)}"
+  ami_owner = "${lookup(local.image_owners_map, var.image_name)}"
   linux_script_path = "/tmp/bootstrap.sh"
   windows_script_path = "C:\\bootstrap.ps1"
 }

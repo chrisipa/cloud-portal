@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.OutputStream;
 import java.net.URI;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -14,6 +15,7 @@ import java.util.Map.Entry;
 import javax.annotation.PostConstruct;
 
 import org.apache.commons.exec.CommandLine;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,8 +32,8 @@ import de.papke.cloud.portal.constants.Constants;
 import de.papke.cloud.portal.constants.VSphereConstants;
 import de.papke.cloud.portal.pojo.CommandResult;
 import de.papke.cloud.portal.pojo.Credentials;
-import de.papke.cloud.portal.pojo.VariableConfig;
 import de.papke.cloud.portal.pojo.Variable;
+import de.papke.cloud.portal.pojo.VariableConfig;
 import de.papke.cloud.portal.pojo.VariableGroup;
 
 /**
@@ -48,6 +50,10 @@ public class TerraformService {
 	private static final String FLAG_VAR = "-var";
 	private static final String FLAG_FORCE = "-force";
 
+	private static final String VARIABLE_NAME = "variable";
+	private static final String VARIABLE_DEFAULT = "default";
+	private static final String VARIABLE_DESCRIPTION = "description";
+
 	@Autowired
 	private CommandExecutorService commandExecutorService;
 
@@ -60,9 +66,9 @@ public class TerraformService {
 	public void init() {
 
 		try {
-			
+
 			Constructor constructor = new Constructor(VariableConfig.class);
-			
+
 			TypeDescription variableConfigTypeDescription = new TypeDescription(VariableConfig.class);
 			variableConfigTypeDescription.putListPropertyType("variableGroups", VariableGroup.class);
 			constructor.addTypeDescription(variableConfigTypeDescription);
@@ -70,9 +76,9 @@ public class TerraformService {
 			TypeDescription variableGroupTypeDescription = new TypeDescription(VariableGroup.class);
 			variableGroupTypeDescription.putListPropertyType("variables", Variable.class);
 			constructor.addTypeDescription(variableGroupTypeDescription);
-			
+
 			Yaml yaml = new Yaml(constructor);
-			
+
 			URL url = getClass().getClassLoader().getResource("terraform");
 			File terraformFolder = new File(url.toURI());
 			if (!terraformFolder.isFile()) {
@@ -103,6 +109,9 @@ public class TerraformService {
 			outputStream.write(TEXT_INTRODUCTION.getBytes());
 			outputStream.flush();
 
+			// generate variable file
+			generateVariablesFile(credentials.getProvider(), tmpFolder);
+
 			// execute init command
 			CommandLine initCommand = buildInitCommand(terraformPath);
 			commandExecutorService.execute(initCommand, tmpFolder, outputStream);
@@ -125,6 +134,57 @@ public class TerraformService {
 		}
 
 		return commandResult;
+	}
+
+	private void generateVariablesFile(String provider, File tmpFolder) throws Exception {
+
+		File variablesFile = new File(tmpFolder.getAbsolutePath() + File.separator + "variables.tf");
+		StringBuilder variablesBuilder = new StringBuilder();
+		
+		List<VariableGroup> variableGroupList = providerDefaults.get(provider);
+		for (VariableGroup variableGroup : variableGroupList) {
+			for (Variable variable : variableGroup.getVariables()) {
+				
+				String defaultValue = "";
+				List<String> defaultsList = variable.getDefaults();
+				if (!defaultsList.isEmpty()) {
+					defaultValue = defaultsList.get(variable.getIndex()); 
+				}
+				
+				variablesBuilder
+					.append(VARIABLE_NAME)
+					.append(Constants.CHAR_WHITESPACE)
+					.append(Constants.CHAR_DOUBLE_QUOTE)
+					.append(variable.getName())
+					.append(Constants.CHAR_DOUBLE_QUOTE)
+					.append(Constants.CHAR_WHITESPACE)
+					.append(Constants.CHAR_BRACE_OPEN)
+					.append(Constants.CHAR_NEW_LINE)
+					.append(Constants.CHAR_TAB)
+					.append(VARIABLE_DEFAULT)
+					.append(Constants.CHAR_WHITESPACE)
+					.append(Constants.CHAR_EQUAL)
+					.append(Constants.CHAR_WHITESPACE)
+					.append(Constants.CHAR_DOUBLE_QUOTE)
+					.append(defaultValue)
+					.append(Constants.CHAR_DOUBLE_QUOTE)
+					.append(Constants.CHAR_NEW_LINE)
+					.append(Constants.CHAR_TAB)
+					.append(VARIABLE_DESCRIPTION)
+					.append(Constants.CHAR_WHITESPACE)
+					.append(Constants.CHAR_EQUAL)
+					.append(Constants.CHAR_WHITESPACE)
+					.append(Constants.CHAR_DOUBLE_QUOTE)
+					.append(variable.getDescription())
+					.append(Constants.CHAR_DOUBLE_QUOTE)
+					.append(Constants.CHAR_NEW_LINE)
+					.append(Constants.CHAR_BRACE_CLOSE)
+					.append(Constants.CHAR_NEW_LINE)
+					.append(Constants.CHAR_NEW_LINE);
+			}
+		}
+
+		FileUtils.writeStringToFile(variablesFile, variablesBuilder.toString(), StandardCharsets.UTF_8, false);
 	}
 
 	private CommandLine buildInitCommand(String terraformPath) {
@@ -190,6 +250,23 @@ public class TerraformService {
 
 	public Map<String, List<VariableGroup>> getProviderDefaults() {
 		return providerDefaults;
+	}
+	
+	public Map<String, List<VariableGroup>> getVisibleProviderDefaults() {
+		
+		Map<String, List<VariableGroup>> visibleProviderDefaults = new HashMap<>();
+		
+		for (Entry<String, List<VariableGroup>> entry : providerDefaults.entrySet()) {
+			List<VariableGroup> visibleVariableGroupList = new ArrayList<>();
+			for (VariableGroup variableGroup : entry.getValue()) {
+				if (!variableGroup.isHidden()) {
+					visibleVariableGroupList.add(variableGroup);
+				}
+			}
+			visibleProviderDefaults.put(entry.getKey(), visibleVariableGroupList);
+		}
+		
+		return visibleProviderDefaults;
 	}
 
 	public List<Variable> getOptionalVariables(String provider) {

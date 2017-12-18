@@ -1,4 +1,44 @@
 variableGroups:
+
+  - title: Credentials
+    hidden: true
+    variables:
+      
+      - title: vCenter Hostname
+        name: vcenter_hostname
+        description: The hostname of the vcenter to use.
+        type: string
+        required: true
+        defaults: []
+      
+      - title: vCenter Image Folder
+        name: vcenter_image_folder
+        description: The vcenter folder where all the vm images are located.
+        type: string
+        required: true
+        defaults: []
+      
+      - title: vCenter Target Folder
+        name: vcenter_target_folder
+        description: The vcenter target folder where vms are created.
+        type: string
+        required: true
+        defaults: []
+      
+      - title: vCenter Username
+        name: vcenter_username
+        description: The vcenter username.
+        type: string
+        required: true
+        defaults: []
+        
+      - title: vCenter Password
+        name: vcenter_password
+        description: The vcenter password.
+        type: string
+        required: true
+        defaults: []
+
   - title: General
     variables:
     

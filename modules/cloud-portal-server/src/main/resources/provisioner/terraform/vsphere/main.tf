@@ -11,10 +11,17 @@ provider "vmware" {
 }
 
 locals {
+
+  image_templates_map = {
+    "Ubuntu Server Linux 16.04" = "TPL_UBUNTU_SERVER_16.04.3_LTS"
+    "Windows Server 2016" = "TPL_WIN_2016"  
+  }
+
   is_linux = "${replace(var.image_name, "Linux", "") != var.image_name ? 1 : 0}"
   is_windows = "${replace(var.image_name, "Windows", "") != var.image_name ? 1 : 0}"
   linux_script_path = "/tmp/bootstrap.sh"
   windows_script_path = "C:\\bootstrap.ps1"  
+  image_path = "${var.vcenter_image_folder}/${lookup(local.image_templates_map, var.image_name)}"
 }
 
 resource "random_id" "id" {
@@ -25,7 +32,7 @@ resource "vmware_virtual_machine" "linux" {
 
   count = "${local.is_linux}"
   name = "${random_id.id.hex}"
-  image = "${var.vcenter_image_folder}/${lookup(var.image_templates_map, var.image_name)}"
+  image = "${local.image_path}"
   folder = "${var.vcenter_target_folder}"
   cpus = "${var.vm_cores}"
   memory = "${var.vm_ram}"
@@ -56,7 +63,7 @@ resource "vmware_virtual_machine" "windows" {
 
   count = "${local.is_windows}"
   name = "${random_id.id.hex}"
-  image = "${var.vcenter_image_folder}/${lookup(var.image_templates_map, var.image_name)}"
+  image = "${local.image_path}"
   folder = "${var.vcenter_target_folder}"
   cpus = "${var.vm_cores}"
   memory = "${var.vm_ram}"
