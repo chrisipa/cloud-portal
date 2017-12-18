@@ -22,9 +22,12 @@
 <c:if test="${param.level == 3}">
     <c:set var="levelClass" value="nav-third-level" />
 </c:if>
+<c:if test="${param.level == 4}">
+    <c:set var="levelClass" value="nav-fourth-level" />
+</c:if>
 
 <c:if test="${fn:length(menuEntry.menus) > 0}">
-<ul class="nav ${levelClass}">
+<ul class="nav ${levelClass}" data-nav-level="${param.level}">
 	<c:forEach items="${menuEntry.menus}" var="subMenuEntry">
 	    <c:set var="menuEntry" value="${subMenuEntry}" scope="request" />
 	    <jsp:include page="menu-entry.jsp">

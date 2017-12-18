@@ -51,4 +51,6 @@ $(function() {
         responsive: true,
         order: [[ 1, 'desc' ]]
     });
+	
+	$("ul[data-nav-level='1']").show();
 });
