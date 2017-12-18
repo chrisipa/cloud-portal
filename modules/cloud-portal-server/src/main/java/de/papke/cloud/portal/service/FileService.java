@@ -1,7 +1,6 @@
 package de.papke.cloud.portal.service;
 
 import java.io.File;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -9,10 +8,14 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class FileService {
+	
+	@Autowired
+	private ResourceService resourceService;
 	
 	private static final Logger LOG = LoggerFactory.getLogger(FileService.class);
 
@@ -22,8 +25,7 @@ public class FileService {
 
         try {
         	
-        	URL url = getClass().getClassLoader().getResource(resourcePath);
-            File resource = new File(url.toURI());
+            File resource = resourceService.getClasspathResource(resourcePath);
             String resourceName = resource.getName();
             
             if (resource.isFile()) {

@@ -1,7 +1,6 @@
 package de.papke.cloud.portal.service;
 
 import java.io.File;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -10,6 +9,7 @@ import javax.annotation.PostConstruct;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -26,13 +26,15 @@ public class MailTemplateService {
 	
 	private Map<String, String> mailTemplateMap = new HashMap<>();
 
+	@Autowired
+	private ResourceService resourceService;
+	
 	@PostConstruct
 	public void init() {
 		
 		try {
 			
-			URL url = getClass().getClassLoader().getResource(TEMPLATE_FOLDER_NAME);
-			File mailFolder = new File(url.toURI());
+			File mailFolder = resourceService.getClasspathResource(TEMPLATE_FOLDER_NAME);
 			if (!mailFolder.isFile()) {
 				File[] mailFolderArray = mailFolder.listFiles();
 				for (File mailTemplateFile : mailFolderArray) {

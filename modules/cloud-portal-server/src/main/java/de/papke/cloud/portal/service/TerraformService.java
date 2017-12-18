@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.OutputStream;
 import java.net.URI;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -56,6 +55,9 @@ public class TerraformService {
 
 	@Autowired
 	private CommandExecutorService commandExecutorService;
+	
+	@Autowired
+	private ResourceService resourceService;
 
 	@Value("${terraform.path}")
 	private String terraformPath;
@@ -79,8 +81,7 @@ public class TerraformService {
 
 			Yaml yaml = new Yaml(constructor);
 
-			URL url = getClass().getClassLoader().getResource("terraform");
-			File terraformFolder = new File(url.toURI());
+			File terraformFolder = resourceService.getClasspathResource("terraform");
 			if (!terraformFolder.isFile()) {
 				File[] providerFolderArray = terraformFolder.listFiles();
 				for (File providerFolder : providerFolderArray) {
