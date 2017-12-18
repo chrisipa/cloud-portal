@@ -22,6 +22,7 @@
                             <tr>
                                 <th>Actions</th>
                                 <th>Date</th>
+                                <th>Username</th>
                                 <th>Command</th>
                                 <th>Success</th>
                                 <th>Variables</th>
@@ -44,6 +45,7 @@
                                         </c:if>                                            
                                     </td>
                                     <td data-order="<fmt:formatDate pattern="yyyy-MM-dd HH:mm" value="${provisionLog.date}"/>"><fmt:formatDate pattern="dd.MM.yyyy HH:mm:ss" value="${provisionLog.date}"/></td>
+                                    <td><c:out value="${provisionLog.username}" /></td>
                                     <td><c:out value="${provisionLog.command}" /></td>
                                     <td><c:out value="${provisionLog.success}" /></td>
                                     <td>

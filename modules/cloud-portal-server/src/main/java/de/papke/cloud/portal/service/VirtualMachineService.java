@@ -88,6 +88,9 @@ public class VirtualMachineService {
 			// get provider from credentials
 			String provider = credentials.getProvider();
 			
+			// get group from credentials
+			String group = credentials.getGroup();
+			
 			// copy terraform resources to filesystem
 			tmpFolder = fileService.copyResourceToFilesystem("terraform/" + provider);
 
@@ -106,7 +109,7 @@ public class VirtualMachineService {
 				variableMap.putAll(commandVariableMap);
 
 				// create provision log
-				provisionLogService.create(action, provider, success, variableMap, privateKeyFile, tmpFolder);
+				provisionLogService.create(action, provider, group, success, variableMap, privateKeyFile, tmpFolder);
 
 				// get attachment for mail
 				attachment = getAttachment(commandResult);
@@ -171,8 +174,12 @@ public class VirtualMachineService {
 			// command was successful?
 			if (commandResult.isSuccess()) {
 				
+				// get username
+				String username = user.getUsername();
+				
 				// update provision log entry
 				provisionLog.setCommand(action);
+				provisionLog.setUsername(username);
 				provisionLogService.update(provisionLog);
 			}
 			

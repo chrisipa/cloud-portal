@@ -42,8 +42,8 @@ public class ProvisionLogService {
 
 		User user = sessionUserService.getUser();
 		if (user != null) {
-			String username = user.getUsername();
-			provisionLogList = provisionLogDao.findByUsernameAndProvider(username, provider);
+			List<String> groups = user.getGroups();
+			provisionLogList = provisionLogDao.findByGroupInAndProvider(groups, provider);
 		}
 
 		return provisionLogList;
@@ -57,7 +57,7 @@ public class ProvisionLogService {
 		return provisionLogDao.findByCommandAndExpirationDate(Constants.ACTION_APPLY, new Date());
 	}
 
-	public ProvisionLog create(String state, String provider, Boolean success, Map<String, Object> variableMap, File privateKeyFile, File tmpFolder) {
+	public ProvisionLog create(String state, String provider, String group, Boolean success, Map<String, Object> variableMap, File privateKeyFile, File tmpFolder) {
 
 		ProvisionLog provisionLog = null;
 		File zipFile = null;
@@ -91,7 +91,7 @@ public class ProvisionLogService {
 			}
 			
 			// create provision log
-			provisionLog = provisionLogDao.save(new ProvisionLog(new Date(), expirationDate, username, state, provider, success, variableMap, privateKey, data));
+			provisionLog = provisionLogDao.save(new ProvisionLog(new Date(), expirationDate, username, group, state, provider, success, variableMap, privateKey, data));
 		}
 		catch (Exception e) {
 			LOG.error(e.getMessage(), e);

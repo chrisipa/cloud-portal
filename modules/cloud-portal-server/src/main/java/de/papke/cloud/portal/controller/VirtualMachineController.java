@@ -34,6 +34,7 @@ import de.papke.cloud.portal.pojo.VariableGroup;
 import de.papke.cloud.portal.service.CredentialsService;
 import de.papke.cloud.portal.service.KeyPairService;
 import de.papke.cloud.portal.service.ProvisionLogService;
+import de.papke.cloud.portal.service.SessionUserService;
 import de.papke.cloud.portal.service.TerraformService;
 import de.papke.cloud.portal.service.VirtualMachineService;
 
@@ -62,6 +63,9 @@ public class VirtualMachineController extends ApplicationController {
 	
 	@Autowired
 	private KeyPairService keyPairService;
+	
+	@Autowired
+	private SessionUserService sessionUserService;
 
 	/**
 	 * Method for returning the model and view for the create vm page.
@@ -229,11 +233,21 @@ public class VirtualMachineController extends ApplicationController {
 				ProvisionLog provisionLog = provisionLogService.get(id);
 				if (provisionLog != null) {
 					
-					// get response output stream
-					OutputStream outputStream = response.getOutputStream();
+					// get group
+					String group = provisionLog.getGroup();
 					
-					// provision VM
-					virtualMachineService.deprovision(provisionLog, credentials, outputStream);
+					// check if user is allowed to deprovision the vm
+					if (sessionUserService.getUser().getGroups().contains(group)) {
+					
+						// get response output stream
+						OutputStream outputStream = response.getOutputStream();
+						
+						// provision VM
+						virtualMachineService.deprovision(provisionLog, credentials, outputStream);
+					}
+					else {
+						response.getWriter().println(String.format("You are not allowed to deprovision the entry with the id '%s'", id));
+					}
 				}
 				else {
 					response.getWriter().println(String.format("No provision log entry found for id '%s'.", id));
