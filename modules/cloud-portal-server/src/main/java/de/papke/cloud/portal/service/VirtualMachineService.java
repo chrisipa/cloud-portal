@@ -109,7 +109,10 @@ public class VirtualMachineService {
 				variableMap.putAll(commandVariableMap);
 
 				// create provision log
-				provisionLogService.create(action, provider, group, success, variableMap, privateKeyFile, tmpFolder);
+				ProvisionLog provisionLog = provisionLogService.create(action, provider, group, success, variableMap, privateKeyFile, tmpFolder);
+				
+				// output provision log id
+				outputStream.write(("provisioning_id = " + provisionLog.getId()).getBytes());
 
 				// get attachment for mail
 				attachment = getAttachment(commandResult);
