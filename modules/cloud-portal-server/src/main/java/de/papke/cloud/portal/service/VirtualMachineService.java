@@ -220,7 +220,11 @@ public class VirtualMachineService {
 	private File sendMail(User user, String action, boolean success, Map<String, Object> variableMap, File attachment) {
 		
 		// get mail address
-		String email = user.getEmail(); 
+		String email = user.getEmail();
+		
+		// add additional user properties to map
+		variableMap.put("givenName", user.getGivenName());
+		variableMap.put("surName", user.getSurName());
 
 		// send mail
 		if (StringUtils.isNotEmpty(email)) {

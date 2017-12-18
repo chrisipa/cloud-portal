@@ -1,7 +1,7 @@
 <html>
 <body>
 <h2>VM provisioning was successful</h2>
-<p>Hello,<br /><br />your VM provisioning to <strong>${provider}</strong> was successful.</p>
+<p>Hello ${givenName} ${surName},<br /><br />your VM provisioning to <strong>${provider}</strong> was successful.</p>
 <p>Please use this data to connect to the server:<p>
 <hr />
 <p>ID: <strong>${id}</strong></p>

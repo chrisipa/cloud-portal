@@ -25,263 +25,285 @@ import com.unboundid.ldap.sdk.SearchResultEntry;
 import com.unboundid.ldap.sdk.SearchScope;
 import com.unboundid.ldap.sdk.controls.SimplePagedResultsControl;
 
+import de.papke.cloud.portal.pojo.User;
+
 @Service
 public class DirectoryService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(DirectoryService.class);
+	private static final Logger LOG = LoggerFactory.getLogger(DirectoryService.class);
 
-    @Value("${ldap.url.string}")
-    private String urlString;
+	@Value("${ldap.url.string}")
+	private String urlString;
 
-    @Value("${ldap.base.dn}")
-    private String baseDn;
+	@Value("${ldap.base.dn}")
+	private String baseDn;
 
-    @Value("${ldap.principal}")
-    private String principal;
+	@Value("${ldap.principal}")
+	private String principal;
 
-    @Value("${ldap.password}")
-    private String password;
+	@Value("${ldap.password}")
+	private String password;
 
-    @Value("${ldap.user.search.filter}")
-    private String userSearchFilter;
+	@Value("${ldap.user.search.filter}")
+	private String userSearchFilter;
 
-    @Value("${ldap.login.attribute}")
-    private String loginAttribute;
+	@Value("${ldap.login.attribute}")
+	private String loginAttribute;
 
-    @Value("${ldap.group.attribute}")
-    private String groupAttribute;
+	@Value("${ldap.givenname.attribute}")
+	private String givenNameAttribute;
 
-    @Value("${ldap.timeout}")
-    private Integer timeout;
+	@Value("${ldap.surname.attribute}")
+	private String surNameAttribute;
 
-    @Value("${ldap.page.size}")
-    private Integer pageSize;
+	@Value("${ldap.mail.attribute}")
+	private String mailAttribute;
 
-    private String[] urls;
+	@Value("${ldap.group.attribute}")
+	private String groupAttribute;
 
-    @PostConstruct
-    public void init() {
-        if (StringUtils.isNoneEmpty(urlString)) {
-            urls = urlString.split(",");
-        }
-    }
+	@Value("${ldap.timeout}")
+	private Integer timeout;
 
-    public boolean authenticate(String username, String password) {
+	@Value("${ldap.page.size}")
+	private Integer pageSize;
 
-        boolean success = false;
-        LDAPConnection ldapConnection = null;
-        String loginDn = getLoginDn(username);
+	private String[] urls;
 
-        if (loginDn != null) {
-            try {
-                ldapConnection = getUserConnection(loginDn, password);
-                if (ldapConnection != null) {
-                    success = true;
-                }
-            }
-            catch (Exception e) {
-                LOG.error(e.getMessage(), e);
-            }
-            finally {
-                if (ldapConnection != null) {
-                    ldapConnection.close();
-                }
-            }
-        }
+	@PostConstruct
+	public void init() {
+		if (StringUtils.isNoneEmpty(urlString)) {
+			urls = urlString.split(",");
+		}
+	}
 
-        return success;
-    }
+	public boolean authenticate(String username, String password) {
 
-    private String getLoginDn(String username) {
+		boolean success = false;
+		LDAPConnection ldapConnection = null;
+		String loginDn = getLoginDn(username);
 
-        String loginDn = null;
+		if (loginDn != null) {
+			try {
+				ldapConnection = getUserConnection(loginDn, password);
+				if (ldapConnection != null) {
+					success = true;
+				}
+			}
+			catch (Exception e) {
+				LOG.error(e.getMessage(), e);
+			}
+			finally {
+				if (ldapConnection != null) {
+					ldapConnection.close();
+				}
+			}
+		}
 
-        try {
+		return success;
+	}
 
-            Filter userFilter = Filter.create(userSearchFilter);
-            Filter loginFilter = getLoginFilter(username);
-            Filter filter = Filter.createANDFilter(userFilter, loginFilter);
+	private String getLoginDn(String username) {
 
-            List<SearchResultEntry> searchResultEntries = search(filter);
-            if (!searchResultEntries.isEmpty()) {
-                loginDn = searchResultEntries.get(0).getDN();
-            }
-        }
-        catch (Exception e) {
-            LOG.error(e.getMessage(), e);
-        }
+		String loginDn = null;
 
-        return loginDn;
-    }        
+		try {
 
-    private Filter getLoginFilter(String username) {
-        return Filter.createEqualityFilter(loginAttribute, username);
-    }
+			Filter userFilter = Filter.create(userSearchFilter);
+			Filter loginFilter = getLoginFilter(username);
+			Filter filter = Filter.createANDFilter(userFilter, loginFilter);
 
-    private LDAPConnection getUserConnection(String principal, String password) {
-        return getFailoverLdapConnection(principal, password);        
-    }    
+			List<SearchResultEntry> searchResultEntries = search(filter);
+			if (!searchResultEntries.isEmpty()) {
+				loginDn = searchResultEntries.get(0).getDN();
+			}
+		}
+		catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+		}
 
-    private LDAPConnection getAdminConnection() {
-        return getFailoverLdapConnection(principal, password);
-    }    
+		return loginDn;
+	}        
 
-    private LDAPConnection getFailoverLdapConnection(String principal, String password) {
-        for (String url : urls) {
-            LDAPConnection ldapConnection = getLdapConnection(principal, password, url.trim());
-            if (ldapConnection != null) {
-                return ldapConnection;
-            }
-        }
-        return null;
-    }   
+	private Filter getLoginFilter(String username) {
+		return Filter.createEqualityFilter(loginAttribute, username);
+	}
 
-    private LDAPConnection getLdapConnection(String principal, String password, String url) {
+	private LDAPConnection getUserConnection(String principal, String password) {
+		return getFailoverLdapConnection(principal, password);        
+	}    
 
-        LDAPConnection ldapConnection = null;
+	private LDAPConnection getAdminConnection() {
+		return getFailoverLdapConnection(principal, password);
+	}    
 
-        try {
-            LDAPURL ldapUrl = new LDAPURL(url);
-            LDAPConnectionOptions ldapConnectionOptions = new LDAPConnectionOptions();
-            ldapConnectionOptions.setConnectTimeoutMillis(timeout);
-            ldapConnection = new LDAPConnection(ldapConnectionOptions, ldapUrl.getHost(), ldapUrl.getPort(), principal, password);
-        }
-        catch (Exception e) {
-            LOG.error(e.getMessage(), e);
-        }
+	private LDAPConnection getFailoverLdapConnection(String principal, String password) {
+		for (String url : urls) {
+			LDAPConnection ldapConnection = getLdapConnection(principal, password, url.trim());
+			if (ldapConnection != null) {
+				return ldapConnection;
+			}
+		}
+		return null;
+	}   
 
-        return ldapConnection;
-    }    
+	private LDAPConnection getLdapConnection(String principal, String password, String url) {
 
-    public List<SearchResultEntry> search(String filterString) throws LDAPException {
-        return search(Filter.create(filterString), new String[]{});
-    }
+		LDAPConnection ldapConnection = null;
 
-    public List<SearchResultEntry> search(Filter filter) {
-        return search(filter, new String[]{});
-    }
+		try {
+			LDAPURL ldapUrl = new LDAPURL(url);
+			LDAPConnectionOptions ldapConnectionOptions = new LDAPConnectionOptions();
+			ldapConnectionOptions.setConnectTimeoutMillis(timeout);
+			ldapConnection = new LDAPConnection(ldapConnectionOptions, ldapUrl.getHost(), ldapUrl.getPort(), principal, password);
+		}
+		catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+		}
 
-    public List<SearchResultEntry> search(String filterString, String[] attributes) throws LDAPException {
-        return search(SearchScope.SUB, Filter.create(filterString), attributes);
-    }
+		return ldapConnection;
+	}    
 
-    public List<SearchResultEntry> search(Filter filter, String[] attributes) {
-        return search(SearchScope.SUB, filter, attributes);
-    }
+	public List<SearchResultEntry> search(String filterString) throws LDAPException {
+		return search(Filter.create(filterString), new String[]{});
+	}
 
-    public List<SearchResultEntry> search(SearchScope searchScope, String filterString, String[] attributes) throws LDAPException {
-        return search(baseDn, searchScope, Filter.create(filterString), attributes);
-    }
+	public List<SearchResultEntry> search(Filter filter) {
+		return search(filter, new String[]{});
+	}
 
-    public List<SearchResultEntry> search(SearchScope searchScope, Filter filter, String[] attributes) {
-        return search(baseDn, searchScope, filter, attributes);
-    }
+	public List<SearchResultEntry> search(String filterString, String[] attributes) throws LDAPException {
+		return search(SearchScope.SUB, Filter.create(filterString), attributes);
+	}
 
-    public List<SearchResultEntry> search(String baseDn, SearchScope searchScope, String filterString, String[] attributes) throws LDAPException {
-        return search(baseDn, searchScope, Filter.create(filterString), attributes, false);
-    }
+	public List<SearchResultEntry> search(Filter filter, String[] attributes) {
+		return search(SearchScope.SUB, filter, attributes);
+	}
 
-    public List<SearchResultEntry> search(String baseDn, SearchScope searchScope, Filter filter, String[] attributes) {
-        return search(baseDn, searchScope, filter, attributes, false);
-    }
+	public List<SearchResultEntry> search(SearchScope searchScope, String filterString, String[] attributes) throws LDAPException {
+		return search(baseDn, searchScope, Filter.create(filterString), attributes);
+	}
 
-    public List<SearchResultEntry> search(String baseDn, SearchScope searchScope, String filterString, String[] attributes, boolean paging) throws LDAPException {
-        return search(baseDn, searchScope, Filter.create(filterString), attributes, paging);    
-    }
+	public List<SearchResultEntry> search(SearchScope searchScope, Filter filter, String[] attributes) {
+		return search(baseDn, searchScope, filter, attributes);
+	}
 
-    /**
-     * Helper method for executing an LDAP search request.
-     * 
-     * @param baseDn
-     * @param searchScope
-     * @param filter
-     * @param attributes
-     * @param pageSize
-     * @param connection
-     * @return
-     * @throws Exception
-     */
-    public List<SearchResultEntry> search(String baseDn, SearchScope searchScope, Filter filter, String[] attributes, boolean paging) {
+	public List<SearchResultEntry> search(String baseDn, SearchScope searchScope, String filterString, String[] attributes) throws LDAPException {
+		return search(baseDn, searchScope, Filter.create(filterString), attributes, false);
+	}
 
-        List<SearchResultEntry> searchResultEntries = new ArrayList<>();
+	public List<SearchResultEntry> search(String baseDn, SearchScope searchScope, Filter filter, String[] attributes) {
+		return search(baseDn, searchScope, filter, attributes, false);
+	}
 
-        try {
-        	
-        	LDAPConnection connection = getAdminConnection();
+	public List<SearchResultEntry> search(String baseDn, SearchScope searchScope, String filterString, String[] attributes, boolean paging) throws LDAPException {
+		return search(baseDn, searchScope, Filter.create(filterString), attributes, paging);    
+	}
 
-        	if (connection != null) { 
-        	
-	            // check if paging should be used
-	            if (paging) {
-	
-	                // create LDAP search request
-	                SearchRequest searchRequest = new SearchRequest(baseDn, searchScope, filter, attributes);
-	
-	                // instantiate variable for paging cookie
-	                ASN1OctetString cookie = null;
-	
-	                do {
-	
-	                    // set controls for LDAP search request
-	                    Control[] controls = new Control[1];
-	                    controls[0] = new SimplePagedResultsControl(pageSize, cookie);
-	                    searchRequest.setControls(controls);
-	
-	                    // execute LDAP search request
-	                    SearchResult searchResult = connection.search(searchRequest);
-	
-	                    // add search entries from page to result list
-	                    searchResultEntries.addAll(searchResult.getSearchEntries());
-	
-	                    // get cookie for next page
-	                    cookie = null;
-	                    for (Control control : searchResult.getResponseControls()) {
-	                        if (control instanceof SimplePagedResultsControl) {
-	                            SimplePagedResultsControl simplePagedResultsControl = (SimplePagedResultsControl) control; 
-	                            cookie = simplePagedResultsControl.getCookie();
-	                        }
-	                    }
-	
-	                } 
-	                // do this as long as a cookie is returned
-	                while ((cookie != null) && (cookie.getValueLength() > 0));
-	            }
-	            else {
-	                // execute LDAP search request
-	                SearchResult searchResult = connection.search(baseDn, searchScope, filter, attributes);
-	
-	                // set search entries as result list
-	                searchResultEntries = searchResult.getSearchEntries();
-	            }
-        	}
-        }
-        catch (Exception e) {
-            LOG.error(e.getMessage(), e);
-        }
+	/**
+	 * Helper method for executing an LDAP search request.
+	 * 
+	 * @param baseDn
+	 * @param searchScope
+	 * @param filter
+	 * @param attributes
+	 * @param pageSize
+	 * @param connection
+	 * @return
+	 * @throws Exception
+	 */
+	public List<SearchResultEntry> search(String baseDn, SearchScope searchScope, Filter filter, String[] attributes, boolean paging) {
 
-        return searchResultEntries;
-    }    
+		List<SearchResultEntry> searchResultEntries = new ArrayList<>();
 
-    public List<String> getGroupList(String username) {
+		try {
 
-        List<String> groupList = new ArrayList<>();
+			LDAPConnection connection = getAdminConnection();
 
-        try {
+			if (connection != null) { 
 
-            List<SearchResultEntry> searchResultEntries = search(getLoginFilter(username));
-            for (SearchResultEntry searchResultEntry : searchResultEntries) {
-                String[] groupAttributeValues = searchResultEntry.getAttributeValues(groupAttribute);
-                for (String groupAttributeValue : groupAttributeValues) {
-                    DN groupDN = new DN(groupAttributeValue);
-                    String groupName = groupDN.getRDN().getAttributeValues()[0];
-                    groupList.add(groupName);
-                }
-            }
-        }
-        catch(Exception e) {
-            LOG.error(e.getMessage(), e);
-        }
+				// check if paging should be used
+				if (paging) {
 
-        return groupList;
-    }
+					// create LDAP search request
+					SearchRequest searchRequest = new SearchRequest(baseDn, searchScope, filter, attributes);
+
+					// instantiate variable for paging cookie
+					ASN1OctetString cookie = null;
+
+					do {
+
+						// set controls for LDAP search request
+						Control[] controls = new Control[1];
+						controls[0] = new SimplePagedResultsControl(pageSize, cookie);
+						searchRequest.setControls(controls);
+
+						// execute LDAP search request
+						SearchResult searchResult = connection.search(searchRequest);
+
+						// add search entries from page to result list
+						searchResultEntries.addAll(searchResult.getSearchEntries());
+
+						// get cookie for next page
+						cookie = null;
+						for (Control control : searchResult.getResponseControls()) {
+							if (control instanceof SimplePagedResultsControl) {
+								SimplePagedResultsControl simplePagedResultsControl = (SimplePagedResultsControl) control; 
+								cookie = simplePagedResultsControl.getCookie();
+							}
+						}
+
+					} 
+					// do this as long as a cookie is returned
+					while ((cookie != null) && (cookie.getValueLength() > 0));
+				}
+				else {
+					// execute LDAP search request
+					SearchResult searchResult = connection.search(baseDn, searchScope, filter, attributes);
+
+					// set search entries as result list
+					searchResultEntries = searchResult.getSearchEntries();
+				}
+			}
+		}
+		catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+		}
+
+		return searchResultEntries;
+	}    
+
+	public User getUser(String username) {
+
+		User user = new User();
+
+		try {
+
+			List<SearchResultEntry> searchResultEntries = search(getLoginFilter(username));
+			if (!searchResultEntries.isEmpty()) {
+
+				SearchResultEntry searchResultEntry = searchResultEntries.get(0);
+
+				user.setUsername(username);
+				user.setGivenName(searchResultEntry.getAttributeValue(givenNameAttribute));
+				user.setSurName(searchResultEntry.getAttributeValue(surNameAttribute));
+				user.setEmail(searchResultEntry.getAttributeValue(mailAttribute));
+
+				List<String> groups = new ArrayList<>();            	
+				String[] groupAttributeValues = searchResultEntry.getAttributeValues(groupAttribute);
+				for (String groupAttributeValue : groupAttributeValues) {
+					DN groupDN = new DN(groupAttributeValue);
+					String groupName = groupDN.getRDN().getAttributeValues()[0];
+					groups.add(groupName);
+				}
+				
+				user.setGroups(groups);
+			}
+		}
+		catch(Exception e) {
+			LOG.error(e.getMessage(), e);
+		}
+
+		return user;
+	}
 }

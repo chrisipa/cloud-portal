@@ -1,7 +1,7 @@
 <html>
 <body>
 <h2>VM destroyed successfully</h2>
-<p>Hello,<br /><br />your VM from <strong>${provider}</strong> was destroyed successfully.</p>
+<p>Hello ${givenName} ${surName},<br /><br />your VM from <strong>${provider}</strong> was destroyed successfully.</p>
 <p>See log file for additional details.<p>
 <hr />
 <p>ID: <strong>${id}</strong></p>

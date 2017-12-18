@@ -13,7 +13,7 @@ import de.papke.cloud.portal.pojo.User;
 public class SessionUserService {
 	
 	private static final String SESSION_ATTRIBUTE_USER = "user";
-	private static final User DUMMY_USER = new User("anonymous", "dummy@dummy.com", new ArrayList<>(), false);
+	private static final User DUMMY_USER = new User("anonymous", "Anonymous", "User", "dummy@dummy.com", new ArrayList<>(), false);
 	
 	@Autowired
 	private HttpSession session;

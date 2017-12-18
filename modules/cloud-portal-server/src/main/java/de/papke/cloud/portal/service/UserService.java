@@ -27,24 +27,20 @@ public class UserService {
 
 		try {
 
-			Boolean isAdmin = false;
-
-			List<String> groupList = directoryService.getGroupList(username);
-			for (String group : groupList) {
+			user = directoryService.getUser(username);
+			
+			List<String> groups = user.getGroups(); 
+			for (String group : groups) {
 				if (group.equals(adminGroup)) {
-					isAdmin = true;
+					user.setIsAdmin(true);
 				}
 			}
-
-			user = new User(username, username, groupList, isAdmin);
-
 		}
 		catch(Exception e) {
 			LOG.error(e.getMessage(), e);
 		}
-
+		
 		return user;
-
 	}
 	
 	public boolean authenticate(String username, String password) {

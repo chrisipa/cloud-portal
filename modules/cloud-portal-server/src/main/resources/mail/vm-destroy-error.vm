@@ -1,7 +1,7 @@
 <html>
 <body>
 <h2>Error while destroying VM</h2>
-<p>Hello,<br /><br />there was an error destroying your VM from <strong>${provider}</strong>.</p>
+<p>Hello ${givenName} ${surName},<br /><br />there was an error destroying your VM from <strong>${provider}</strong>.</p>
 <p>See log file for additional details.<p>
 <hr />
 <p>ID: <strong>${id}</strong></p>
