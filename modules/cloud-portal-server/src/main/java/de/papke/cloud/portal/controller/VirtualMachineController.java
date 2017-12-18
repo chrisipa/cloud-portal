@@ -175,11 +175,11 @@ public class VirtualMachineController extends ApplicationController {
 							
 							StringBuilder scriptPath = new StringBuilder("script/default.");
 							
-							String imageName = ((String) variableMap.get("image_name")).toLowerCase();
-							if (imageName.contains("windows")) {
+							String imageName = (String) variableMap.get("image_name");
+							if (imageName != null && imageName.contains("windows")) {
 								scriptPath.append("ps1");
 							}
-							else if (imageName.contains("linux")) {
+							else {
 								scriptPath.append("sh");
 							}
 							
