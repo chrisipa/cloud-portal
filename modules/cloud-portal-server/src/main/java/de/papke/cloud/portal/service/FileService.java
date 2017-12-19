@@ -29,7 +29,7 @@ public class FileService {
             String resourceName = resource.getName();
             
             if (resource.isFile()) {
-            	String prefix = FilenameUtils.getPrefix(resourceName);
+            	String prefix = FilenameUtils.removeExtension(resourceName);
             	String suffix = FilenameUtils.getExtension(resourceName);
             	tmpFile = File.createTempFile(prefix, suffix);	
             	FileUtils.copyFile(resource, tmpFile);

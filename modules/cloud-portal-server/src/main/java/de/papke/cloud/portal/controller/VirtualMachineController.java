@@ -31,9 +31,9 @@ import de.papke.cloud.portal.pojo.ProvisionLog;
 import de.papke.cloud.portal.pojo.Variable;
 import de.papke.cloud.portal.pojo.VariableGroup;
 import de.papke.cloud.portal.service.CredentialsService;
+import de.papke.cloud.portal.service.FileService;
 import de.papke.cloud.portal.service.KeyPairService;
 import de.papke.cloud.portal.service.ProvisionLogService;
-import de.papke.cloud.portal.service.ResourceService;
 import de.papke.cloud.portal.service.SessionUserService;
 import de.papke.cloud.portal.service.TerraformService;
 import de.papke.cloud.portal.service.VirtualMachineService;
@@ -68,7 +68,7 @@ public class VirtualMachineController extends ApplicationController {
 	private SessionUserService sessionUserService;
 
 	@Autowired
-	private ResourceService resourceService;
+	private FileService fileService;
 	
 	/**
 	 * Method for returning the model and view for the create vm page.
@@ -186,7 +186,7 @@ public class VirtualMachineController extends ApplicationController {
 								scriptPath.append("sh");
 							}
 							
-							File scriptFile = resourceService.getClasspathResource(scriptPath.toString());
+							File scriptFile = fileService.copyResourceToFilesystem(scriptPath.toString());
 							variableMap.put("script_file", scriptFile.getAbsolutePath());
 						}
 					}
