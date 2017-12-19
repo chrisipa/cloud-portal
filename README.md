@@ -53,7 +53,6 @@ tomcat:
   volumes:
     - /opt/cloud-portal/logs:/opt/tomcat/logs
   environment:    
-    - 'TOMCAT_SESSION_TIMEOUT=720'
     - 'application.title=My Cloud Portal'
     - 'application.admin.group=my-admin-group'
     - 'encryptor.secret=my-encryptor-secret'
