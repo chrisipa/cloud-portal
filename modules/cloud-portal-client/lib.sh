@@ -36,23 +36,16 @@ function log() {
 # --------------------------------------------------------
 # Function for creating a session in the cloud portal
 # --------------------------------------------------------
-# $1 - Username
-# $2 - Password
-# --------------------------------------------------------
 function login() {
 
-    # read parameters
-    local username="$1"
-    local password="$2"
-    
     # get login url
-    local loginUrl="$baseUrl/login"
+    local loginUrl="$CLOUD_PORTAL_URL/login"
     
     # logging
-    log "INFO" "Creating a session with username '$username' and login url '$loginUrl'"
+    log "INFO" "Creating a session with username '$CLOUD_PORTAL_USERNAME' and login url '$loginUrl'"
     
     # create session and save to cookie file
-    curl -s -X POST -c "$cookieFile" -F "username=$username" -F "password=$password" "$loginUrl" >> /dev/null
+    curl -s -X POST -c "$cookieFile" -F "username=$CLOUD_PORTAL_USERNAME" -F "password=$CLOUD_PORTAL_PASSWORD" "$loginUrl" >> /dev/null
 }
 
 # --------------------------------------------------------
@@ -61,7 +54,7 @@ function login() {
 function logout() {
 
     # get logout url
-    local logoutUrl="$baseUrl/logout"
+    local logoutUrl="$CLOUD_PORTAL_URL/logout"
 
     # logging
     log "INFO" "Destroying a session with logout url '$logoutUrl'"
@@ -73,39 +66,33 @@ function logout() {
 # --------------------------------------------------------
 # Function for creating a vm for a cloud platform
 # --------------------------------------------------------
-# $1 - Provider (possible values: aws, azure, vsphere)
-# --------------------------------------------------------
 function apply() {
 
-    # read parameters
-    local provider="$1"
-    
     # get apply url
-    local applyUrl="$baseUrl/vm/create/action/apply"
+    local applyUrl="$CLOUD_PORTAL_URL/vm/create/action/apply"
     
     # logging
-    log "INFO" "Creating virtual machine for cloud provider '$provider' and apply url '$applyUrl'"
+    log "INFO" "Creating virtual machine for cloud provider '$CLOUD_PORTAL_PROVIDER' and apply url '$applyUrl'"
     
     # create virtual machine for cloud provider
-    curl -s -X POST -b "$cookieFile" -F "provider=$provider" "$applyUrl" | tee "$outputFile"            
+    curl -s -X POST -b "$cookieFile" -F "provider=$CLOUD_PORTAL_PROVIDER" "$@" "$applyUrl" | tee "$outputFile"            
 }
 
 # --------------------------------------------------------
 # Function for destroying a vm for a cloud platform
 # --------------------------------------------------------
-# $1 - Provider (possible values: aws, azure, vsphere)
+# $1 - Provisioning ID
 # --------------------------------------------------------
 function destroy() {
 
     # read parameters
-    local provider="$1"
-    local id="$2"
+    local id="$1"
     
     # get destroy url
-    local destroyUrl="$baseUrl/vm/delete/action/$provider/$id"
+    local destroyUrl="$CLOUD_PORTAL_URL/vm/delete/action/$CLOUD_PORTAL_PROVIDER/$id"
     
     # logging
-    log "INFO" "Destroying virtual machine for cloud provider '$provider' and id '$id'"
+    log "INFO" "Destroying virtual machine for cloud provider '$CLOUD_PORTAL_PROVIDER' and id '$id'"
     
     # destroy virtual machine for cloud provider
     curl -X GET -b "$cookieFile" "$destroyUrl"  
@@ -145,7 +132,7 @@ function execute() {
     local id="$4"
     
     # get private key url
-    local privateKeyUrl="$baseUrl/provision-log/private-key/$id"
+    local privateKeyUrl="$CLOUD_PORTAL_URL/provision-log/private-key/$id"
     
     # download private key
     log "INFO" "Downloading private key file '$privateKeyUrl'"
@@ -190,35 +177,26 @@ echo "# Cloud Portal CLI Client #"
 echo "###########################"
 echo ""
 
-# get base url from environment variables
-if [ "$CLOUD_PORTAL_URL" != "" ]
+if [ "$CLOUD_PORTAL_URL" == "" ]
 then
-    baseUrl="$CLOUD_PORTAL_URL"
-else
-    read -p "Base URL: " baseUrl     
+    log "ERROR" "Please specifiy CLOUD_PORTAL_URL as environment variable!"
+    exit -1
 fi
 
-# get provider from environment variables
-if [ "$CLOUD_PORTAL_PROVIDER" != "" ]
+if [ "$CLOUD_PORTAL_USERNAME" == "" ]
 then
-    provider="$CLOUD_PORTAL_PROVIDER"
-else
-    read -p "Provider: " provider 
+    log "ERROR" "Please specifiy CLOUD_PORTAL_USERNAME as environment variable!"
+    exit -1
 fi
 
-# get username from environment variables
-if [ "$CLOUD_PORTAL_USERNAME" != "" ]
+if [ "$CLOUD_PORTAL_PASSWORD" == "" ]
 then
-    username="$CLOUD_PORTAL_USERNAME"
-else
-    read -p "Username: " username    
+    log "ERROR" "Please specifiy CLOUD_PORTAL_PASSWORD as environment variable!"
+    exit -1
 fi
 
-# get password from environment variables
-if [ "$CLOUD_PORTAL_PASSWORD" != "" ]
+if [ "$CLOUD_PORTAL_PROVIDER" == "" ]
 then
-    password="$CLOUD_PORTAL_PASSWORD"
-else
-    read -s -p "Password: " password
-    echo ""        
+    log "ERROR" "Please specifiy CLOUD_PORTAL_PROVIDER as environment variable!"
+    exit -1
 fi

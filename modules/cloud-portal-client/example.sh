@@ -4,10 +4,10 @@
 source "$(dirname $(readlink -f $0))/lib.sh"
 
 # login 
-login "$username" "$password"
+login 
 
 # create vm 
-apply "$provider"
+apply "$@"
 
 # get variables from output
 username="$(getVariableFromOutput 'username')"
@@ -19,7 +19,7 @@ command="ls -la /tmp"
 execute "$username" "$host" "$command" "$provisioningId"
 
 # destroy vm 
-destroy "$provider" "$provisioningId"
+destroy "$provisioningId"
 
 # logout 
 logout
