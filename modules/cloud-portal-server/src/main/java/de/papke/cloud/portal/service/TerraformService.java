@@ -2,6 +2,7 @@ package de.papke.cloud.portal.service;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
@@ -137,7 +138,7 @@ public class TerraformService {
 		return commandResult;
 	}
 
-	private void generateVariablesFile(String provider, File tmpFolder) throws Exception {
+	private void generateVariablesFile(String provider, File tmpFolder) throws IOException {
 
 		File variablesFile = new File(tmpFolder.getAbsolutePath() + File.separator + "variables.tf");
 		StringBuilder variablesBuilder = new StringBuilder();
