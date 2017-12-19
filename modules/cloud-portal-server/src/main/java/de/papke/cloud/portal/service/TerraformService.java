@@ -55,7 +55,7 @@ public class TerraformService {
 
 	@Autowired
 	private CommandExecutorService commandExecutorService;
-	
+
 	@Autowired
 	private ResourceService resourceService;
 
@@ -141,25 +141,29 @@ public class TerraformService {
 
 		File variablesFile = new File(tmpFolder.getAbsolutePath() + File.separator + "variables.tf");
 		StringBuilder variablesBuilder = new StringBuilder();
-		
+
 		List<VariableGroup> variableGroupList = providerDefaults.get(provider);
 		for (VariableGroup variableGroup : variableGroupList) {
 			for (Variable variable : variableGroup.getVariables()) {
-				
-				String defaultValue = "";
+
+				String defaultValue = null;
 				List<String> defaultsList = variable.getDefaults();
 				if (!defaultsList.isEmpty()) {
 					defaultValue = defaultsList.get(variable.getIndex()); 
 				}
-				
+
 				variablesBuilder
-					.append(VARIABLE_NAME)
-					.append(Constants.CHAR_WHITESPACE)
-					.append(Constants.CHAR_DOUBLE_QUOTE)
-					.append(variable.getName())
-					.append(Constants.CHAR_DOUBLE_QUOTE)
-					.append(Constants.CHAR_WHITESPACE)
-					.append(Constants.CHAR_BRACE_OPEN)
+				.append(VARIABLE_NAME)
+				.append(Constants.CHAR_WHITESPACE)
+				.append(Constants.CHAR_DOUBLE_QUOTE)
+				.append(variable.getName())
+				.append(Constants.CHAR_DOUBLE_QUOTE)
+				.append(Constants.CHAR_WHITESPACE)
+				.append(Constants.CHAR_BRACE_OPEN);
+
+				if (StringUtils.isNotEmpty(defaultValue)) {
+
+					variablesBuilder
 					.append(Constants.CHAR_NEW_LINE)
 					.append(Constants.CHAR_TAB)
 					.append(VARIABLE_DEFAULT)
@@ -168,20 +172,24 @@ public class TerraformService {
 					.append(Constants.CHAR_WHITESPACE)
 					.append(Constants.CHAR_DOUBLE_QUOTE)
 					.append(defaultValue)
-					.append(Constants.CHAR_DOUBLE_QUOTE)
-					.append(Constants.CHAR_NEW_LINE)
-					.append(Constants.CHAR_TAB)
-					.append(VARIABLE_DESCRIPTION)
-					.append(Constants.CHAR_WHITESPACE)
-					.append(Constants.CHAR_EQUAL)
-					.append(Constants.CHAR_WHITESPACE)
-					.append(Constants.CHAR_DOUBLE_QUOTE)
-					.append(variable.getDescription())
-					.append(Constants.CHAR_DOUBLE_QUOTE)
-					.append(Constants.CHAR_NEW_LINE)
-					.append(Constants.CHAR_BRACE_CLOSE)
-					.append(Constants.CHAR_NEW_LINE)
-					.append(Constants.CHAR_NEW_LINE);
+					.append(Constants.CHAR_DOUBLE_QUOTE);
+
+				}
+
+				variablesBuilder
+				.append(Constants.CHAR_NEW_LINE)
+				.append(Constants.CHAR_TAB)
+				.append(VARIABLE_DESCRIPTION)
+				.append(Constants.CHAR_WHITESPACE)
+				.append(Constants.CHAR_EQUAL)
+				.append(Constants.CHAR_WHITESPACE)
+				.append(Constants.CHAR_DOUBLE_QUOTE)
+				.append(variable.getDescription())
+				.append(Constants.CHAR_DOUBLE_QUOTE)
+				.append(Constants.CHAR_NEW_LINE)
+				.append(Constants.CHAR_BRACE_CLOSE)
+				.append(Constants.CHAR_NEW_LINE)
+				.append(Constants.CHAR_NEW_LINE);
 			}
 		}
 
@@ -252,11 +260,11 @@ public class TerraformService {
 	public Map<String, List<VariableGroup>> getProviderDefaults() {
 		return providerDefaults;
 	}
-	
+
 	public Map<String, List<VariableGroup>> getVisibleProviderDefaults() {
-		
+
 		Map<String, List<VariableGroup>> visibleProviderDefaults = new HashMap<>();
-		
+
 		for (Entry<String, List<VariableGroup>> entry : providerDefaults.entrySet()) {
 			List<VariableGroup> visibleVariableGroupList = new ArrayList<>();
 			for (VariableGroup variableGroup : entry.getValue()) {
@@ -266,7 +274,7 @@ public class TerraformService {
 			}
 			visibleProviderDefaults.put(entry.getKey(), visibleVariableGroupList);
 		}
-		
+
 		return visibleProviderDefaults;
 	}
 
