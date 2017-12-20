@@ -18,8 +18,12 @@ provisioningId="$(getVariableFromOutput 'provisioning_id')"
 command="ls -la /tmp"
 execute "$username" "$host" "$command" "$provisioningId"
 
-# destroy vm 
-destroy "$provisioningId"
+# destroy vm if user decides
+if confirm "Do you want to remove this VM?"
+then
+    # destroy vm 
+    destroy "$provisioningId"
+fi
 
 # logout 
 logout

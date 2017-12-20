@@ -33,6 +33,30 @@ function log() {
     echo -e "\n$now [$level] $text\n"
 }
 
+# ---------------------------------------------------------------
+# Function for confirming a message on the console
+# ---------------------------------------------------------------
+# $1 - Confirm message to show
+# ---------------------------------------------------------------
+function confirm() {
+
+    # read parameters
+    local question="$1"
+
+    echo ""
+    read -r -p "$question [Y/n] " answer
+    echo ""
+
+    case "$answer" in
+        [yY][eE][sS]|[yY])
+            return 0
+        ;;
+        *)
+            return 1
+        ;;
+    esac
+}
+
 # --------------------------------------------------------
 # Function for creating a session in the cloud portal
 # --------------------------------------------------------
