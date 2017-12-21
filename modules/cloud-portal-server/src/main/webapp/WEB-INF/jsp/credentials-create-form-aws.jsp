@@ -20,11 +20,11 @@
 							required="required">
 					</div>
 					<div class="form-group">
-                        <label>Access Key</label> <input type="text" class="form-control" name="accessKey"
+                        <label>Access Key</label> <input type="text" class="form-control" name="access_key"
                             required="required">
                     </div>
 					<div class="form-group">
-                        <label>Secret Key</label> <input type="password" class="form-control" name="secretKey"
+                        <label>Secret Key</label> <input type="password" class="form-control" name="secret_key"
                             required="required">
                     </div>
                     <button id="create/action/aws" type="submit" class="btn btn-warning">Create</button>

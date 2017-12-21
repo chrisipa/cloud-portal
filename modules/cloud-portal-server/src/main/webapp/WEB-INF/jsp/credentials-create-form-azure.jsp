@@ -20,19 +20,19 @@
 							required="required">
 					</div>
 					<div class="form-group">
-                        <label>Subscription ID</label> <input type="text" class="form-control" name="subscriptionId"
+                        <label>Subscription ID</label> <input type="text" class="form-control" name="subscription_id"
                             required="required">
                     </div>
 					<div class="form-group">
-                        <label>Tenant ID</label> <input type="text" class="form-control" name="tenantId"
+                        <label>Tenant ID</label> <input type="text" class="form-control" name="tenant_id"
                             required="required">
                     </div>
 					<div class="form-group">
-                        <label>Client ID</label> <input type="text" class="form-control" name="clientId"
+                        <label>Client ID</label> <input type="text" class="form-control" name="client_id"
                             required="required">
                     </div>
 					<div class="form-group">
-                        <label>Client Secret</label> <input type="password" class="form-control" name="clientSecret"
+                        <label>Client Secret</label> <input type="password" class="form-control" name="client_secret"
                             required="required">
                     </div>
                     <button id="create/action/azure" type="submit" class="btn btn-warning">Create</button>

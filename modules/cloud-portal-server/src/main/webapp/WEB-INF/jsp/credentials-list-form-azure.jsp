@@ -34,10 +34,10 @@
 									   <button id="delete/action/azure/${cred.id}" type="submit" class="btn btn-danger btn-circle"><i class="fa fa-times"></i></button>
 									</td>
 									<td><c:out value="${cred.group}" /></td>
-									<td><c:out value="${cred.secretMap['subscriptionId']}" /></td>
-									<td><c:out value="${cred.secretMap['tenantId']}" /></td>
-									<td><c:out value="${cred.secretMap['clientId']}" /></td>
-									<td><c:out value="${cred.secretMap['clientSecret']}" /></td>
+									<td><c:out value="${cred.secretMap['subscription_id']}" /></td>
+									<td><c:out value="${cred.secretMap['tenant_id']}" /></td>
+									<td><c:out value="${cred.secretMap['client_id']}" /></td>
+									<td><c:out value="${cred.secretMap['client_secret']}" /></td>
 								</tr>
 							</c:forEach>
 						</tbody>

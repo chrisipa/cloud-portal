@@ -20,23 +20,23 @@
 							required="required">
 					</div>
 					<div class="form-group">
-                        <label>vCenter Hostname</label> <input type="text" class="form-control" name="vCenterHostname"
+                        <label>vCenter Hostname</label> <input type="text" class="form-control" name="vcenter_hostname"
                             required="required">
                     </div>
 					<div class="form-group">
-                        <label>vCenter Image Folder</label> <input type="text" class="form-control" name="vCenterImageFolder"
+                        <label>vCenter Image Folder</label> <input type="text" class="form-control" name="vcenter_image_folder"
                             required="required">
                     </div>
 					<div class="form-group">
-                        <label>vCenter Target Folder</label> <input type="text" class="form-control" name="vCenterTargetFolder"
+                        <label>vCenter Target Folder</label> <input type="text" class="form-control" name="vcenter_target_folder"
                             required="required">
                     </div>
 					<div class="form-group">
-                        <label>vCenter Username</label> <input type="text" class="form-control" name="vCenterUsername"
+                        <label>vCenter Username</label> <input type="text" class="form-control" name="vcenter_username"
                             required="required">
                     </div>
 					<div class="form-group">
-                        <label>vCenter Password</label> <input type="password" class="form-control" name="vCenterPassword"
+                        <label>vCenter Password</label> <input type="password" class="form-control" name="vcenter_password"
                             required="required">
                     </div>
                     <button id="create/action/vsphere" type="submit" class="btn btn-warning">Create</button>

@@ -35,11 +35,11 @@
 									   <button id="delete/action/vsphere/${cred.id}" type="submit" class="btn btn-danger btn-circle"><i class="fa fa-times"></i></button>
 									</td>
 									<td><c:out value="${cred.group}" /></td>
-									<td><c:out value="${cred.secretMap['vCenterHostname']}" /></td>
-									<td><c:out value="${cred.secretMap['vCenterImageFolder']}" /></td>
-									<td><c:out value="${cred.secretMap['vCenterTargetFolder']}" /></td>
-									<td><c:out value="${cred.secretMap['vCenterUsername']}" /></td>
-									<td><c:out value="${cred.secretMap['vCenterPassword']}" /></td>
+									<td><c:out value="${cred.secretMap['vcenter_hostname']}" /></td>
+									<td><c:out value="${cred.secretMap['vcenter_image_folder']}" /></td>
+									<td><c:out value="${cred.secretMap['vcenter_target_folder']}" /></td>
+									<td><c:out value="${cred.secretMap['vcenter_username']}" /></td>
+									<td><c:out value="${cred.secretMap['vcenter_password']}" /></td>
 								</tr>
 							</c:forEach>
 						</tbody>

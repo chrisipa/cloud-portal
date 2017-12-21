@@ -32,8 +32,8 @@
 									   <button id="delete/action/aws/${cred.id}" type="submit" class="btn btn-danger btn-circle"><i class="fa fa-times"></i></button>
 									</td>
 									<td><c:out value="${cred.group}" /></td>
-									<td><c:out value="${cred.secretMap['accessKey']}" /></td>
-									<td><c:out value="${cred.secretMap['secretKey']}" /></td>
+									<td><c:out value="${cred.secretMap['access_key']}" /></td>
+									<td><c:out value="${cred.secretMap['secret_key']}" /></td>
 								</tr>
 							</c:forEach>
 						</tbody>

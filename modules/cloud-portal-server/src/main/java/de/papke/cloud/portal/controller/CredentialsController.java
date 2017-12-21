@@ -1,6 +1,5 @@
 package de.papke.cloud.portal.controller;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,9 +9,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import de.papke.cloud.portal.constants.AwsConstants;
-import de.papke.cloud.portal.constants.AzureConstants;
-import de.papke.cloud.portal.constants.VSphereConstants;
 import de.papke.cloud.portal.model.CredentialsModel;
 import de.papke.cloud.portal.service.CredentialsService;
 import de.papke.cloud.portal.service.SessionUserService;
@@ -20,6 +16,7 @@ import de.papke.cloud.portal.service.SessionUserService;
 @Controller
 public class CredentialsController extends ApplicationController {
 
+	private static final String GROUP = "group";
 	private static final String PREFIX = "/credentials";
 	private static final String MODEL_VAR_NAME = "credentials";
 	private static final String LIST_PATH_PREFIX = PREFIX + "/list/form";
@@ -39,30 +36,13 @@ public class CredentialsController extends ApplicationController {
 		if (sessionUserService.isAdmin()) {
 
 			// get group
-			String group = variableMap.get("group");
+			String group = variableMap.get(GROUP);
 
-			// get secret map from variable map
-			Map<String, String> secretMap = new HashMap<>();
-			if (provider.equals(AzureConstants.PROVIDER)) {
-				secretMap.put(AzureConstants.SUBSCRIPTION_ID, variableMap.get(AzureConstants.SUBSCRIPTION_ID));
-				secretMap.put(AzureConstants.TENANT_ID, variableMap.get(AzureConstants.TENANT_ID));
-				secretMap.put(AzureConstants.CLIENT_ID, variableMap.get(AzureConstants.CLIENT_ID));
-				secretMap.put(AzureConstants.CLIENT_SECRET, variableMap.get(AzureConstants.CLIENT_SECRET));
-			}
-			else if (provider.equals(AwsConstants.PROVIDER)) {
-				secretMap.put(AwsConstants.ACCESS_KEY, variableMap.get(AwsConstants.ACCESS_KEY));
-				secretMap.put(AwsConstants.SECRET_KEY, variableMap.get(AwsConstants.SECRET_KEY));
-			}
-			else if (provider.equals(VSphereConstants.PROVIDER)) {
-				secretMap.put(VSphereConstants.VCENTER_HOSTNAME, variableMap.get(VSphereConstants.VCENTER_HOSTNAME));
-				secretMap.put(VSphereConstants.VCENTER_IMAGE_FOLDER, variableMap.get(VSphereConstants.VCENTER_IMAGE_FOLDER));
-				secretMap.put(VSphereConstants.VCENTER_TARGET_FOLDER, variableMap.get(VSphereConstants.VCENTER_TARGET_FOLDER));
-				secretMap.put(VSphereConstants.VCENTER_USERNAME, variableMap.get(VSphereConstants.VCENTER_USERNAME));
-				secretMap.put(VSphereConstants.VCENTER_PASSWORD, variableMap.get(VSphereConstants.VCENTER_PASSWORD));
-			}
-
+			// remove group from map
+			variableMap.remove(GROUP);
+			
 			// create credentials
-			credentialsService.create(group, provider, secretMap);
+			credentialsService.create(group, provider, variableMap);
 
 			// fill model
 			fillModel(model, provider);
