@@ -1,17 +1,21 @@
 package de.papke.cloud.portal.controller;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.OutputStream;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,12 +74,6 @@ public class VirtualMachineController extends ApplicationController {
 	@Autowired
 	private FileService fileService;
 	
-	/**
-	 * Method for returning the model and view for the create vm page.
-	 *
-	 * @param model
-	 * @return
-	 */
 	@GetMapping(path = PREFIX + "/list/form/{provider}")
 	public String list(Map<String, Object> model, @PathVariable String provider) {
 
@@ -86,28 +84,35 @@ public class VirtualMachineController extends ApplicationController {
 		return "vm-list-form";
 	}
 
-	/**
-	 * Method for returning the model and view for the create vm page.
-	 *
-	 * @param model
-	 * @return
-	 */
 	@GetMapping(path = PREFIX + "/create/form/{provider}")
 	public String create(Map<String, Object> model, @PathVariable String provider) {
-
+		
 		// fill model
 		fillModel(model, provider);
-
+		
 		// return view name
 		return "vm-create-form";
 	}
+	
+	@GetMapping(path = PREFIX + "/variables/{provider}")
+	public void variables(HttpServletResponse response, @PathVariable String provider) {
 
-	/**
-	 * Method for returning the model and view for the provision vm page.
-	 *
-	 * @param model
-	 * @return
-	 */
+		try {
+			StringBuilder usageBuilder = new StringBuilder();
+			
+			List<Variable> variables = terraformService.getVisibleVariables(provider);
+			for (Variable variable : variables) {
+				usageBuilder.append(renderVariable(variable));
+				usageBuilder.append(Constants.CHAR_NEW_LINE);
+			}
+			
+			response.getWriter().println(usageBuilder);
+		}
+		catch(Exception e) {
+			LOG.error(e.getMessage(), e);
+		}
+	}
+
 	@PostMapping(path = PREFIX + "/create/action/{action}", produces="text/plain")
 	@ResponseBody
 	public void provision(
@@ -121,90 +126,35 @@ public class VirtualMachineController extends ApplicationController {
 
 		try {
 
-			// get multipart request
-			StandardMultipartHttpServletRequest multipartHttpServletRequest = (StandardMultipartHttpServletRequest) request;
-
-			// get file map from request
-			Map<String, MultipartFile> fileMap = multipartHttpServletRequest.getFileMap();
-
 			// iterate over file map
-			for (Entry<String, MultipartFile> fileMapEntry : fileMap.entrySet()) {
-
-				// write file uploads to disk
-				File file = writeMultipartFile(fileMapEntry.getValue());
-				if (file != null) {
-					
-					// add to temp file list
-					tempFileList.add(file);
-	
-					// add file paths to variable map
-					variableMap.put(fileMapEntry.getKey(), file.getAbsolutePath());
-				}
-			}
+			writeFilesAndAddToMap(request, variableMap, tempFileList);
 			
-			// fill up optional values
-			File privateKeyFile = null;
-			List<Variable> optionalVariablesList = terraformService.getOptionalVariables(provider);
-			for (Variable variable : optionalVariablesList) {
-				
-				String variableName = variable.getName();
-				Object variableValue = variableMap.get(variableName); 
-				
-				if (variableValue == null) {
-					
-					String variableType = variable.getType();
-					
-					if (variableType.equals("file")) {
-						
-						if (variableName.contains("key")) {
-						
-							List<File> keyFileList = keyPairService.createKeyPair();
-							
-							for (File keyFile : keyFileList) {
-								
-								String keyFilePath = keyFile.getAbsolutePath();
-								if (keyFilePath.endsWith(Constants.KEY_FILE_SUFFIX)) {
-									variableMap.put("public_key_file", keyFile.getAbsolutePath());
-								}
-								else {
-									variableMap.put("private_key_file", keyFile.getAbsolutePath());
-									privateKeyFile = keyFile;
-								}
-								
-								tempFileList.add(keyFile);
-							}
-						}
-						else if (variableName.contains("script")) {
-							
-							StringBuilder scriptPath = new StringBuilder("script/default.");
-							
-							String imageName = (String) variableMap.get("image_name");
-							if (imageName != null && imageName.toLowerCase().contains("windows")) {
-								scriptPath.append("ps1");
-							}
-							else {
-								scriptPath.append("sh");
-							}
-							
-							File scriptFile = fileService.copyResourceToFilesystem(scriptPath.toString());
-							variableMap.put("script_file", scriptFile.getAbsolutePath());
-						}
-					}
+			// get variables
+			List<Variable> variables = terraformService.getVisibleVariables(provider);
+			
+			// extend variables map with default values
+			File privateKeyFile = extendWithDefaultValues(variables, variableMap, tempFileList);
+			
+			// validate parameters
+			List<Variable> errorList = validateValues(variables, variableMap);
+			if (errorList.isEmpty()) {
+
+				// get credentials
+				Credentials credentials = credentialsService.getCredentials(provider);
+				if (credentials != null) {
+	
+					// get response output stream
+					OutputStream outputStream = response.getOutputStream();
+	
+					// provision VM
+					virtualMachineService.provision(action, credentials, variableMap, privateKeyFile, outputStream);
 				}
-			}
-
-			// get credentials
-			Credentials credentials = credentialsService.getCredentials(provider);
-			if (credentials != null) {
-
-				// get response output stream
-				OutputStream outputStream = response.getOutputStream();
-
-				// provision VM
-				virtualMachineService.provision(action, credentials, variableMap, privateKeyFile, outputStream);
+				else {
+					fail(String.format("No credentials found for cloud provider '%s'. Please contact your administrator.", provider), response);
+				}
 			}
 			else {
-				response.getWriter().println(String.format("No credentials found for cloud provider '%s'. Please contact your administrator.", provider));
+				fail(renderVariableErrorMessage(errorList), response);
 			}
 		}
 		catch (Exception e) {
@@ -217,7 +167,7 @@ public class VirtualMachineController extends ApplicationController {
 				FileUtils.deleteQuietly(tempFile);
 			}
 		}
-	}    
+	}
 
 	@GetMapping(path = PREFIX + "/delete/action/{provider}/{id}")
 	public void deprovision(Map<String, Object> model,
@@ -248,15 +198,15 @@ public class VirtualMachineController extends ApplicationController {
 						virtualMachineService.deprovision(provisionLog, credentials, outputStream);
 					}
 					else {
-						response.getWriter().println(String.format("You are not allowed to deprovision the entry with the id '%s'", id));
+						fail(String.format("You are not allowed to deprovision the entry with the id '%s'", id), response);
 					}
 				}
 				else {
-					response.getWriter().println(String.format("No provision log entry found for id '%s'.", id));
+					fail(String.format("No provision log entry found for id '%s'.", id), response);
 				}
 			}
 			else {
-				response.getWriter().println(String.format("No credentials found for cloud provider '%s'. Please contact your administrator.", provider));
+				fail(String.format("No credentials found for cloud provider '%s'. Please contact your administrator.", provider), response);
 			}
 
 		}
@@ -267,7 +217,12 @@ public class VirtualMachineController extends ApplicationController {
 		// fill model
 		fillModel(model, provider);
 	} 
-
+	
+	private void fail(String message, HttpServletResponse response) throws IOException {
+		response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+		response.getWriter().println(message);
+	}
+	
 	private static File writeMultipartFile(MultipartFile multipartFile) {
 
 		File file = null;
@@ -288,7 +243,168 @@ public class VirtualMachineController extends ApplicationController {
 		}
 
 		return file;
+	}	
+	
+	private void writeFilesAndAddToMap(HttpServletRequest request, Map<String, Object> variableMap, List<File> tempFileList) {
+		
+		// get multipart request
+		StandardMultipartHttpServletRequest multipartHttpServletRequest = (StandardMultipartHttpServletRequest) request;
+
+		// get file map from request
+		Map<String, MultipartFile> fileMap = multipartHttpServletRequest.getFileMap();
+		
+		for (Entry<String, MultipartFile> fileMapEntry : fileMap.entrySet()) {
+
+			// write file uploads to disk
+			File file = writeMultipartFile(fileMapEntry.getValue());
+			if (file != null) {
+				
+				// add to temp file list
+				tempFileList.add(file);
+
+				// add file paths to variable map
+				variableMap.put(fileMapEntry.getKey(), file.getAbsolutePath());
+			}
+		}
+	}	
+
+	private File extendWithDefaultValues(List<Variable> variables, Map<String, Object> variableMap, List<File> tempFileList) {
+		
+		File privateKeyFile = null;
+		
+		for (Variable variable : variables) {
+			
+			String variableName = variable.getName();
+			
+			if (!variableMap.containsKey(variableName)) {
+				
+				Object variableValue = null;
+				
+				if (!variable.getType().equals("file")) {
+					List<String> defaultsList = variable.getDefaults();
+					if (!defaultsList.isEmpty()) {
+						variableValue = defaultsList.get(variable.getIndex()); 
+						variableMap.put(variableName, variableValue);
+					}
+				}
+				else {
+					if (variableName.contains("key")) {
+						
+						List<File> keyFileList = keyPairService.createKeyPair();
+						
+						for (File keyFile : keyFileList) {
+							
+							String keyFilePath = keyFile.getAbsolutePath();
+							if (keyFilePath.endsWith(Constants.KEY_FILE_SUFFIX)) {
+								variableMap.put("public_key_file", keyFile.getAbsolutePath());
+							}
+							else {
+								variableMap.put("private_key_file", keyFile.getAbsolutePath());
+								privateKeyFile = keyFile;
+							}
+							
+							tempFileList.add(keyFile);
+						}
+					}
+					else if (variableName.contains("script")) {
+						
+						StringBuilder scriptPath = new StringBuilder("script/default.");
+						
+						String imageName = (String) variableMap.get("image_name");
+						if (imageName != null && imageName.toLowerCase().contains("windows")) {
+							scriptPath.append("ps1");
+						}
+						else {
+							scriptPath.append("sh");
+						}
+						
+						File scriptFile = fileService.copyResourceToFilesystem(scriptPath.toString());
+						variableMap.put("script_file", scriptFile.getAbsolutePath());
+						
+						tempFileList.add(scriptFile);
+					}
+				}
+			}
+		}
+		
+		return privateKeyFile;
 	}
+	
+	private List<Variable> validateValues(List<Variable> variables, Map<String, Object> variableMap) {
+		
+		List<Variable> errorList = new ArrayList<>();
+		
+		for (Variable variable : variables) {
+
+			boolean errorFound = false;
+			
+			String variableName = variable.getName();
+			if (variableMap.containsKey(variableName)) {
+				String pattern = variable.getPattern();
+				if (StringUtils.isNotEmpty(pattern)) {
+					String variableValue = String.valueOf(variableMap.get(variableName));
+					if (!Pattern.matches(pattern, variableValue)) {
+						errorFound = true;
+					}
+				}
+			}
+			else if (variable.isRequired()) {
+				errorFound = true;
+			}
+			
+			if (errorFound) {
+				errorList.add(variable);
+			}
+		}
+		
+		return errorList;
+	}
+	
+	private String renderVariableErrorMessage(List<Variable> errorList) throws IllegalAccessException {
+		
+		StringBuilder errorMessage = new StringBuilder();
+		errorMessage.append("Parameter validation failed:");
+		errorMessage.append(Constants.CHAR_NEW_LINE);
+		errorMessage.append(Constants.CHAR_NEW_LINE);
+		
+		for (int i = 0; i < errorList.size(); i++) {
+			
+			errorMessage.append(renderVariable(errorList.get(i)));
+			
+			if (i < errorList.size() - 1) {
+				errorMessage.append(Constants.CHAR_NEW_LINE);
+				errorMessage.append(Constants.CHAR_NEW_LINE);
+			}
+		}
+		
+		return errorMessage.toString();
+	}
+	
+	private String renderVariable(Variable variable) throws IllegalAccessException {
+		
+		StringBuilder variableBuilder = new StringBuilder();
+		
+		String variableName = variable.getName();
+		variableBuilder.append(variableName);
+		variableBuilder.append(Constants.CHAR_NEW_LINE);
+		
+		for (int i = 0; i < variableName.length(); i++) {
+			variableBuilder.append(Constants.CHAR_DASH);
+		}
+		
+		variableBuilder.append(Constants.CHAR_NEW_LINE);
+		
+		for (Field field : Variable.class.getDeclaredFields()) {
+			field.setAccessible(true);
+			variableBuilder.append(field.getName());
+			variableBuilder.append(Constants.CHAR_DOUBLE_DOT);
+			variableBuilder.append(Constants.CHAR_WHITESPACE);
+			variableBuilder.append(field.get(variable));
+			variableBuilder.append(Constants.CHAR_NEW_LINE);
+		}
+		
+		return variableBuilder.toString();
+	}	
 
 	private void fillModel(Map<String, Object> model, String provider) {
 

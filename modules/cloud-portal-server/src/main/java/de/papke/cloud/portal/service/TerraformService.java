@@ -50,9 +50,7 @@ public class TerraformService {
 	private static final String FLAG_VAR = "-var";
 	private static final String FLAG_FORCE = "-force";
 
-	private static final String VARIABLE_NAME = "variable";
-	private static final String VARIABLE_DEFAULT = "default";
-	private static final String VARIABLE_DESCRIPTION = "description";
+	private static final String VARIABLE_IDENTIFIER = "variable";
 
 	@Autowired
 	private CommandExecutorService commandExecutorService;
@@ -86,7 +84,7 @@ public class TerraformService {
 			if (!terraformFolder.isFile()) {
 				File[] providerFolderArray = terraformFolder.listFiles();
 				for (File providerFolder : providerFolderArray) {
-					File variableFile = new File(new URI(providerFolder.toURI() + "/gui.yml"));
+					File variableFile = new File(new URI(providerFolder.toURI() + "/variables.yml"));
 					if (variableFile.exists()) {
 						VariableConfig variableConfig = yaml.loadAs(new FileInputStream(variableFile), VariableConfig.class);
 						List<VariableGroup> variableGroupList = variableConfig.getVariableGroups();
@@ -146,50 +144,15 @@ public class TerraformService {
 		List<VariableGroup> variableGroupList = providerDefaults.get(provider);
 		for (VariableGroup variableGroup : variableGroupList) {
 			for (Variable variable : variableGroup.getVariables()) {
-
-				String defaultValue = null;
-				List<String> defaultsList = variable.getDefaults();
-				if (!defaultsList.isEmpty()) {
-					defaultValue = defaultsList.get(variable.getIndex()); 
-				}
-
 				variablesBuilder
-				.append(VARIABLE_NAME)
+				.append(VARIABLE_IDENTIFIER)
 				.append(Constants.CHAR_WHITESPACE)
 				.append(Constants.CHAR_DOUBLE_QUOTE)
 				.append(variable.getName())
 				.append(Constants.CHAR_DOUBLE_QUOTE)
 				.append(Constants.CHAR_WHITESPACE)
-				.append(Constants.CHAR_BRACE_OPEN);
-
-				if (StringUtils.isNotEmpty(defaultValue)) {
-
-					variablesBuilder
-					.append(Constants.CHAR_NEW_LINE)
-					.append(Constants.CHAR_TAB)
-					.append(VARIABLE_DEFAULT)
-					.append(Constants.CHAR_WHITESPACE)
-					.append(Constants.CHAR_EQUAL)
-					.append(Constants.CHAR_WHITESPACE)
-					.append(Constants.CHAR_DOUBLE_QUOTE)
-					.append(defaultValue)
-					.append(Constants.CHAR_DOUBLE_QUOTE);
-
-				}
-
-				variablesBuilder
-				.append(Constants.CHAR_NEW_LINE)
-				.append(Constants.CHAR_TAB)
-				.append(VARIABLE_DESCRIPTION)
-				.append(Constants.CHAR_WHITESPACE)
-				.append(Constants.CHAR_EQUAL)
-				.append(Constants.CHAR_WHITESPACE)
-				.append(Constants.CHAR_DOUBLE_QUOTE)
-				.append(variable.getDescription())
-				.append(Constants.CHAR_DOUBLE_QUOTE)
-				.append(Constants.CHAR_NEW_LINE)
+				.append(Constants.CHAR_BRACE_OPEN)
 				.append(Constants.CHAR_BRACE_CLOSE)
-				.append(Constants.CHAR_NEW_LINE)
 				.append(Constants.CHAR_NEW_LINE);
 			}
 		}
@@ -279,23 +242,18 @@ public class TerraformService {
 		return visibleProviderDefaults;
 	}
 
-	public List<Variable> getOptionalVariables(String provider) {
-
-		List<Variable> optionalVariablesList = new ArrayList<>();
-
-		try {
-			for (VariableGroup variableGroup : providerDefaults.get(provider)) {
+	public List<Variable> getVisibleVariables(String provider) {
+		
+		List<Variable> variables = new ArrayList<>();
+		
+		for (VariableGroup variableGroup : providerDefaults.get(provider)) {
+			if (!variableGroup.isHidden()) {
 				for (Variable variable : variableGroup.getVariables()) {
-					if (!variable.isRequired()) {
-						optionalVariablesList.add(variable);
-					}
+					variables.add(variable);
 				}
 			}
 		}
-		catch (Exception e) {
-			LOG.error(e.getMessage(), e);
-		}
-
-		return optionalVariablesList;
+		
+		return variables;
 	}
 }

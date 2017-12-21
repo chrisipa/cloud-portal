@@ -12,8 +12,12 @@ public class Constants {
 	public static final String CHAR_NEW_LINE = "\n";
 	public static final String CHAR_TAB = "\t";
 	public static final String CHAR_DOT = ".";
+	public static final String CHAR_DOUBLE_DOT = ":";
 	public static final String CHAR_BRACE_OPEN = "{";
 	public static final String CHAR_BRACE_CLOSE = "}";
+	public static final String CHAR_BRAKET_OPEN = "[";
+	public static final String CHAR_BRAKET_CLOSE = "]";
+	public static final String CHAR_COMMA = ",";
 	
 	public static final String ACTION_INIT = "init";
 	public static final String ACTION_APPLY = "apply";

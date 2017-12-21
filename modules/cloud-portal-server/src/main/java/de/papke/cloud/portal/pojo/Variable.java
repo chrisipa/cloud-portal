@@ -12,10 +12,11 @@ public class Variable {
 	private boolean required = false;
 	private String type = "";
 	private int index = 0;
+	private String pattern = "";
 	
 	@Override
 	public String toString() {
-		return "title=" + title + ", name=" + name + ", description=" + description + ", defaults=" + defaults + ", required=" + required + ", type=" + type + ", index=" + index;
+		return "title=" + title + ", name=" + name + ", description=" + description + ", defaults=" + defaults + ", required=" + required + ", type=" + type + ", index=" + index + ", pattern" + pattern;
 	}
 	
 	public String getTitle() {
@@ -72,5 +73,13 @@ public class Variable {
 
 	public void setIndex(int index) {
 		this.index = index;
+	}
+
+	public String getPattern() {
+		return pattern;
+	}
+
+	public void setPattern(String pattern) {
+		this.pattern = pattern;
 	}
 }

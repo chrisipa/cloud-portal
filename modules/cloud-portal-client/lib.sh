@@ -6,10 +6,9 @@ set -e
 # VARIABLES #
 #############
 
-tmpFolder="/tmp"
-cookieFile="$tmpFolder/cloud-portal-cookie.txt"
-outputFile="$tmpFolder/cloud-portal-output.txt"
-privateKeyFile="$tmpFolder/cloud-portal-private-key.txt"
+tmpFolder="/tmp/cloud-portal-client/$(date +'%s%N')"
+cookieFile="$tmpFolder/cookie.txt"
+outputFile="$tmpFolder/output.txt"
 
 
 #############
@@ -58,9 +57,47 @@ function confirm() {
 }
 
 # --------------------------------------------------------
+# Function for cleaning up temporary files
+# --------------------------------------------------------
+function cleanup() {
+
+    if [ -d "$tmpFolder" ]
+    then
+        # logging
+        log "INFO" "Removing tmp folder '$tmpFolder'"
+    
+        # remove temp folder
+        rm -rf "$tmpFolder"
+    fi 
+}
+
+# --------------------------------------------------------
+# Function for failing the script
+# --------------------------------------------------------
+# $1 - Message to show
+# --------------------------------------------------------
+function fail() {
+
+    # get parameters
+    message="$1"
+
+    # logging
+    log "ERROR" "$message"
+
+    # logout
+    logout
+        
+    # exit with error
+    exit -1        
+}
+
+# --------------------------------------------------------
 # Function for creating a session in the cloud portal
 # --------------------------------------------------------
 function login() {
+
+    # create temp folder
+    mkdir -p "$tmpFolder"
 
     # get login url
     local loginUrl="$CLOUD_PORTAL_URL/login"
@@ -69,7 +106,13 @@ function login() {
     log "INFO" "Creating a session with username '$CLOUD_PORTAL_USERNAME' and login url '$loginUrl'"
     
     # create session and save to cookie file
-    curl -s -X POST -c "$cookieFile" -F "username=$CLOUD_PORTAL_USERNAME" -F "password=$CLOUD_PORTAL_PASSWORD" "$loginUrl" >> /dev/null
+    redirectUrl=$(curl -w "%{redirect_url}" -s -X POST -c "$cookieFile" -F "username=$CLOUD_PORTAL_USERNAME" -F "password=$CLOUD_PORTAL_PASSWORD" "$loginUrl")
+    
+    # check if login failed
+    if [[ "$redirectUrl" == *error ]]
+    then
+        fail "Login failed. Try with other credentials"
+    fi 
 }
 
 # --------------------------------------------------------
@@ -84,7 +127,10 @@ function logout() {
     log "INFO" "Destroying a session with logout url '$logoutUrl'"
 
     # destroy session
-    curl -s -X GET -b "$cookieFile" "$logoutUrl" >> /dev/null
+    curl -s -X GET -b "$cookieFile" "$logoutUrl" > "$outputFile" >> /dev/null
+    
+    # cleanup
+    cleanup
 }
 
 # --------------------------------------------------------
@@ -99,7 +145,14 @@ function apply() {
     log "INFO" "Creating virtual machine for cloud provider '$CLOUD_PORTAL_PROVIDER' and apply url '$applyUrl'"
     
     # create virtual machine for cloud provider
-    curl -s -X POST -b "$cookieFile" -F "provider=$CLOUD_PORTAL_PROVIDER" "$@" "$applyUrl" | tee "$outputFile"            
+    curl -w "\nstatus_code = %{http_code}" -s -X POST -b "$cookieFile" -F "provider=$CLOUD_PORTAL_PROVIDER" "$@" "$applyUrl" | tee "$outputFile"      
+    
+    # check if status code is valid
+    statusCode=$(getVariableFromOutput "status_code")
+    if [ "$statusCode" != "200" ]
+    then
+        fail "Invalid parameters. Try with other values." 
+    fi     
 }
 
 # --------------------------------------------------------
@@ -119,7 +172,14 @@ function destroy() {
     log "INFO" "Destroying virtual machine for cloud provider '$CLOUD_PORTAL_PROVIDER' and id '$id'"
     
     # destroy virtual machine for cloud provider
-    curl -X GET -b "$cookieFile" "$destroyUrl"  
+    curl -w "\nstatus_code = %{http_code}" -s -X GET -b "$cookieFile" "$destroyUrl" | tee "$outputFile"
+    
+    # check if status code is valid
+    statusCode=$(getVariableFromOutput "status_code")
+    if [ "$statusCode" != "200" ]
+    then
+        fail "Invalid parameters. Try with other values." 
+    fi   
 }
 
 # --------------------------------------------------------
@@ -140,56 +200,29 @@ function getVariableFromOutput() {
 }
 
 # --------------------------------------------------------
-# Function for executing a command on a server
+# Function for getting a list of possible variables
 # --------------------------------------------------------
-# $1 - Username
-# $2 - Host
-# $3 - Command
-# $4 - Provisioning ID
-# --------------------------------------------------------
-function execute() {
+function variables() {
+
+    # login
+    login
+
+    # get variables url
+    local variablesUrl="$CLOUD_PORTAL_URL/vm/variables/$CLOUD_PORTAL_PROVIDER"
+
+    # logging
+    log "INFO" "Getting variable information from url '$variablesUrl'"
+
+    # get usage 
+    curl -X GET -b "$cookieFile" "$variablesUrl"
+
+    # logout
+    login
     
-    # read parameters
-    local username="$1"
-    local host="$2"
-    local command="$3"
-    local id="$4"
-    
-    # get private key url
-    local privateKeyUrl="$CLOUD_PORTAL_URL/provision-log/private-key/$id"
-    
-    # download private key
-    log "INFO" "Downloading private key file '$privateKeyUrl'"
-    curl -s -X GET -b "$cookieFile" -o "$privateKeyFile" "$privateKeyUrl" >> /dev/null 
-    
-    # change file rights
-    log "INFO" "Changing permissions of private key file '$privateKeyFile'"
-    chmod 600 "$privateKeyFile"
-    
-    # execute command
-    log "INFO" "Executing command '$command' on server '$host' with username '$username'"
-    ssh -i "$privateKeyFile" -o StrictHostKeyChecking=no "$username"@"$host" "$command"    
+    # stop
+    exit 0
 }
 
-# --------------------------------------------------------
-# Function for cleaning up temporary files
-# --------------------------------------------------------
-# $1 - Username
-# $2 - Host
-# $3 - Command
-# $4 - Provisioning ID
-# --------------------------------------------------------
-function cleanup() {
-
-    # remove cookie file
-    rm -f "$cookieFile"
-    
-    # remove output file
-    rm -f "$outputFile"
-    
-    # remove private key file
-    rm -f "$privateKeyFile"
-}
 
 ####################
 # SCRIPT EXECUTION #
@@ -201,26 +234,30 @@ echo "# Cloud Portal CLI Client #"
 echo "###########################"
 echo ""
 
+# check for environment variables
 if [ "$CLOUD_PORTAL_URL" == "" ]
 then
     log "ERROR" "Please specifiy CLOUD_PORTAL_URL as environment variable!"
     exit -1
 fi
-
 if [ "$CLOUD_PORTAL_USERNAME" == "" ]
 then
     log "ERROR" "Please specifiy CLOUD_PORTAL_USERNAME as environment variable!"
     exit -1
 fi
-
 if [ "$CLOUD_PORTAL_PASSWORD" == "" ]
 then
     log "ERROR" "Please specifiy CLOUD_PORTAL_PASSWORD as environment variable!"
     exit -1
 fi
-
 if [ "$CLOUD_PORTAL_PROVIDER" == "" ]
 then
     log "ERROR" "Please specifiy CLOUD_PORTAL_PROVIDER as environment variable!"
     exit -1
 fi
+
+# show variable information if nothing is entered
+if [ "$#" ==  "0" ]
+then
+    variables    
+fi    

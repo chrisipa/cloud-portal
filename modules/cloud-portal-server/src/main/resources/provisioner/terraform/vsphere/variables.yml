@@ -62,6 +62,7 @@ variableGroups:
       type: string   
       required: true
       defaults: [ -1 ]
+      pattern: "[0-9]*|-1"
       
   - title: VM
     variables:
@@ -72,6 +73,7 @@ variableGroups:
       type: list   
       required: true
       defaults: [ Ubuntu Server Linux 16.04, Windows Server 2016 ]
+      pattern: "Ubuntu Server Linux 16.04|Windows Server 2016"
       
     - title: vCores
       name: vm_cores
@@ -79,6 +81,7 @@ variableGroups:
       type: list   
       required: true
       defaults: [ 1, 2, 3, 4, 5, 6, 7, 8 ]
+      pattern: "[1-8]"
       
     - title: vRAM
       name: vm_ram
@@ -87,6 +90,7 @@ variableGroups:
       required: true
       defaults: [ 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536 ]
       index: 1
+      pattern: "512|1024|2048|4096|8192|16384|32768|65536"
       
   - title: Bootstrap
     variables:
