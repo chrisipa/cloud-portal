@@ -42,16 +42,26 @@ import de.papke.cloud.portal.service.SessionUserService;
 import de.papke.cloud.portal.service.TerraformService;
 import de.papke.cloud.portal.service.VirtualMachineService;
 
-/**
- * Created by chris on 16.10.17.
- */
 @Controller
 public class VirtualMachineController extends ApplicationController {
+
+
 
 	private static final Logger LOG = LoggerFactory.getLogger(VirtualMachineController.class);
 
 	private static final String PREFIX = "/vm";
 	private static final String MODEL_VAR_NAME = "virtualMachine";
+	private static final String EXTENSION_POWERSHELL = "ps1";
+	private static final String EXTENSION_BASH = "sh";
+	private static final String VAR_TYPE_FILE = "file";
+	private static final String VAR_NAME_SCRIPT_FILE = "script_file";
+	private static final String VAR_NAME_PRIVATE_KEY_FILE = "private_key_file";
+	private static final String VAR_NAME_PUBLIC_KEY_FILE = "public_key_file";
+	private static final String VAR_NAME_IMAGE_NAME = "image_name";
+	private static final String VAR_NAME_PART_KEY = "key";
+	private static final String IMAGE_PART_WINDOWS = "windows";
+	private static final String FOLDER_SCRIPT = "script";
+	private static final String SCRIPT_NAME_DEFAULT = "default";
 
 	@Autowired
 	private CredentialsService credentialsService;
@@ -280,7 +290,7 @@ public class VirtualMachineController extends ApplicationController {
 				
 				Object variableValue = null;
 				
-				if (!variable.getType().equals("file")) {
+				if (!variable.getType().equals(VAR_TYPE_FILE)) {
 					List<String> defaultsList = variable.getDefaults();
 					if (!defaultsList.isEmpty()) {
 						variableValue = defaultsList.get(variable.getIndex()); 
@@ -288,40 +298,11 @@ public class VirtualMachineController extends ApplicationController {
 					}
 				}
 				else {
-					if (variableName.contains("key")) {
-						
-						List<File> keyFileList = keyPairService.createKeyPair();
-						
-						for (File keyFile : keyFileList) {
-							
-							String keyFilePath = keyFile.getAbsolutePath();
-							if (keyFilePath.endsWith(Constants.KEY_FILE_SUFFIX)) {
-								variableMap.put("public_key_file", keyFile.getAbsolutePath());
-							}
-							else {
-								variableMap.put("private_key_file", keyFile.getAbsolutePath());
-								privateKeyFile = keyFile;
-							}
-							
-							tempFileList.add(keyFile);
-						}
+					if (variableName.contains(VAR_NAME_PART_KEY)) {
+						privateKeyFile = generateKeyPair(variableMap, tempFileList);
 					}
-					else if (variableName.contains("script")) {
-						
-						StringBuilder scriptPath = new StringBuilder("script/default.");
-						
-						String imageName = (String) variableMap.get("image_name");
-						if (imageName != null && imageName.toLowerCase().contains("windows")) {
-							scriptPath.append("ps1");
-						}
-						else {
-							scriptPath.append("sh");
-						}
-						
-						File scriptFile = fileService.copyResourceToFilesystem(scriptPath.toString());
-						variableMap.put("script_file", scriptFile.getAbsolutePath());
-						
-						tempFileList.add(scriptFile);
+					else if (variableName.equals(VAR_NAME_SCRIPT_FILE)) {
+						addDefaultScriptFile(variableMap, tempFileList);
 					}
 				}
 			}
@@ -329,6 +310,50 @@ public class VirtualMachineController extends ApplicationController {
 		
 		return privateKeyFile;
 	}
+
+	private void addDefaultScriptFile(Map<String, Object> variableMap, List<File> tempFileList) {
+		
+		StringBuilder scriptPath = new StringBuilder();
+		scriptPath.append(FOLDER_SCRIPT);
+		scriptPath.append(File.separator);
+		scriptPath.append(SCRIPT_NAME_DEFAULT);
+		scriptPath.append(Constants.CHAR_DOT);
+		
+		String imageName = (String) variableMap.get(VAR_NAME_IMAGE_NAME);
+		if (imageName != null && imageName.toLowerCase().contains(IMAGE_PART_WINDOWS)) {
+			scriptPath.append(EXTENSION_POWERSHELL);
+		}
+		else {
+			scriptPath.append(EXTENSION_BASH);
+		}
+		
+		File scriptFile = fileService.copyResourceToFilesystem(scriptPath.toString());
+		variableMap.put(VAR_NAME_SCRIPT_FILE, scriptFile.getAbsolutePath());
+		
+		tempFileList.add(scriptFile);
+	}
+	
+	private File generateKeyPair(Map<String, Object> variableMap, List<File> tempFileList) {
+		
+		File privateKeyFile = null;
+		
+		List<File> keyFileList = keyPairService.createKeyPair();
+		for (File keyFile : keyFileList) {
+			
+			String keyFilePath = keyFile.getAbsolutePath();
+			if (keyFilePath.endsWith(Constants.KEY_FILE_SUFFIX)) {
+				variableMap.put(VAR_NAME_PUBLIC_KEY_FILE, keyFile.getAbsolutePath());
+			}
+			else {
+				variableMap.put(VAR_NAME_PRIVATE_KEY_FILE, keyFile.getAbsolutePath());
+				privateKeyFile = keyFile;
+			}
+			
+			tempFileList.add(keyFile);
+		}
+		
+		return privateKeyFile;
+	}	
 	
 	private List<Variable> validateValues(List<Variable> variables, Map<String, Object> variableMap) {
 		

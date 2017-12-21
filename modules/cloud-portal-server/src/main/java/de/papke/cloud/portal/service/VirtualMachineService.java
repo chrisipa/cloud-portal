@@ -34,12 +34,17 @@ public class VirtualMachineService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(VirtualMachineService.class);
 
-	private static final String MAIL_TEMPLATE_PREFIX = "vm";
 	private static final String PATTERN_FILE = "_file";
 	private static final String PATTERN_OUTPUTS = "Outputs:";
 	private static final String PATTERN_EMPTY_LINE = "(?m)^\\s";
-	private static final String ATTACHMENT_SUFFIX = ".txt";
-	private static final String ATTACHMENT_PREFIX = "log";
+	private static final String SUFFIX_ATTACHMENT = ".txt";
+	private static final String SUFFIX_ZIP = ".zip";
+	private static final String PREFIX_MAIL_TEMPLATE = "vm";
+	private static final String PREFIX_ATTACHMENT = "log";
+	private static final String PART_ERROR = "error";
+	private static final String PART_SUCCESS = "success";
+	private static final String VARIABLE_SUR_NAME = "surName";
+	private static final String VARIABLE_GIVEN_NAME = "givenName";
 
 	@Autowired
 	private ProvisionLogService provisionLogService;
@@ -92,7 +97,7 @@ public class VirtualMachineService {
 			String group = credentials.getGroup();
 			
 			// copy terraform resources to filesystem
-			tmpFolder = fileService.copyResourceToFilesystem("terraform/" + provider);
+			tmpFolder = fileService.copyResourceToFilesystem(Constants.FOLDER_TERRAFORM + File.separator + provider);
 
 			// use terraform to provision vms
 			CommandResult commandResult = terraformService.execute(action, credentials, variableMap, outputStream, tmpFolder);
@@ -153,7 +158,7 @@ public class VirtualMachineService {
 
 			// get resource folder
 			tmpFolder = getTmpFolder();
-			zipFile = File.createTempFile("test", ".zip");
+			zipFile = File.createTempFile(this.getClass().getSimpleName(), SUFFIX_ZIP);
 			IOUtils.write(provisionLog.getResult(), new FileOutputStream(zipFile));
 			ZipUtil.unzip(zipFile, tmpFolder);
 			File resourceFolder = tmpFolder.listFiles()[0];
@@ -226,8 +231,8 @@ public class VirtualMachineService {
 		String email = user.getEmail();
 		
 		// add additional user properties to map
-		variableMap.put("givenName", user.getGivenName());
-		variableMap.put("surName", user.getSurName());
+		variableMap.put(VARIABLE_GIVEN_NAME, user.getGivenName());
+		variableMap.put(VARIABLE_SUR_NAME, user.getSurName());
 
 		// send mail
 		if (StringUtils.isNotEmpty(email)) {
@@ -256,7 +261,7 @@ public class VirtualMachineService {
 	}
 	
 	private String getMailTemplateName(String action, boolean success) {
-		return MAIL_TEMPLATE_PREFIX + Constants.CHAR_DASH + action + Constants.CHAR_DASH + (success ? "success" : "error"); 
+		return PREFIX_MAIL_TEMPLATE + Constants.CHAR_DASH + action + Constants.CHAR_DASH + (success ? PART_SUCCESS : PART_ERROR); 
 	}
 
 	private Map<String, Object> getCommandVariableMap(CommandResult commandResult) {
@@ -294,7 +299,7 @@ public class VirtualMachineService {
 		if (commandResult != null) {
 			String output = commandResult.getOutput();
 			if (StringUtils.isNotEmpty(output)) {
-				attachment = File.createTempFile(ATTACHMENT_PREFIX, ATTACHMENT_SUFFIX);
+				attachment = File.createTempFile(PREFIX_ATTACHMENT, SUFFIX_ATTACHMENT);
 				FileUtils.writeStringToFile(attachment, commandResult.getOutput(), StandardCharsets.UTF_8);
 			}
 		}

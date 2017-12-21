@@ -16,11 +16,11 @@ import de.papke.cloud.portal.service.SessionUserService;
 @Controller
 public class CredentialsController extends ApplicationController {
 
-	private static final String GROUP = "group";
 	private static final String PREFIX = "/credentials";
 	private static final String MODEL_VAR_NAME = "credentials";
 	private static final String LIST_PATH_PREFIX = PREFIX + "/list/form";
 	private static final String LIST_VIEW_PREFIX = "credentials-list-form-";
+	private static final String ATTRIBUTE_GROUP = "group";
 
 	@Autowired
 	private CredentialsService credentialsService;
@@ -36,10 +36,10 @@ public class CredentialsController extends ApplicationController {
 		if (sessionUserService.isAdmin()) {
 
 			// get group
-			String group = variableMap.get(GROUP);
+			String group = variableMap.get(ATTRIBUTE_GROUP);
 
 			// remove group from map
-			variableMap.remove(GROUP);
+			variableMap.remove(ATTRIBUTE_GROUP);
 			
 			// create credentials
 			credentialsService.create(group, provider, variableMap);
@@ -52,12 +52,6 @@ public class CredentialsController extends ApplicationController {
 		return REDIRECT_PREFIX + LIST_PATH_PREFIX + "/" + provider;
 	}
 
-	/**
-	 * Method for returning the model and view for the credentials create form page.
-	 *
-	 * @param model
-	 * @return
-	 */
 	@GetMapping(value = PREFIX + "/create/form/{provider}")
 	public String createForm(Map<String, Object> model,
 			@PathVariable String provider) {
@@ -72,12 +66,6 @@ public class CredentialsController extends ApplicationController {
 		return "credentials-create-form-" + provider;
 	}
 
-	/**
-	 * Method for returning the model and view for the credentials list page.
-	 *
-	 * @param model
-	 * @return
-	 */
 	@GetMapping(value = LIST_PATH_PREFIX + "/{provider}")
 	public String list(Map<String, Object> model,
 			@PathVariable String provider) {

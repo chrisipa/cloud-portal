@@ -18,11 +18,6 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.mail.javamail.MimeMessagePreparator;
 import org.springframework.stereotype.Service;
 
-/**
- * Service class for sending emails.
- *
- * @author Christoph Papke (info@papke.it)
- */
 @Service
 public class MailService {
 
@@ -63,9 +58,6 @@ public class MailService {
 	@Autowired
 	private VelocityService velocityService;
 
-	/**
-	 * Method for initializing the mail service.
-	 */
 	@PostConstruct
 	public void init() {
 
@@ -103,12 +95,6 @@ public class MailService {
 		send(to, subject, templatePath, attachmentList, variableMap);
 	}
 	
-	/**
-	 * Method for sending an HTML mail.
-	 *
-	 * @param to - mail recipient
-	 * @param variableMap - variable map for substitution
-	 */
 	@SuppressWarnings("rawtypes")
 	public void send(String to, String subject, String templatePath, List<File> attachmentList, Map variableMap) {
 

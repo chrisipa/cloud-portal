@@ -7,22 +7,16 @@ import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 
-/**
- * Web security config class for configurating the spring boot webapp.
- */
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-    @Autowired
+	private static final String PATTERN_LOGIN = "/login";
+	private static final String PATTERN_STATIC_FILES = "/static/**";
+    
+	@Autowired
     private DirectoryAuthenticationProvider directoryAuthenticationProvider;
 
-    /**
-     * Method for configuring the http security.
-     *
-     * @param http
-     * @throws Exception
-     */
     @Override
     protected void configure(HttpSecurity http) throws Exception {
 
@@ -33,7 +27,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http.authorizeRequests().anyRequest().authenticated();
 
         // use form based login
-        http.formLogin().loginPage("/login").permitAll().and().logout().permitAll();
+        http.formLogin().loginPage(PATTERN_LOGIN).permitAll().and().logout().permitAll();
 
         // disable cross site request forgery
         http.csrf().disable();
@@ -42,15 +36,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http.headers().frameOptions().sameOrigin().httpStrictTransportSecurity().disable();
     }
 
-    /**
-     * Method for configuring the web security.
-     *
-     * @param web
-     */
     @Override
     public void configure(WebSecurity web) {
 
         // ignore static resources from authentication
-        web.ignoring().antMatchers("/static/**");
+        web.ignoring().antMatchers(PATTERN_STATIC_FILES);
     }
 }

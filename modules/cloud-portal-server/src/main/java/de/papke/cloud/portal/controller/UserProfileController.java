@@ -10,12 +10,6 @@ public class UserProfileController extends ApplicationController {
 	
 	private static final String PREFIX = "/user";
 	
-	/**
-	 * Method for returning the model and view for the user profile page.
-	 *
-	 * @param model
-	 * @return
-	 */
 	@GetMapping(path = PREFIX + "/profile")
 	public String userProfile(Map<String, Object> model) {
 		

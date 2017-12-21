@@ -13,12 +13,12 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class FileService {
+
+	private static final Logger LOG = LoggerFactory.getLogger(FileService.class);
 	
 	@Autowired
 	private ResourceService resourceService;
 	
-	private static final Logger LOG = LoggerFactory.getLogger(FileService.class);
-
     public File copyResourceToFilesystem(String resourcePath) {
 
         File tmpFile = null;

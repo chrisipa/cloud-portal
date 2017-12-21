@@ -30,5 +30,7 @@ public class Constants {
 	
 	public static final String TMP_FOLDER_PREFIX = System.getProperty("java.io.tmpdir") + "/tmp-";
 	
+	public static final String FOLDER_TERRAFORM = "terraform";
+	
 	private Constants() {}
 }

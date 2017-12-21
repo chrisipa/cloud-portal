@@ -20,6 +20,7 @@ import de.papke.cloud.portal.service.ProvisionLogService;
 public class ProvisionLogController {
 	
 	private static final String PRIVATE_KEY_MIME_TYPE = "application/x-pem-file";
+	private static final String HEADER_CONTENT_DISPOSITION = "Content-Disposition";
 	private static final String PREFIX = "/provision-log";
 	
 	@Autowired
@@ -33,7 +34,7 @@ public class ProvisionLogController {
     	if (provisionLog != null) {
     		byte[] privateKey = provisionLog.getPrivateKey();
     		response.setContentType(PRIVATE_KEY_MIME_TYPE);
-    		response.setHeader("Content-Disposition", String.format("inline; filename=\"%s\"", Constants.KEY_FILE_PREFIX));
+    		response.setHeader(HEADER_CONTENT_DISPOSITION, String.format("inline; filename=\"%s\"", Constants.KEY_FILE_PREFIX));
     		response.setContentLength(privateKey.length);
     		IOUtils.copy(new ByteArrayInputStream(privateKey), response.getOutputStream());
     	}

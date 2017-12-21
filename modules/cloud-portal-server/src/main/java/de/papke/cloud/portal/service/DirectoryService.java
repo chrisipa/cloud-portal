@@ -200,18 +200,6 @@ public class DirectoryService {
 		return search(baseDn, searchScope, Filter.create(filterString), attributes, paging);    
 	}
 
-	/**
-	 * Helper method for executing an LDAP search request.
-	 * 
-	 * @param baseDn
-	 * @param searchScope
-	 * @param filter
-	 * @param attributes
-	 * @param pageSize
-	 * @param connection
-	 * @return
-	 * @throws Exception
-	 */
 	public List<SearchResultEntry> search(String baseDn, SearchScope searchScope, Filter filter, String[] attributes, boolean paging) {
 
 		List<SearchResultEntry> searchResultEntries = new ArrayList<>();

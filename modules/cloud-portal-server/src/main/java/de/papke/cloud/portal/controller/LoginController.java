@@ -10,12 +10,6 @@ public class LoginController extends ApplicationController {
 
 	private static final String PREFIX = "/login";
 	
-	/**
-	 * Method for returning the model and view for the login page.
-	 *
-	 * @param model
-	 * @return
-	 */
 	@GetMapping(path = PREFIX)
 	public String login(Map<String, Object> model) {
 

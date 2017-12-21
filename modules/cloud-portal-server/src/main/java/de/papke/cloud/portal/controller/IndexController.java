@@ -10,12 +10,6 @@ public class IndexController extends ApplicationController {
 	
 	private static final String PREFIX = "/";
 	
-	/**
-	 * Method for returning the model and view for the index page.
-	 *
-	 * @param model
-	 * @return
-	 */
 	@GetMapping(path = PREFIX)
 	public String index(Map<String, Object> model) {
 

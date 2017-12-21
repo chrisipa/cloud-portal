@@ -33,21 +33,22 @@ import de.papke.cloud.portal.pojo.Variable;
 import de.papke.cloud.portal.pojo.VariableConfig;
 import de.papke.cloud.portal.pojo.VariableGroup;
 
-/**
- * Created by chris on 16.10.17.
- */
 @Service
 public class TerraformService {
+
+
 
 	private static final Logger LOG = LoggerFactory.getLogger(TerraformService.class);
 
 	private static final String TEXT_INTRODUCTION = "TERRAFORM IS WORKING ON YOUR ACTION. YOU WILL GET AN EMAIL WITH THE RESULTS. PLEASE BE PATIENT!!!\n";
-
 	private static final String FLAG_NO_COLOR = "-no-color";
 	private static final String FLAG_VAR = "-var";
 	private static final String FLAG_FORCE = "-force";
-
 	private static final String VARIABLE_IDENTIFIER = "variable";
+	private static final String FILE_VARIABLES_YML = "variables.yml";
+	private static final String FILE_VARIABLES_TF = "variables.tf";
+	private static final String PROPERTY_VARIABLES = "variables";
+	private static final String PROPERTY_VARIABLE_GROUPS = "variableGroups";
 
 	@Autowired
 	private CommandExecutorService commandExecutorService;
@@ -68,20 +69,20 @@ public class TerraformService {
 			Constructor constructor = new Constructor(VariableConfig.class);
 
 			TypeDescription variableConfigTypeDescription = new TypeDescription(VariableConfig.class);
-			variableConfigTypeDescription.putListPropertyType("variableGroups", VariableGroup.class);
+			variableConfigTypeDescription.putListPropertyType(PROPERTY_VARIABLE_GROUPS, VariableGroup.class);
 			constructor.addTypeDescription(variableConfigTypeDescription);
 
 			TypeDescription variableGroupTypeDescription = new TypeDescription(VariableGroup.class);
-			variableGroupTypeDescription.putListPropertyType("variables", Variable.class);
+			variableGroupTypeDescription.putListPropertyType(PROPERTY_VARIABLES, Variable.class);
 			constructor.addTypeDescription(variableGroupTypeDescription);
 
 			Yaml yaml = new Yaml(constructor);
 
-			File terraformFolder = resourceService.getClasspathResource("terraform");
+			File terraformFolder = resourceService.getClasspathResource(Constants.FOLDER_TERRAFORM);
 			if (!terraformFolder.isFile()) {
 				File[] providerFolderArray = terraformFolder.listFiles();
 				for (File providerFolder : providerFolderArray) {
-					File variableFile = new File(new URI(providerFolder.toURI() + "/variables.yml"));
+					File variableFile = new File(new URI(providerFolder.toURI() + File.separator + FILE_VARIABLES_YML));
 					if (variableFile.exists()) {
 						VariableConfig variableConfig = yaml.loadAs(new FileInputStream(variableFile), VariableConfig.class);
 						List<VariableGroup> variableGroupList = variableConfig.getVariableGroups();
@@ -135,7 +136,7 @@ public class TerraformService {
 
 	private void generateVariablesFile(String provider, File tmpFolder) throws IOException {
 
-		File variablesFile = new File(tmpFolder.getAbsolutePath() + File.separator + "variables.tf");
+		File variablesFile = new File(tmpFolder.getAbsolutePath() + File.separator + FILE_VARIABLES_TF);
 		StringBuilder variablesBuilder = new StringBuilder();
 
 		List<VariableGroup> variableGroupList = providerDefaults.get(provider);

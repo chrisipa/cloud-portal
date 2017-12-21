@@ -13,7 +13,9 @@ import org.springframework.stereotype.Service;
 public class ResourceService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(ResourceService.class);
-	
+
+	private static final String PREFIX_CLASSPATH = "classpath:/";
+
 	@Autowired
 	private ResourceLoader resourceLoader;
 	
@@ -22,7 +24,7 @@ public class ResourceService {
 		File file = null;
 		
 		try {
-			Resource resource = resourceLoader.getResource("classpath:/" + path);
+			Resource resource = resourceLoader.getResource(PREFIX_CLASSPATH + path);
 			file = new File(resource.getURI());
 		}
 		catch (Exception e) {

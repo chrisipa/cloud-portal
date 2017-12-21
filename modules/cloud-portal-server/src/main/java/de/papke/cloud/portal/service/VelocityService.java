@@ -14,11 +14,6 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Map;
 
-/**
- * Service class for evaluating velocity code.
- *
- * @author Christoph Papke (info@papke.it)
- */
 @Service
 public class VelocityService {
 
@@ -29,9 +24,6 @@ public class VelocityService {
 
     private VelocityEngine velocityEngine;
 
-    /**
-     * Method for initializing the velocity engine.
-     */
     @PostConstruct
     public void init() {
 
@@ -42,13 +34,6 @@ public class VelocityService {
         velocityEngine.init();
     }
 
-    /**
-     * Method for evaluating velocity code.
-     *
-     * @param templatePath - path to velocity template
-     * @param variableMap - variable map for substitution
-     * @return output of velocity code
-     */
     public String evaluate(String templatePath, Map<String, Object> variableMap) {
 
         String output = null;
