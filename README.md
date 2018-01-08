@@ -11,8 +11,8 @@ Self service web portal for different Cloud platforms like Azure, AWS and VMWare
 
 [![Self Service Cloud Portal - Use Case #1](https://github.com/chrisipa/cloud-portal/raw/master/public/youtube.png)](https://youtu.be/NKZ46OSocp8 "Self Service Cloud Portal - Use Case #1")
 
-Features (working)
-------------------
+Features
+--------
 * LDAP authentication & authorization
 * VM provisioning to Azure, AWS and VMWare vSphere using Hashicorp's Terraform
 * VM provisioning history
@@ -21,11 +21,6 @@ Features (working)
 * Send HTML emails with customizable velocity templates and Terraform log data as attachment
 * Responsive WebUI with generic Terraform variable rendering
 * Optimized RESTful WebService for CD pipeline integrations
-
-Features (planned)
-------------------
-* Additional workflow actions after VM provisioning
-* Support of additional use cases
 
 Prerequisites
 -------------
