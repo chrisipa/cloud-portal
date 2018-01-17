@@ -210,6 +210,9 @@
                                     <!-- clear apt cache -->
                                     <run>apt-get clean</run>
 
+                                    <!-- make entrypoint executable -->
+                                    <run>chmod +x /${project.artifactId}.sh</run>
+
                                 </runCmds>
                                 <assembly>
                                     <basedir>/</basedir>
@@ -224,7 +227,7 @@
                                             </dependencySet>
                                         </dependencySets>
                                         <fileSets>
-                                            <fileSet>
+                                            <fileSet>                                                
                                                 <directory>${project.basedir}/src/main/resources/docker/entrypoint</directory>
                                                 <outputDirectory>/</outputDirectory>
                                                 <includes>
