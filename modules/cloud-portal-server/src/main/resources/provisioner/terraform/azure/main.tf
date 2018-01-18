@@ -2,10 +2,6 @@ provider "null" {
   version = "1.0.0"
 }
 
-provider "random" {
-  version = "1.1.0"
-}
-
 provider "azurerm" {
   subscription_id = "${var.subscription_id}"
   tenant_id = "${var.tenant_id}"
@@ -34,12 +30,8 @@ locals {
   allow_win_rm_url = "https://raw.githubusercontent.com/chrisipa/cloud-portal/master/public/bootstrap/${local.allow_win_rm_file}"
 }
 
-resource "random_id" "id" {
-  byte_length = 6
-}
-
 resource "azurerm_resource_group" "rg" {
-  name = "${random_id.id.hex}rg"
+  name = "${var.random_id}rg"
   location = "${var.region}"
   
   tags {
@@ -49,7 +41,7 @@ resource "azurerm_resource_group" "rg" {
 }
 
 resource "azurerm_virtual_network" "vnet" {
-  name = "${random_id.id.hex}vnet"
+  name = "${var.random_id}vnet"
   location = "${var.region}"
   address_space = ["${var.vnet_address_space}"]
   resource_group_name = "${azurerm_resource_group.rg.name}"
@@ -61,14 +53,14 @@ resource "azurerm_virtual_network" "vnet" {
 }
 
 resource "azurerm_subnet" "subnet" {
-  name = "${random_id.id.hex}subnet"
+  name = "${var.random_id}subnet"
   virtual_network_name = "${azurerm_virtual_network.vnet.name}"
   resource_group_name = "${azurerm_resource_group.rg.name}"
   address_prefix = "${var.subnet_address_space}"
 }
 
 resource "azurerm_network_security_group" "nsg" {
-  name = "${random_id.id.hex}nsg"
+  name = "${var.random_id}nsg"
   location = "${var.region}"
   resource_group_name = "${azurerm_resource_group.rg.name}"
   
@@ -80,7 +72,7 @@ resource "azurerm_network_security_group" "nsg" {
 
 resource "azurerm_network_security_rule" "rulessh" {
   count = "${local.is_linux}"
-  name = "${random_id.id.hex}rulessh"
+  name = "${var.random_id}rulessh"
   priority = 100
   direction = "Inbound"
   access = "Allow"
@@ -95,7 +87,7 @@ resource "azurerm_network_security_rule" "rulessh" {
 
 resource "azurerm_network_security_rule" "rulerdp" {
   count = "${local.is_windows}"
-  name = "${random_id.id.hex}rulerdp"
+  name = "${var.random_id}rulerdp"
   priority = 101
   direction = "Inbound"
   access = "Allow"
@@ -110,7 +102,7 @@ resource "azurerm_network_security_rule" "rulerdp" {
 
 resource "azurerm_network_security_rule" "rulerm" {
   count = "${local.is_windows}"
-  name = "${random_id.id.hex}rulerm"
+  name = "${var.random_id}rulerm"
   priority = 102
   direction = "Inbound"
   access = "Allow"
@@ -125,7 +117,7 @@ resource "azurerm_network_security_rule" "rulerm" {
 
 resource "azurerm_network_security_rule" "rulecustom" {
   count = "${var.incoming_ports != -1 ? length(local.incoming_ports_list) : 0}"
-  name = "${random_id.id.hex}rulecustom"
+  name = "${var.random_id}rulecustom"
   priority = "${103 + count.index}"
   direction = "Inbound"
   access = "Allow"
@@ -139,13 +131,13 @@ resource "azurerm_network_security_rule" "rulecustom" {
 }
 
 resource "azurerm_network_interface" "nic" {
-  name = "${random_id.id.hex}nic"
+  name = "${var.random_id}nic"
   location = "${var.region}"
   resource_group_name = "${azurerm_resource_group.rg.name}"
   network_security_group_id = "${azurerm_network_security_group.nsg.id}"
 
   ip_configuration {
-    name = "${random_id.id.hex}ipconfig"
+    name = "${var.random_id}ipconfig"
     subnet_id = "${azurerm_subnet.subnet.id}"
     private_ip_address_allocation = "dynamic"
     public_ip_address_id = "${azurerm_public_ip.pip.id}"
@@ -160,11 +152,11 @@ resource "azurerm_network_interface" "nic" {
 }
 
 resource "azurerm_public_ip" "pip" {
-  name = "${random_id.id.hex}ip"
+  name = "${var.random_id}ip"
   location = "${var.region}"
   resource_group_name = "${azurerm_resource_group.rg.name}"
   public_ip_address_allocation = "dynamic"
-  domain_name_label = "d${random_id.id.hex}"
+  domain_name_label = "d${var.random_id}"
   
   tags {
     Name = "${var.title}"
@@ -173,7 +165,7 @@ resource "azurerm_public_ip" "pip" {
 }
 
 resource "azurerm_storage_account" "stor" {
-  name = "${random_id.id.hex}stor"
+  name = "${var.random_id}stor"
   location = "${var.region}"
   resource_group_name = "${azurerm_resource_group.rg.name}"
   account_tier = "${var.storage_account_tier}"
@@ -186,7 +178,7 @@ resource "azurerm_storage_account" "stor" {
 }
 
 resource "azurerm_storage_container" "storc" {
-  name = "${random_id.id.hex}vhds"
+  name = "${var.random_id}vhds"
   resource_group_name = "${azurerm_resource_group.rg.name}"
   storage_account_name = "${azurerm_storage_account.stor.name}"
   container_access_type = "private"
@@ -195,7 +187,7 @@ resource "azurerm_storage_container" "storc" {
 resource "azurerm_virtual_machine" "linux" {
 
   count = "${local.is_linux}"
-  name = "${random_id.id.hex}vm"
+  name = "${var.random_id}vm"
   location = "${var.region}"
   resource_group_name = "${azurerm_resource_group.rg.name}"
   vm_size = "${var.vm_size}"
@@ -209,14 +201,14 @@ resource "azurerm_virtual_machine" "linux" {
   }
 
   storage_os_disk {
-    name = "${random_id.id.hex}osdisk"
-    vhd_uri = "${azurerm_storage_account.stor.primary_blob_endpoint}${azurerm_storage_container.storc.name}/${random_id.id.hex}osdisk.vhd"
+    name = "${var.random_id}osdisk"
+    vhd_uri = "${azurerm_storage_account.stor.primary_blob_endpoint}${azurerm_storage_container.storc.name}/${var.random_id}osdisk.vhd"
     caching = "ReadWrite"
     create_option = "FromImage"
   }
 
   os_profile {
-    computer_name = "${random_id.id.hex}"
+    computer_name = "${var.random_id}"
     admin_username = "${var.username}"
     admin_password = "${var.password}"
   }
@@ -262,7 +254,7 @@ resource "azurerm_virtual_machine" "linux" {
 resource "azurerm_virtual_machine" "windows" {
 
   count = "${local.is_windows}"
-  name = "${random_id.id.hex}vm"
+  name = "${var.random_id}vm"
   location = "${var.region}"
   resource_group_name = "${azurerm_resource_group.rg.name}"
   vm_size = "${var.vm_size}"
@@ -276,14 +268,14 @@ resource "azurerm_virtual_machine" "windows" {
   }
 
   storage_os_disk {
-    name = "${random_id.id.hex}osdisk"
-    vhd_uri = "${azurerm_storage_account.stor.primary_blob_endpoint}${azurerm_storage_container.storc.name}/${random_id.id.hex}osdisk.vhd"
+    name = "${var.random_id}osdisk"
+    vhd_uri = "${azurerm_storage_account.stor.primary_blob_endpoint}${azurerm_storage_container.storc.name}/${var.random_id}osdisk.vhd"
     caching = "ReadWrite"
     create_option = "FromImage"
   }
 
   os_profile {
-    computer_name = "${random_id.id.hex}"
+    computer_name = "${var.random_id}"
     admin_username = "${var.username}"
     admin_password = "${var.password}"
   }
@@ -304,7 +296,7 @@ resource "azurerm_virtual_machine" "windows" {
 resource "azurerm_virtual_machine_extension" "windowsvmext" {
   
   count = "${local.is_windows}"
-  name = "${random_id.id.hex}vmext"
+  name = "${var.random_id}vmext"
   location = "${var.region}"
   resource_group_name = "${azurerm_resource_group.rg.name}"  
   virtual_machine_name = "${azurerm_virtual_machine.windows.name}"  

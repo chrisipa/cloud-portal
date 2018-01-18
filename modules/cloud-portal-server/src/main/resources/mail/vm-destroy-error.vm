@@ -4,7 +4,8 @@
 <p>Hello ${givenName} ${surName},<br /><br />there was an error destroying your VM from <strong>${provider}</strong>.</p>
 <p>See log file for additional details.<p>
 <hr />
-<p>ID: <strong>${id}</strong></p>
+<p>Random ID: <strong>${random_id}</strong></p>
+<p>Provisioning ID: <strong>${provisioning_id}</strong></p>
 <hr />
 <p>Best regards</p>
 <p>Your Self Service Cloud Portal</p>

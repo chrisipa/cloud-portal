@@ -24,19 +24,31 @@
                             required="required">
                     </div>
 					<div class="form-group">
-                        <label>vCenter Image Folder</label> <input type="text" class="form-control" name="vcenter_image_folder"
-                            required="required">
-                    </div>
-					<div class="form-group">
-                        <label>vCenter Target Folder</label> <input type="text" class="form-control" name="vcenter_target_folder"
-                            required="required">
-                    </div>
-					<div class="form-group">
                         <label>vCenter Username</label> <input type="text" class="form-control" name="vcenter_username"
                             required="required">
                     </div>
 					<div class="form-group">
                         <label>vCenter Password</label> <input type="password" class="form-control" name="vcenter_password"
+                            required="required">
+                    </div>
+					<div class="form-group">
+                        <label>vCenter Datacenter</label> <input type="text" class="form-control" name="vcenter_datacenter"
+                            required="required">
+                    </div>
+					<div class="form-group">
+                        <label>vCenter Datastore</label> <input type="text" class="form-control" name="vcenter_datastore"
+                            required="required">
+                    </div>
+					<div class="form-group">
+                        <label>vCenter Resource Pool</label> <input type="text" class="form-control" name="vcenter_resource_pool"
+                            required="required">
+                    </div>
+					<div class="form-group">
+                        <label>vCenter Network</label> <input type="text" class="form-control" name="vcenter_network"
+                            required="required">
+                    </div>
+					<div class="form-group">
+                        <label>vCenter Target Folder</label> <input type="text" class="form-control" name="vcenter_target_folder"
                             required="required">
                     </div>
                     <button id="create/action/vsphere" type="submit" class="btn btn-warning">Create</button>

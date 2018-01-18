@@ -22,10 +22,13 @@
 								<th>Actions</th>
 								<th>Group</th>
 								<th>vCenter Hostname</th>
-								<th>vCenter Image Folder</th>
-								<th>vCenter Target Folder</th>
 								<th>vCenter Username</th>
 								<th>vCenter Password</th>
+								<th>vCenter Datacenter</th>
+								<th>vCenter Datastore</th>
+								<th>vCenter Resource Pool</th>
+								<th>vCenter Network</th>
+								<th>vCenter Target Folder</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -36,10 +39,13 @@
 									</td>
 									<td><c:out value="${cred.group}" /></td>
 									<td><c:out value="${cred.secretMap['vcenter_hostname']}" /></td>
-									<td><c:out value="${cred.secretMap['vcenter_image_folder']}" /></td>
-									<td><c:out value="${cred.secretMap['vcenter_target_folder']}" /></td>
 									<td><c:out value="${cred.secretMap['vcenter_username']}" /></td>
 									<td><c:out value="${cred.secretMap['vcenter_password']}" /></td>
+									<td><c:out value="${cred.secretMap['vcenter_datacenter']}" /></td>
+									<td><c:out value="${cred.secretMap['vcenter_datastore']}" /></td>
+									<td><c:out value="${cred.secretMap['vcenter_resource_pool']}" /></td>
+									<td><c:out value="${cred.secretMap['vcenter_network']}" /></td>
+									<td><c:out value="${cred.secretMap['vcenter_target_folder']}" /></td>
 								</tr>
 							</c:forEach>
 						</tbody>

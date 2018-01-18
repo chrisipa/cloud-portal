@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +36,6 @@ import de.papke.cloud.portal.pojo.ProvisionLog;
 import de.papke.cloud.portal.pojo.Variable;
 import de.papke.cloud.portal.pojo.VariableGroup;
 import de.papke.cloud.portal.service.CredentialsService;
-import de.papke.cloud.portal.service.FileService;
 import de.papke.cloud.portal.service.KeyPairService;
 import de.papke.cloud.portal.service.ProvisionLogService;
 import de.papke.cloud.portal.service.SessionUserService;
@@ -45,23 +45,17 @@ import de.papke.cloud.portal.service.VirtualMachineService;
 @Controller
 public class VirtualMachineController extends ApplicationController {
 
-
-
 	private static final Logger LOG = LoggerFactory.getLogger(VirtualMachineController.class);
 
 	private static final String PREFIX = "/vm";
 	private static final String MODEL_VAR_NAME = "virtualMachine";
-	private static final String EXTENSION_POWERSHELL = "ps1";
-	private static final String EXTENSION_BASH = "sh";
 	private static final String VAR_TYPE_FILE = "file";
 	private static final String VAR_NAME_SCRIPT_FILE = "script_file";
 	private static final String VAR_NAME_PRIVATE_KEY_FILE = "private_key_file";
 	private static final String VAR_NAME_PUBLIC_KEY_FILE = "public_key_file";
-	private static final String VAR_NAME_IMAGE_NAME = "image_name";
+	private static final String VAR_NAME_RANDOM_ID = "random_id";
 	private static final String VAR_NAME_PART_KEY = "key";
-	private static final String IMAGE_PART_WINDOWS = "windows";
-	private static final String FOLDER_SCRIPT = "script";
-	private static final String SCRIPT_NAME_DEFAULT = "default";
+	private static final String EMPTY_SCRIPT_NAME = "empty";
 
 	@Autowired
 	private CredentialsService credentialsService;
@@ -81,9 +75,6 @@ public class VirtualMachineController extends ApplicationController {
 	@Autowired
 	private SessionUserService sessionUserService;
 
-	@Autowired
-	private FileService fileService;
-	
 	@GetMapping(path = PREFIX + "/list/form/{provider}")
 	public String list(Map<String, Object> model, @PathVariable String provider) {
 
@@ -141,6 +132,9 @@ public class VirtualMachineController extends ApplicationController {
 			
 			// get variables
 			List<Variable> variables = terraformService.getVisibleVariables(provider);
+			
+			// extend variables map with random id
+			extendWithRandomId(variableMap);
 			
 			// extend variables map with default values
 			File privateKeyFile = extendWithDefaultValues(variables, variableMap, tempFileList);
@@ -277,8 +271,12 @@ public class VirtualMachineController extends ApplicationController {
 			}
 		}
 	}	
+	
+	private void extendWithRandomId(Map<String, Object> variableMap) {
+		variableMap.put(VAR_NAME_RANDOM_ID, RandomStringUtils.randomAlphanumeric(12).toLowerCase());
+	}	
 
-	private File extendWithDefaultValues(List<Variable> variables, Map<String, Object> variableMap, List<File> tempFileList) {
+	private File extendWithDefaultValues(List<Variable> variables, Map<String, Object> variableMap, List<File> tempFileList) throws IOException {
 		
 		File privateKeyFile = null;
 		
@@ -302,7 +300,7 @@ public class VirtualMachineController extends ApplicationController {
 						privateKeyFile = generateKeyPair(variableMap, tempFileList);
 					}
 					else if (variableName.equals(VAR_NAME_SCRIPT_FILE)) {
-						addDefaultScriptFile(variableMap, tempFileList);
+						addEmptyScriptFile(variableMap, tempFileList);
 					}
 				}
 			}
@@ -311,26 +309,10 @@ public class VirtualMachineController extends ApplicationController {
 		return privateKeyFile;
 	}
 
-	private void addDefaultScriptFile(Map<String, Object> variableMap, List<File> tempFileList) {
-		
-		StringBuilder scriptPath = new StringBuilder();
-		scriptPath.append(FOLDER_SCRIPT);
-		scriptPath.append(File.separator);
-		scriptPath.append(SCRIPT_NAME_DEFAULT);
-		scriptPath.append(Constants.CHAR_DOT);
-		
-		String imageName = (String) variableMap.get(VAR_NAME_IMAGE_NAME);
-		if (imageName != null && imageName.toLowerCase().contains(IMAGE_PART_WINDOWS)) {
-			scriptPath.append(EXTENSION_POWERSHELL);
-		}
-		else {
-			scriptPath.append(EXTENSION_BASH);
-		}
-		
-		File scriptFile = fileService.copyResourceToFilesystem(scriptPath.toString());
-		variableMap.put(VAR_NAME_SCRIPT_FILE, scriptFile.getAbsolutePath());
-		
-		tempFileList.add(scriptFile);
+	private void addEmptyScriptFile(Map<String, Object> variableMap, List<File> tempFileList) throws IOException {
+		File emptyScriptFile = File.createTempFile(EMPTY_SCRIPT_NAME, Constants.CHAR_EMPTY);
+		variableMap.put(VAR_NAME_SCRIPT_FILE, emptyScriptFile.getAbsolutePath());
+		tempFileList.add(emptyScriptFile);
 	}
 	
 	private File generateKeyPair(Map<String, Object> variableMap, List<File> tempFileList) {

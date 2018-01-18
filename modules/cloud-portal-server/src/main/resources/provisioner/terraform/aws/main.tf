@@ -1,7 +1,3 @@
-provider "random" {
-  version = "1.1.0"
-}
-
 provider "aws" {
   profile    = "default"
   access_key = "${var.access_key}"
@@ -31,12 +27,8 @@ locals {
   windows_script_path = "C:\\bootstrap.ps1"
 }
 
-resource "random_id" "id" {
-  byte_length = 6
-}
-
 resource "aws_security_group" "nsg" {
-  name        = "${random_id.id.hex}_nsg"
+  name        = "${var.random_id}_nsg"
   
   tags {
     Name = "${var.title}"

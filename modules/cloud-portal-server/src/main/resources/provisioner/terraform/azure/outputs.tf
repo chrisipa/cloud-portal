@@ -1,5 +1,5 @@
 output "id" {
-  value = "${random_id.id.hex}"
+  value = "${var.random_id}"
 }
 
 output "host" {  

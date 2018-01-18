@@ -1,3 +1,0 @@
-#!/bin/bash
-
-# do nothing

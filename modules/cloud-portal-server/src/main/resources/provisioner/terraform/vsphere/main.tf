@@ -1,12 +1,8 @@
-provider "random" {
-  version = "1.1.0"
-}
-
-provider "vmware" {
-  vcenter_server = "${var.vcenter_hostname}"
+provider "vsphere" {
+  vsphere_server = "${var.vcenter_hostname}"
   user = "${var.vcenter_username}"
   password = "${var.vcenter_password}"
-  insecure_connection = "true"
+  allow_unverified_ssl = "true"
   version = "1.2.0"
 }
 
@@ -20,27 +16,62 @@ locals {
   is_linux = "${replace(var.image_name, "Linux", "") != var.image_name ? 1 : 0}"
   is_windows = "${replace(var.image_name, "Windows", "") != var.image_name ? 1 : 0}"
   linux_script_path = "/tmp/bootstrap.sh"
-  windows_script_path = "C:\\bootstrap.ps1"  
-  image_path = "${var.vcenter_image_folder}/${lookup(local.image_templates_map, var.image_name)}"
+  windows_script_path = "C:\\bootstrap.ps1"    
 }
 
-resource "random_id" "id" {
-  byte_length = 6
+data "vsphere_datacenter" "dc" {
+  name = "${var.vcenter_datacenter}"
 }
 
-resource "vmware_virtual_machine" "linux" {
+data "vsphere_datastore" "datastore" {
+  name          = "${var.vcenter_datastore}"
+  datacenter_id = "${data.vsphere_datacenter.dc.id}"
+}
+
+data "vsphere_resource_pool" "pool" {
+  name          = "${var.vcenter_resource_pool}"
+  datacenter_id = "${data.vsphere_datacenter.dc.id}"
+}
+
+data "vsphere_network" "network" {
+  name          = "${var.vcenter_network}"
+  datacenter_id = "${data.vsphere_datacenter.dc.id}"
+}
+
+data "vsphere_virtual_machine" "template" {
+  name          = "${lookup(local.image_templates_map, var.image_name)}"
+  datacenter_id = "${data.vsphere_datacenter.dc.id}"
+}
+
+resource "vsphere_virtual_machine" "linux" {
 
   count = "${local.is_linux}"
-  name = "${random_id.id.hex}"
-  image = "${local.image_path}"
-  folder = "${var.vcenter_target_folder}"
-  cpus = "${var.vm_cores}"
+  name = "${var.random_id}"
+  resource_pool_id = "${data.vsphere_resource_pool.pool.id}"
+  datastore_id     = "${data.vsphere_datastore.datastore.id}"
+
+  num_cpus = "${var.vm_cores}"
   memory = "${var.vm_ram}"
+  guest_id = "${data.vsphere_virtual_machine.template.guest_id}"
+  folder = "${var.vcenter_target_folder}"
+
+  network_interface {
+    network_id = "${data.vsphere_network.network.id}"
+  }
+
+  disk {
+    name = "${var.random_id}.vmdk"
+    size = "${var.vm_storage}"
+  }
+
+  clone {
+    template_uuid = "${data.vsphere_virtual_machine.template.id}"    
+  }  
   
   connection {
     type = "ssh"
     agent = false  
-    host = "${vmware_virtual_machine.linux.ip_address}"
+    host = "${vsphere_virtual_machine.linux.guest_ip_addresses.0}"
     user = "${var.username}" 
     password = "${var.password}"     
     timeout = "1m"      
@@ -56,21 +87,37 @@ resource "vmware_virtual_machine" "linux" {
       "echo '${var.password}' | sudo -S bash ${local.linux_script_path}",
       "rm ${local.linux_script_path}"
     ]
-  }
+  }  
 }
 
-resource "vmware_virtual_machine" "windows" {
+resource "vsphere_virtual_machine" "windows" {
 
   count = "${local.is_windows}"
-  name = "${random_id.id.hex}"
-  image = "${local.image_path}"
-  folder = "${var.vcenter_target_folder}"
-  cpus = "${var.vm_cores}"
+  name = "${var.random_id}"
+  resource_pool_id = "${data.vsphere_resource_pool.pool.id}"
+  datastore_id     = "${data.vsphere_datastore.datastore.id}"
+
+  num_cpus = "${var.vm_cores}"
   memory = "${var.vm_ram}"
+  guest_id = "${data.vsphere_virtual_machine.template.guest_id}"
+  folder = "${var.vcenter_target_folder}"
+
+  network_interface {
+    network_id = "${data.vsphere_network.network.id}"
+  }
+
+  disk {
+    name = "${var.random_id}.vmdk"
+    size = "${var.vm_storage}"
+  }
+
+  clone {
+    template_uuid = "${data.vsphere_virtual_machine.template.id}"    
+  }  
   
   connection {
     type = "winrm"
-    host = "${vmware_virtual_machine.windows.ip_address}"
+    host = "${vsphere_virtual_machine.windows.guest_ip_addresses.0}"
     user = "${var.username}"
     password = "${var.password}"          
     timeout = "10m"      

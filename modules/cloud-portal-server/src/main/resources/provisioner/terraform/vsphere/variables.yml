@@ -1,5 +1,16 @@
 variableGroups:
 
+  - title: ID
+    hidden: true
+    variables:
+    
+      - title: Random ID
+        name: random_id
+        description: A generated random ID.
+        type: string
+        required: true
+        defaults: []  
+    
   - title: Credentials
     hidden: true
     variables:
@@ -9,14 +20,35 @@ variableGroups:
         description: The hostname of the vcenter to use.
         type: string
         required: true
-        defaults: []
+        defaults: []    
       
-      - title: vCenter Image Folder
-        name: vcenter_image_folder
-        description: The vcenter folder where all the vm images are located.
+      - title: vCenter Datacenter
+        name: vcenter_datacenter
+        description: The datacenter of the vcenter to use.
         type: string
         required: true
-        defaults: []
+        defaults: []    
+      
+      - title: vCenter Datastore
+        name: vcenter_datastore
+        description: The datastore of the vcenter to use.
+        type: string
+        required: true
+        defaults: []    
+      
+      - title: vCenter Resource Pool
+        name: vcenter_resource_pool
+        description: The resource pool of the vcenter to use.
+        type: string
+        required: true
+        defaults: []    
+      
+      - title: vCenter Network
+        name: vcenter_network
+        description: The network of the vcenter to use.
+        type: string
+        required: true
+        defaults: []    
       
       - title: vCenter Target Folder
         name: vcenter_target_folder
@@ -91,6 +123,14 @@ variableGroups:
       defaults: [ 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536 ]
       index: 1
       pattern: "512|1024|2048|4096|8192|16384|32768|65536"
+      
+    - title: Storage
+      name: vm_storage
+      description: Storage size (in GB) of the virtual machine.
+      type: string   
+      required: true
+      defaults: [ 50 ] 
+      pattern: "[0-9]*"   
       
   - title: Bootstrap
     variables:

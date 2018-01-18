@@ -32,6 +32,7 @@ import de.papke.cloud.portal.util.ZipUtil;
 @Service
 public class VirtualMachineService {
 
+
 	private static final Logger LOG = LoggerFactory.getLogger(VirtualMachineService.class);
 
 	private static final String PATTERN_FILE = "_file";
@@ -45,6 +46,7 @@ public class VirtualMachineService {
 	private static final String PART_SUCCESS = "success";
 	private static final String VARIABLE_SUR_NAME = "surName";
 	private static final String VARIABLE_GIVEN_NAME = "givenName";
+	private static final String VARIABLE_PROVISIONING_ID = "provisioning_id";
 
 	@Autowired
 	private ProvisionLogService provisionLogService;
@@ -116,8 +118,11 @@ public class VirtualMachineService {
 				// create provision log
 				ProvisionLog provisionLog = provisionLogService.create(action, provider, group, success, variableMap, privateKeyFile, tmpFolder);
 				
-				// output provision log id
-				outputStream.write(("provisioning_id = " + provisionLog.getId()).getBytes());
+				// add provisioning id
+				String provisioningId = provisionLog.getId();
+				String provisioningIdVariableString = VARIABLE_PROVISIONING_ID + Constants.CHAR_WHITESPACE + Constants.CHAR_EQUAL + Constants.CHAR_WHITESPACE + provisioningId;
+				outputStream.write((provisioningIdVariableString).getBytes());
+				variableMap.put(VARIABLE_PROVISIONING_ID, provisioningId);
 
 				// get attachment for mail
 				attachment = getAttachment(commandResult);

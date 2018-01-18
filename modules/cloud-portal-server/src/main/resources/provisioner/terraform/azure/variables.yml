@@ -1,5 +1,16 @@
 variableGroups:
 
+  - title: ID
+    hidden: true
+    variables:
+    
+      - title: Random ID
+        name: random_id
+        description: A generated random ID.
+        type: string
+        required: true
+        defaults: []
+
   - title: Credentials
     hidden: true
     variables:

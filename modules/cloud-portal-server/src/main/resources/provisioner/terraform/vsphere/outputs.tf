@@ -1,9 +1,9 @@
-output "id" {
-  value = "${random_id.id.hex}"
+output "random_id" {
+  value = "${var.random_id}"
 }
 
 output "host" {
-  value = "${element(flatten(list(vmware_virtual_machine.linux.*.ip_address, vmware_virtual_machine.windows.*.ip_address)), 0)}"  
+  value = "${element(flatten(list(vsphere_virtual_machine.linux.*.guest_ip_addresses.0, vsphere_virtual_machine.windows.*.guest_ip_addresses.0)), 0)}"  
 }
 
 output "username" {
