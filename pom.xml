@@ -39,7 +39,6 @@
         <tomcat.home>${opt.folder}/tomcat</tomcat.home>
         <tomcat.webapps.folder>${tomcat.home}/webapps</tomcat.webapps.folder>
         <terraform.version>0.10.7</terraform.version>
-        <terraform.vmware.version>1.2</terraform.vmware.version>
 
     </properties>
 
@@ -202,11 +201,6 @@
                                     <run>unzip -q terraform_${terraform.version}_linux_amd64.zip -d /usr/local/bin</run>
                                     <run>rm terraform_${terraform.version}_linux_amd64.zip</run>
                                     
-                                    <!-- download 3rd party VMWare vSphere provider -->
-                                    <run>mkdir -p $HOME/.terraform.d/plugins</run>
-                                    <run>wget -q https://github.com/mkuzmin/terraform-provider-vmware/releases/download/v${terraform.vmware.version}/terraform-provider-vmware.linux -O $HOME/.terraform.d/plugins/terraform-provider-vmware_v${terraform.vmware.version}</run>
-                                    <run>chmod +x $HOME/.terraform.d/plugins/terraform-provider-vmware_v${terraform.vmware.version}</run>
-
                                     <!-- clear apt cache -->
                                     <run>apt-get clean</run>
 
