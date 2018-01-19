@@ -71,7 +71,7 @@ chmod -x \$0" > /root/fsresize.sh
       resizefs_rclocal
     fi
 
-    echo -e "Done. The system will reboot automatically in 15 seconds and resize the filesystem during reboot.\n"
+    echo -e "Done. The system will reboot automatically and resize the filesystem during reboot.\n"
     # sleep 15
     # Reboot is necessary in most cases for the kernel to read the new partition table.
     reboot
