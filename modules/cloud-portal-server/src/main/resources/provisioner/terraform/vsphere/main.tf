@@ -149,7 +149,7 @@ resource "vsphere_virtual_machine" "windows" {
       "Powershell.exe -ExecutionPolicy Unrestricted -File ${local.windows_prepare_script_path}",      
       "Powershell.exe -ExecutionPolicy Unrestricted -File ${local.windows_user_script_path}",
       "Powershell.exe -ExecutionPolicy Unrestricted -File ${local.windows_cleanup_script_path}",
-      "del /s /q ${local.windows_script_folder_path}"
+      "Powershell.exe -ExecutionPolicy Unrestricted -Command Remove-Item ${local.windows_script_folder_path} -Force -Recurse"      
     ]
   }
 }
