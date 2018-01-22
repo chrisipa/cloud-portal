@@ -48,6 +48,14 @@ data "vsphere_virtual_machine" "template" {
   datacenter_id = "${data.vsphere_datacenter.dc.id}"
 }
 
+data "vsphere_custom_attribute" "title" {
+  name = "Title"
+}
+
+data "vsphere_custom_attribute" "description" {
+  name = "Description"
+}
+
 resource "vsphere_virtual_machine" "linux" {
 
   count = "${local.is_linux}"
@@ -99,6 +107,11 @@ resource "vsphere_virtual_machine" "linux" {
       "rm -rf ${local.linux_script_folder_path}"
     ]
   }  
+  
+  custom_attributes = "${map(
+    data.vsphere_custom_attribute.title.id, "${var.title}",
+    data.vsphere_custom_attribute.description.id, "${var.description}"
+  )}"
 }
 
 resource "vsphere_virtual_machine" "windows" {
@@ -152,4 +165,9 @@ resource "vsphere_virtual_machine" "windows" {
       "Powershell.exe -ExecutionPolicy Unrestricted -Command Remove-Item ${local.windows_script_folder_path} -Force -Recurse"      
     ]
   }
+  
+  custom_attributes = "${map(
+    data.vsphere_custom_attribute.title.id, "${var.title}",
+    data.vsphere_custom_attribute.description.id, "${var.description}"
+  )}"
 }
