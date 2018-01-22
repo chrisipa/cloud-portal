@@ -55,7 +55,7 @@ resource "vsphere_virtual_machine" "linux" {
   resource_pool_id = "${data.vsphere_resource_pool.pool.id}"
   datastore_id     = "${data.vsphere_datastore.datastore.id}"
   num_cpus = "${var.vm_cores}"
-  memory = "${var.vm_ram}"
+  memory = "${var.vm_ram_size}"
   guest_id = "${data.vsphere_virtual_machine.template.guest_id}"
   folder = "${var.vcenter_target_folder}"
 
@@ -65,7 +65,7 @@ resource "vsphere_virtual_machine" "linux" {
 
   disk {
     name = "${var.random_id}.vmdk"
-    size = "${var.vm_storage}"
+    size = "${var.vm_disk_size}"
   }
 
   clone {
@@ -109,7 +109,7 @@ resource "vsphere_virtual_machine" "windows" {
   datastore_id     = "${data.vsphere_datastore.datastore.id}"
 
   num_cpus = "${var.vm_cores}"
-  memory = "${var.vm_ram}"
+  memory = "${var.vm_ram_size}"
   guest_id = "${data.vsphere_virtual_machine.template.guest_id}"
   folder = "${var.vcenter_target_folder}"
 
@@ -119,7 +119,7 @@ resource "vsphere_virtual_machine" "windows" {
 
   disk {
     name = "${var.random_id}.vmdk"
-    size = "${var.vm_storage}"
+    size = "${var.vm_disk_size}"
   }
 
   clone {

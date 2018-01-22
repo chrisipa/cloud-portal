@@ -75,24 +75,7 @@ variableGroups:
       type: string   
       required: true
       defaults: [ -1 ]
-      pattern: "[0-9]*|-1"
-  
-  - title: Authentication
-    variables:      
-      
-    - title: Username
-      name: username
-      description: Administrator user name.
-      type: string   
-      required: true
-      defaults: [ vmadmin ]    
-      
-    - title: Password
-      name: password
-      description: Administrator password.
-      type: string   
-      required: true
-      defaults: [ "P@ssword1" ]      
+      pattern: "[0-9]*|-1"      
   
   - title: VM
     variables:
@@ -162,9 +145,24 @@ variableGroups:
       required: true
       defaults: [ -1 ]
       pattern: "[0-9,]*|-1|\\*"
-    
-  - title: Bootstrap
+      
+  - title: Authenticaton
     variables:
+    
+    - title: Username
+      name: username
+      description: Username for admin user.
+      type: string   
+      required: true
+      defaults: [ vmadmin ]
+           
+    - title: Password
+      name: password
+      description: Password for admin user.
+      type: string   
+      required: true
+      defaults: [ P@ssword1 ]
+      pattern: "(?=^.{8,255}$)((?=.*\\d)(?=.*[A-Z])(?=.*[a-z])|(?=.*\\d)(?=.*[^A-Za-z0-9])(?=.*[a-z])|(?=.*[^A-Za-z0-9])(?=.*[A-Z])(?=.*[a-z])|(?=.*\\d)(?=.*[A-Z])(?=.*[^A-Za-z0-9]))^.*"    
     
     - title: Public Key
       name: public_key_file
@@ -174,8 +172,11 @@ variableGroups:
     - title: Private Key
       name: private_key_file
       description: Private key file for SSH access. 
-      type: file   
-        
+      type: file      
+    
+  - title: Bootstrap
+    variables:
+    
     - title: Script
       name: script_file
       description: Bootstrap script file to execute after vm has been created. 

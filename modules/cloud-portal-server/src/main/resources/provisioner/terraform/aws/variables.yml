@@ -79,13 +79,6 @@ variableGroups:
       index: 0  
       pattern: "Ubuntu Server Linux 16.04|Windows Server 2016"
     
-    - title: Password
-      name: password
-      description: Administrator password.
-      type: string   
-      required: true
-      defaults: [ "P@ssword1" ]   
-    
     - title: Expiration Days
       name: expiration_days
       description: Days till virtual machine will be removed automatically.
@@ -133,9 +126,17 @@ variableGroups:
       required: true
       defaults: [ -1 ]
       pattern: "[0-9,]*|-1|0"
-    
-  - title: Bootstrap
+      
+  - title: Authenticaton
     variables:
+    
+    - title: Password
+      name: password
+      description: Password for admin user.
+      type: string   
+      required: true
+      defaults: [ P@ssword1 ]
+      pattern: "(?=^.{8,255}$)((?=.*\\d)(?=.*[A-Z])(?=.*[a-z])|(?=.*\\d)(?=.*[^A-Za-z0-9])(?=.*[a-z])|(?=.*[^A-Za-z0-9])(?=.*[A-Z])(?=.*[a-z])|(?=.*\\d)(?=.*[A-Z])(?=.*[^A-Za-z0-9]))^.*"    
     
     - title: Public Key
       name: public_key_file
@@ -145,8 +146,11 @@ variableGroups:
     - title: Private Key
       name: private_key_file
       description: Private key file for SSH access. 
-      type: file   
-        
+      type: file      
+    
+  - title: Bootstrap
+    variables:
+    
     - title: Script
       name: script_file
       description: Bootstrap script file to execute after vm has been created. 

@@ -116,16 +116,19 @@ variableGroups:
       pattern: "[1-8]"
       
     - title: vRAM
-      name: vm_ram
+      name: vm_ram_size
       description: RAM (in MB) of the virtual machine.
       type: list   
       required: true
       defaults: [ 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536 ]
       index: 1
       pattern: "512|1024|2048|4096|8192|16384|32768|65536"
+
+  - title: Storage
+    variables:
       
-    - title: Storage
-      name: vm_storage
+    - title: Disk size
+      name: vm_disk_size
       description: Storage size (in GB) of the virtual machine.
       type: string   
       required: true
@@ -137,14 +140,14 @@ variableGroups:
     
     - title: Username
       name: username
-      description: Username for SSH access.
+      description: Username for admin user.
       type: string   
       required: true
       defaults: [ vmadmin ]
            
     - title: Password
       name: password
-      description: Password for SSH access.
+      description: Password for admin user.
       type: string   
       required: true
       defaults: [ P@ssword1 ]

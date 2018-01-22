@@ -11,7 +11,7 @@ apt-get update
 # install mkpasswd by installing whois package
 apt-get install -y whois
 
-# create new user
+# create new linux user
 useradd -p "$(mkpasswd --hash=md5 $password)" -s "/bin/bash" "$username"
 
 # add sudo group to user

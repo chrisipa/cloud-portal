@@ -1,4 +1,4 @@
-# read parameters
+# read paramters
 $username=$args[0]
 $password=$args[1]
 
