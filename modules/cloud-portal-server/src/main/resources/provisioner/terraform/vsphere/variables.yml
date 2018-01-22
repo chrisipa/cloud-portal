@@ -132,7 +132,7 @@ variableGroups:
       defaults: [ 50 ] 
       pattern: "[0-9]*"   
       
-  - title: Bootstrap
+  - title: Authenticaton
     variables:
     
     - title: Username
@@ -140,15 +140,29 @@ variableGroups:
       description: Username for SSH access.
       type: string   
       required: true
-      defaults: [ devops ]
+      defaults: [ vmadmin ]
            
     - title: Password
       name: password
       description: Password for SSH access.
       type: string   
       required: true
-      defaults: [ devops ]     
+      defaults: [ P@ssword1 ]
+      pattern: "(?=^.{8,255}$)((?=.*\\d)(?=.*[A-Z])(?=.*[a-z])|(?=.*\\d)(?=.*[^A-Za-z0-9])(?=.*[a-z])|(?=.*[^A-Za-z0-9])(?=.*[A-Z])(?=.*[a-z])|(?=.*\\d)(?=.*[A-Z])(?=.*[^A-Za-z0-9]))^.*"    
+    
+    - title: Public Key
+      name: public_key_file
+      description: Public key file for SSH access. 
+      type: file   
+    
+    - title: Private Key
+      name: private_key_file
+      description: Private key file for SSH access. 
+      type: file      
       
+  - title: Bootstrap
+    variables:
+    
     - title: Script
       name: script_file
       description: Bootstrap script file to execute after vm has been created. 
