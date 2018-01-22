@@ -14,6 +14,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import de.papke.cloud.portal.constants.Constants;
@@ -29,6 +30,12 @@ public class ProvisionLogService {
 
 	private static final String TMP_FILE_PREFIX = "provision-log";
 	private static final String TMP_FILE_SUFFIX = ".zip";
+
+	@Value("${application.debug.mode}")
+	private boolean debugMode;	
+	
+	@Value("${application.expiration.auto.minutes}")
+	private int expirationAutoMinutes;	
 
 	@Autowired
 	private SessionUserService sessionUserService;
@@ -80,15 +87,7 @@ public class ProvisionLogService {
 			}
 			
 			// get expiration date
-			Date expirationDate = null;
-			String expirationDaysString = (String) variableMap.get(Constants.VM_EXPIRATION_DAYS_STRING);
-			if (StringUtils.isNotEmpty(expirationDaysString)) {
-				int expirationDays = Integer.parseInt(expirationDaysString);
-				if (expirationDays != -1) {
-					long now = System.currentTimeMillis();
-					expirationDate = new Date(now + (expirationDays * DateUtils.MILLIS_PER_DAY));
-				}
-			}
+			Date expirationDate = getExpirationDate(variableMap);
 			
 			// create provision log
 			provisionLog = provisionLogDao.save(new ProvisionLog(new Date(), expirationDate, username, group, state, provider, success, variableMap, privateKey, data));
@@ -102,7 +101,7 @@ public class ProvisionLogService {
 
 		return provisionLog;
 	}
-
+	
 	public ProvisionLog update(ProvisionLog provisionLog) {
 		
 		// set date
@@ -114,5 +113,26 @@ public class ProvisionLogService {
 
 	public void delete(String id) {
 		provisionLogDao.delete(id);
+	}
+	
+	private Date getExpirationDate(Map<String, Object> variableMap) {
+		
+		Date expirationDate = null;
+		long now = System.currentTimeMillis();
+		
+		if (debugMode) {
+			expirationDate = new Date(now + (expirationAutoMinutes * DateUtils.MILLIS_PER_MINUTE));
+		}
+		else {
+			String expirationDaysString = (String) variableMap.get(Constants.VM_EXPIRATION_DAYS_STRING);
+			if (StringUtils.isNotEmpty(expirationDaysString)) {
+				int expirationDays = Integer.parseInt(expirationDaysString);
+				if (expirationDays != -1) {
+					expirationDate = new Date(now + (expirationDays * DateUtils.MILLIS_PER_DAY));
+				}
+			}
+		}
+		
+		return expirationDate;
 	}
 }
