@@ -101,9 +101,9 @@ resource "vsphere_virtual_machine" "linux" {
   
   provisioner "remote-exec" {
     inline = [
-      "echo '${local.linux_default_password}' | sudo -S bash ${local.linux_prepare_script_path}",
-      "echo '${local.linux_default_password}' | sudo -S bash ${local.linux_user_script_path}",
-      "echo '${local.linux_default_password}' | sudo -S bash ${local.linux_cleanup_script_path} '${var.username}' '${var.password}' '${file("${var.public_key_file}")}'",
+      "echo '${local.linux_default_password}' | sudo -S bash '${local.linux_prepare_script_path}' '${var.username}' '${var.password}' '${file("${var.public_key_file}")}'",
+      "echo '${local.linux_default_password}' | sudo -S bash '${local.linux_user_script_path}'",
+      "echo '${local.linux_default_password}' | sudo -S bash '${local.linux_cleanup_script_path}'",
       "rm -rf ${local.linux_script_folder_path}"
     ]
   }  
@@ -159,9 +159,9 @@ resource "vsphere_virtual_machine" "windows" {
 
   provisioner "remote-exec" {
     inline = [
-      "Powershell.exe -ExecutionPolicy Unrestricted -File ${local.windows_prepare_script_path}",      
+      "Powershell.exe -ExecutionPolicy Unrestricted -File ${local.windows_prepare_script_path} ${var.username} ${var.password}",      
       "Powershell.exe -ExecutionPolicy Unrestricted -File ${local.windows_user_script_path}",
-      "Powershell.exe -ExecutionPolicy Unrestricted -File ${local.windows_cleanup_script_path} ${var.username} ${var.password}",
+      "Powershell.exe -ExecutionPolicy Unrestricted -File ${local.windows_cleanup_script_path}",
       "Powershell.exe -ExecutionPolicy Unrestricted -Command Remove-Item ${local.windows_script_folder_path} -Force -Recurse"      
     ]
   }
