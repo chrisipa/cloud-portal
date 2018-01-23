@@ -45,7 +45,6 @@
         <docker.data.folder>${opt.folder}/docker/${project.artifactId}</docker.data.folder>
         <host.logs.folder>${docker.data.folder}/logs</host.logs.folder>
         <host.data.folder>${docker.data.folder}/data</host.data.folder>
-        <mongodb.version>3.4.10</mongodb.version>
         <mongodb.data.folder>/data/db</mongodb.data.folder>
 
     </properties>
@@ -267,7 +266,7 @@
                             </run>
                         </image>
                         <image>
-                            <name>docker.io/mongo:${mongodb.version}</name>
+                            <name>docker.io/mongo:3.4.10</name>
                             <alias>mongodb</alias>
                             <run>
                                 <namingStrategy>alias</namingStrategy>                            
