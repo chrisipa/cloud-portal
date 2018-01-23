@@ -38,7 +38,15 @@
         <opt.folder>/opt</opt.folder>
         <tomcat.home>${opt.folder}/tomcat</tomcat.home>
         <tomcat.webapps.folder>${tomcat.home}/webapps</tomcat.webapps.folder>
+        <tomcat.logs.folder>${tomcat.home}/logs</tomcat.logs.folder>
+        <tomcat.http.port>8080</tomcat.http.port>
+        <tomcat.https.port>8443</tomcat.https.port>
         <terraform.version>0.10.7</terraform.version>
+        <docker.data.folder>${opt.folder}/docker/${project.artifactId}</docker.data.folder>
+        <host.logs.folder>${docker.data.folder}/logs</host.logs.folder>
+        <host.data.folder>${docker.data.folder}/data</host.data.folder>
+        <mongodb.version>3.4.10</mongodb.version>
+        <mongodb.data.folder>/data/db</mongodb.data.folder>
 
     </properties>
 
@@ -239,6 +247,36 @@
                                     </inline>
                                 </assembly>
                             </build>
+                            <run>
+                                <namingStrategy>alias</namingStrategy>
+                                <links>
+								    <link>mongodb</link>
+								</links>
+                                <volumes>
+                                    <bind>
+                                        <volume>${host.logs.folder}:${tomcat.logs.folder}</volume>
+                                    </bind>
+                                </volumes>
+                                <ports>
+                                    <port>${tomcat.http.port}:${tomcat.http.port}</port>
+                                    <port>${tomcat.https.port}:${tomcat.https.port}</port>
+                                </ports>
+                                <env>
+                                    <spring.data.mongodb.uri>mongodb://mongodb:27017/cloud-portal</spring.data.mongodb.uri>
+                                </env>
+                            </run>
+                        </image>
+                        <image>
+                            <name>docker.io/mongo:${mongodb.version}</name>
+                            <alias>mongodb</alias>
+                            <run>
+                                <namingStrategy>alias</namingStrategy>                            
+                                <volumes>
+                                    <bind>
+                                        <volume>${host.data.folder}:${mongodb.data.folder}</volume>
+                                    </bind>
+                                </volumes>
+                            </run>
                         </image>
                     </images>
                 </configuration>
