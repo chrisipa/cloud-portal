@@ -181,6 +181,32 @@ resource "vsphere_virtual_machine" "windows" {
     timeout = "10m"      
   }
 
+  provisioner "remote-exec" {
+    inline = [
+      "NET USER ${var.username} ${var.password} /add /y /expires:never",
+      "NET LOCALGROUP Administrators ${var.username} /add",
+      "WMIC USERACCOUNT WHERE \"Name='${var.username}'\" SET PasswordExpires=FALSE"
+    ]
+  }
+  
+  custom_attributes = "${map(
+    data.vsphere_custom_attribute.title.id, "${var.title}",
+    data.vsphere_custom_attribute.description.id, "${var.description}"
+  )}"
+}
+
+resource "null_resource" "windowsprovisioning" {
+  
+  count = "${local.is_windows}"
+  
+  connection {
+    type = "winrm"
+    host = "${vsphere_virtual_machine.windows.guest_ip_addresses.0}"
+    user = "${var.username}" 
+    password = "${var.password}"          
+    timeout = "10m"      
+  }
+
   provisioner "file" {
     source      = "${local.windows_script_folder_name}"
     destination = "${local.windows_script_folder_path}"  
@@ -189,19 +215,16 @@ resource "vsphere_virtual_machine" "windows" {
   provisioner "file" {
     source = "${var.script_file}"
     destination = "${local.windows_user_script_path}" 
-  }  
-
+  } 
+  
   provisioner "remote-exec" {
     inline = [
-      "Powershell.exe -ExecutionPolicy Unrestricted -File ${local.windows_prepare_script_path} ${var.username} ${var.password}",      
+      "Powershell.exe -ExecutionPolicy Unrestricted -File ${local.windows_prepare_script_path}",      
       "Powershell.exe -ExecutionPolicy Unrestricted -File ${local.windows_user_script_path}",
       "Powershell.exe -ExecutionPolicy Unrestricted -File ${local.windows_cleanup_script_path}",
       "Powershell.exe -ExecutionPolicy Unrestricted -Command Remove-Item ${local.windows_script_folder_path} -Force -Recurse"      
     ]
-  }
+  } 
   
-  custom_attributes = "${map(
-    data.vsphere_custom_attribute.title.id, "${var.title}",
-    data.vsphere_custom_attribute.description.id, "${var.description}"
-  )}"
+  depends_on = ["vsphere_virtual_machine.windows"]
 }
