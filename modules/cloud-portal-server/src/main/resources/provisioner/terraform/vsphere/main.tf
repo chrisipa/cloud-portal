@@ -1,3 +1,7 @@
+provider "null" {
+  version = "1.0.0"
+}
+
 provider "vsphere" {
   vsphere_server = "${var.vcenter_hostname}"
   user = "${var.vcenter_username}"
@@ -89,22 +93,16 @@ resource "vsphere_virtual_machine" "linux" {
     timeout = "1m"      
   }
   
-  provisioner "file" {
-    source      = "${local.linux_script_folder_name}"
-    destination = "${local.linux_temp_folder_path}"  
-  }
-  
-  provisioner "file" {
-    source      = "${var.script_file}"
-    destination = "${local.linux_user_script_path}"  
-  }
-  
   provisioner "remote-exec" {
     inline = [
-      "echo '${local.linux_default_password}' | sudo -S bash '${local.linux_prepare_script_path}' '${var.username}' '${var.password}' '${file("${var.public_key_file}")}'",
-      "echo '${local.linux_default_password}' | sudo -S bash '${local.linux_user_script_path}'",
-      "echo '${local.linux_default_password}' | sudo -S bash '${local.linux_cleanup_script_path}'",
-      "rm -rf ${local.linux_script_folder_path}"
+      "echo '${local.linux_default_password}' | sudo -S echo test",
+      "sudo apt-get update",
+      "sudo apt-get install -y whois",
+      "sudo useradd -p \"$(mkpasswd --hash=md5 ${var.password})\" -s '/bin/bash' '${var.username}'",
+      "sudo usermod -aG sudo '${var.username}'",
+      "sudo mkdir -p '/home/${var.username}/.ssh'",
+      "sudo bash -c \"echo '${file(var.public_key_file)}' >> '/home/${var.username}/.ssh/authorized_keys'\"",
+      "sudo chown -R '${var.username}.${var.username}' '/home/${var.username}'"
     ]
   }  
   
@@ -112,6 +110,42 @@ resource "vsphere_virtual_machine" "linux" {
     data.vsphere_custom_attribute.title.id, "${var.title}",
     data.vsphere_custom_attribute.description.id, "${var.description}"
   )}"
+}
+
+resource "null_resource" "linuxprovisioning" {
+  
+  count = "${local.is_linux}"
+  
+  connection {
+    type = "ssh"
+    agent = false  
+    host = "${vsphere_virtual_machine.linux.guest_ip_addresses.0}"
+    user = "${var.username}" 
+    password = "${var.password}"     
+    timeout = "1m"      
+  }
+
+  provisioner "file" {
+    source      = "${local.linux_script_folder_name}"
+    destination = "${local.linux_temp_folder_path}"  
+  } 
+
+  provisioner "file" {
+    source      = "${var.script_file}"
+    destination = "${local.linux_user_script_path}"  
+  }
+  
+  provisioner "remote-exec" {
+    inline = [
+      "echo '${var.password}' | sudo -S echo test",
+      "bash '${local.linux_prepare_script_path}'",
+      "bash '${local.linux_user_script_path}'",
+      "bash '${local.linux_cleanup_script_path}'",
+      "rm -rf ${local.linux_script_folder_path}"
+    ]
+  } 
+  
+  depends_on = ["vsphere_virtual_machine.linux"]
 }
 
 resource "vsphere_virtual_machine" "windows" {

@@ -9,4 +9,4 @@ scriptPath="$(readlink -f $0)"
 scriptFolder="$(dirname $(readlink -f $scriptPath))"
 
 # resize lvm to 100% disk space
-"$scriptFolder/lvm-resize.sh" -p "$diskPath" -l "$lvmPath" -f
+sudo "$scriptFolder/lvm-resize.sh" -p "$diskPath" -l "$lvmPath" -f
