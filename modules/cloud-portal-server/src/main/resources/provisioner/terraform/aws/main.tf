@@ -18,13 +18,26 @@ locals {
     "Windows Server 2016" = "801119661308"
   }
 
-  is_linux = "${replace(var.image_name, "Linux", "") != var.image_name ? 1 : 0}"
-  is_windows = "${replace(var.image_name, "Windows", "") != var.image_name ? 1 : 0}"
-  incoming_ports_list = "${split(",", var.incoming_ports)}"
   ami_name = "${lookup(local.image_names_map, var.image_name)}"
   ami_owner = "${lookup(local.image_owners_map, var.image_name)}"
-  linux_script_path = "/tmp/bootstrap.sh"
-  windows_script_path = "C:\\bootstrap.ps1"
+
+  is_linux = "${replace(var.image_name, "Linux", "") != var.image_name ? 1 : 0}"
+  linux_temp_folder_path = "/tmp"
+  linux_script_folder_name = "linux_scripts"
+  linux_script_folder_path = "${local.linux_temp_folder_path}/${local.linux_script_folder_name}"
+  linux_prepare_script_path = "${local.linux_script_folder_path}/prepare.sh"
+  linux_user_script_path = "${local.linux_script_folder_path}/user.sh"
+  linux_cleanup_script_path = "${local.linux_script_folder_path}/cleanup.sh"  
+  
+  is_windows = "${replace(var.image_name, "Windows", "") != var.image_name ? 1 : 0}"
+  windows_temp_folder_path = "C:\\"
+  windows_script_folder_name = "windows_scripts"      
+  windows_script_folder_path = "${local.windows_temp_folder_path}\\${local.windows_script_folder_name}"
+  windows_prepare_script_path = "${local.windows_script_folder_path}\\prepare.ps1"
+  windows_user_script_path = "${local.windows_script_folder_path}\\user.ps1"
+  windows_cleanup_script_path = "${local.windows_script_folder_path}\\cleanup.ps1"
+  
+  incoming_ports_list = "${split(",", var.incoming_ports)}"
 }
 
 resource "aws_security_group" "nsg" {
@@ -133,14 +146,21 @@ resource "aws_instance" "linux" {
   }
 
   provisioner "file" {
-    source      = "${var.script_file}"
-    destination = "${local.linux_script_path}"     
-  }
+    source      = "${local.linux_script_folder_name}"
+    destination = "${local.linux_temp_folder_path}"  
+  } 
 
+  provisioner "file" {
+    source      = "${var.script_file}"
+    destination = "${local.linux_user_script_path}"  
+  }
+  
   provisioner "remote-exec" {
     inline = [
-      "bash ${local.linux_script_path}",
-      "rm ${local.linux_script_path}"
+      "bash '${local.linux_prepare_script_path}'",
+      "bash '${local.linux_user_script_path}'",
+      "bash '${local.linux_cleanup_script_path}'",
+      "rm -rf ${local.linux_script_folder_path}"
     ]
   }
 }
@@ -175,16 +195,23 @@ resource "aws_instance" "windows" {
   }
 
   provisioner "file" {
-    source = "${var.script_file}"
-    destination = "${local.windows_script_path}" 
-  }  
+    source      = "${local.windows_script_folder_name}"
+    destination = "${local.windows_script_folder_path}"  
+  }
 
+  provisioner "file" {
+    source = "${var.script_file}"
+    destination = "${local.windows_user_script_path}" 
+  } 
+  
   provisioner "remote-exec" {
     inline = [
-      "Powershell.exe -ExecutionPolicy Unrestricted -File ${local.windows_script_path}",
-      "del ${local.windows_script_path}"      
+      "Powershell.exe -ExecutionPolicy Unrestricted -File ${local.windows_prepare_script_path}",      
+      "Powershell.exe -ExecutionPolicy Unrestricted -File ${local.windows_user_script_path}",
+      "Powershell.exe -ExecutionPolicy Unrestricted -File ${local.windows_cleanup_script_path}",
+      "Powershell.exe -ExecutionPolicy Unrestricted -Command Remove-Item ${local.windows_script_folder_path} -Force -Recurse"      
     ]
-  }
+  }  
   
   user_data = <<EOF
 <script>

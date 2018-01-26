@@ -17,17 +17,31 @@ locals {
     "Windows Server 2016" = "MicrosoftWindowsServer:WindowsServer:2016-Datacenter:latest"
   }
 
-  is_linux = "${replace(var.image_name, "Linux", "") != var.image_name ? 1 : 0}"
-  is_windows = "${replace(var.image_name, "Windows", "") != var.image_name ? 1 : 0}"
-  incoming_ports_list = "${split(",", var.incoming_ports)}"
   image_publisher = "${element(split(":", lookup(local.image_names_map, var.image_name)), 0)}"
   image_offer = "${element(split(":", lookup(local.image_names_map, var.image_name)), 1)}"
   image_sku = "${element(split(":", lookup(local.image_names_map, var.image_name)), 2)}"
   image_version = "${element(split(":", lookup(local.image_names_map, var.image_name)), 3)}"
-  linux_script_path = "/tmp/bootstrap.sh"
-  windows_script_path = "C:\\bootstrap.ps1"  
+  
+  is_linux = "${replace(var.image_name, "Linux", "") != var.image_name ? 1 : 0}"
+  linux_temp_folder_path = "/tmp"
+  linux_script_folder_name = "linux_scripts"
+  linux_script_folder_path = "${local.linux_temp_folder_path}/${local.linux_script_folder_name}"
+  linux_prepare_script_path = "${local.linux_script_folder_path}/prepare.sh"
+  linux_user_script_path = "${local.linux_script_folder_path}/user.sh"
+  linux_cleanup_script_path = "${local.linux_script_folder_path}/cleanup.sh"  
+  
+  is_windows = "${replace(var.image_name, "Windows", "") != var.image_name ? 1 : 0}"
+  windows_temp_folder_path = "C:\\"
+  windows_script_folder_name = "windows_scripts"      
+  windows_script_folder_path = "${local.windows_temp_folder_path}\\${local.windows_script_folder_name}"
+  windows_prepare_script_path = "${local.windows_script_folder_path}\\prepare.ps1"
+  windows_user_script_path = "${local.windows_script_folder_path}\\user.ps1"
+  windows_cleanup_script_path = "${local.windows_script_folder_path}\\cleanup.ps1"
+  
   allow_win_rm_file = "allow-winrm.cmd"
   allow_win_rm_url = "https://raw.githubusercontent.com/chrisipa/cloud-portal/master/public/bootstrap/${local.allow_win_rm_file}"
+
+  incoming_ports_list = "${split(",", var.incoming_ports)}"
 }
 
 resource "azurerm_resource_group" "rg" {
@@ -232,16 +246,23 @@ resource "azurerm_virtual_machine" "linux" {
   }
 
   provisioner "file" {
-    source = "${var.script_file}"
-    destination = "${local.linux_script_path}"         
-  }
+    source      = "${local.linux_script_folder_name}"
+    destination = "${local.linux_temp_folder_path}"  
+  } 
 
+  provisioner "file" {
+    source      = "${var.script_file}"
+    destination = "${local.linux_user_script_path}"  
+  }
+  
   provisioner "remote-exec" {
     inline = [
-      "bash ${local.linux_script_path}",
-      "rm ${local.linux_script_path}"
+      "bash '${local.linux_prepare_script_path}'",
+      "bash '${local.linux_user_script_path}'",
+      "bash '${local.linux_cleanup_script_path}'",
+      "rm -rf ${local.linux_script_folder_path}"
     ]
-  }
+  }  
   
   tags {
     Name = "${var.title}"
@@ -329,16 +350,23 @@ resource "null_resource" "windowsprovisioning" {
   }
 
   provisioner "file" {
-    source = "${var.script_file}"
-    destination = "${local.windows_script_path}" 
-  }  
+    source      = "${local.windows_script_folder_name}"
+    destination = "${local.windows_script_folder_path}"  
+  }
 
+  provisioner "file" {
+    source = "${var.script_file}"
+    destination = "${local.windows_user_script_path}" 
+  } 
+  
   provisioner "remote-exec" {
     inline = [
-      "Powershell.exe -ExecutionPolicy Unrestricted -File ${local.windows_script_path}",
-      "del ${local.windows_script_path}"      
+      "Powershell.exe -ExecutionPolicy Unrestricted -File ${local.windows_prepare_script_path}",      
+      "Powershell.exe -ExecutionPolicy Unrestricted -File ${local.windows_user_script_path}",
+      "Powershell.exe -ExecutionPolicy Unrestricted -File ${local.windows_cleanup_script_path}",
+      "Powershell.exe -ExecutionPolicy Unrestricted -Command Remove-Item ${local.windows_script_folder_path} -Force -Recurse"      
     ]
-  }
+  }  
   
   depends_on = ["azurerm_virtual_machine_extension.windowsvmext"]
 }

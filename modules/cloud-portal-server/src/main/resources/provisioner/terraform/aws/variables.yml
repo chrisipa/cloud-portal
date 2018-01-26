@@ -46,6 +46,14 @@ variableGroups:
       required: true
       defaults: []  
       
+    - title: Expiration Days
+      name: expiration_days
+      description: Days till virtual machine will be removed automatically.
+      type: string   
+      required: true
+      defaults: [ -1 ]
+      pattern: "[0-9]*|-1"      
+      
   - title: Location
     variables:    
     
@@ -79,14 +87,6 @@ variableGroups:
       index: 0  
       pattern: "Ubuntu Server Linux 16.04|Windows Server 2016"
     
-    - title: Expiration Days
-      name: expiration_days
-      description: Days till virtual machine will be removed automatically.
-      type: string   
-      required: true
-      defaults: [ -1 ]
-      pattern: "[0-9]*|-1"
-    
     - title: Size
       name: vm_size
       description: Size of the virtual machine to create.
@@ -104,7 +104,7 @@ variableGroups:
       description: Size of the virtual machine storage in GB.
       type: string   
       required: true
-      defaults: [ 30 ] 
+      defaults: [ 50 ] 
       pattern: "[0-9]*" 
       
     - title: Type
