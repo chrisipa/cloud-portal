@@ -4,7 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Field;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -20,6 +22,7 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -55,7 +58,11 @@ public class VirtualMachineController extends ApplicationController {
 	private static final String VAR_NAME_PUBLIC_KEY_FILE = "public_key_file";
 	private static final String VAR_NAME_RANDOM_ID = "random_id";
 	private static final String VAR_NAME_PART_KEY = "key";
+	private static final String VAR_NAME_CREATION_DATE = "creation_date";
 	private static final String EMPTY_SCRIPT_NAME = "empty";
+	
+	@Value("${application.date.format}")
+	private SimpleDateFormat dateFormat;
 
 	@Autowired
 	private CredentialsService credentialsService;
@@ -132,6 +139,9 @@ public class VirtualMachineController extends ApplicationController {
 			
 			// get variables
 			List<Variable> variables = terraformService.getVisibleVariables(provider);
+			
+			// extend variables map with creation date
+			extendWithCreationDate(variableMap);
 			
 			// extend variables map with random id
 			extendWithRandomId(variableMap);
@@ -271,6 +281,10 @@ public class VirtualMachineController extends ApplicationController {
 			}
 		}
 	}	
+	
+	private void extendWithCreationDate(Map<String, Object> variableMap) {
+		variableMap.put(VAR_NAME_CREATION_DATE, dateFormat.format(new Date()));
+	}
 	
 	private void extendWithRandomId(Map<String, Object> variableMap) {
 		variableMap.put(VAR_NAME_RANDOM_ID, RandomStringUtils.randomAlphanumeric(12).toLowerCase());

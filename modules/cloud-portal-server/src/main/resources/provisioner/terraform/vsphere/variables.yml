@@ -1,12 +1,19 @@
 variableGroups:
 
-  - title: ID
+  - title: System Generated
     hidden: true
     variables:
     
       - title: Random ID
         name: random_id
         description: A generated random ID.
+        type: string
+        required: true
+        defaults: []  
+    
+      - title: Creation Date
+        name: creation_date
+        description: Current timestamp as date format
         type: string
         required: true
         defaults: []  
