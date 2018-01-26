@@ -28,6 +28,7 @@ locals {
   linux_prepare_script_path = "${local.linux_script_folder_path}/prepare.sh"
   linux_user_script_path = "${local.linux_script_folder_path}/user.sh"
   linux_cleanup_script_path = "${local.linux_script_folder_path}/cleanup.sh"  
+  linux_default_username = "ubuntu"
   
   is_windows = "${replace(var.image_name, "Windows", "") != var.image_name ? 1 : 0}"
   windows_temp_folder_path = "C:\\"
@@ -36,6 +37,7 @@ locals {
   windows_prepare_script_path = "${local.windows_script_folder_path}\\prepare.ps1"
   windows_user_script_path = "${local.windows_script_folder_path}\\user.ps1"
   windows_cleanup_script_path = "${local.windows_script_folder_path}\\cleanup.ps1"
+  windows_default_username = "Administrator"
   
   incoming_ports_list = "${split(",", var.incoming_ports)}"
 }
@@ -140,7 +142,7 @@ resource "aws_instance" "linux" {
     type = "ssh"
     agent = false  
     host = "${aws_instance.linux.public_dns}"
-    user = "ubuntu"      
+    user = "${local.linux_default_username}"      
     private_key = "${file("${var.private_key_file}")}"
     timeout = "1m"      
   }
@@ -189,7 +191,7 @@ resource "aws_instance" "windows" {
   connection {
     type = "winrm"
     host = "${aws_instance.windows.public_dns}"
-    user = "Administrator"
+    user = "${local.windows_default_username}"
     password = "${var.password}"          
     timeout = "10m"      
   }
@@ -220,7 +222,7 @@ resource "aws_instance" "windows" {
 <powershell>
   netsh advfirewall firewall add rule name="WinRM in" protocol=TCP dir=in profile=any localport=5985 remoteip=any localip=any action=allow
   # Set Administrator password
-  $admin = [adsi]("WinNT://./administrator, user")
+  $admin = [adsi]("WinNT://./${local.windows_default_username}, user")
   $admin.psbase.invoke("SetPassword", "${var.password}")
 </powershell>
 EOF

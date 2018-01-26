@@ -7,5 +7,5 @@ output "host" {
 }
 
 output "username" {
-  value = "${local.is_linux ? "ubuntu" : "Administrator"}"
+  value = "${local.is_linux ? local.linux_default_username : local.windows_default_username}"
 }
