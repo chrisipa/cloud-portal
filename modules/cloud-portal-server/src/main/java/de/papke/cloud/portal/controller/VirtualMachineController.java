@@ -59,6 +59,8 @@ public class VirtualMachineController extends ApplicationController {
 	private static final String VAR_NAME_RANDOM_ID = "random_id";
 	private static final String VAR_NAME_PART_KEY = "key";
 	private static final String VAR_NAME_CREATION_DATE = "creation_date";
+	private static final String VAR_NAME_OWNER = "owner";
+	private static final String VAR_NAME_GROUP = "group";
 	private static final String EMPTY_SCRIPT_NAME = "empty";
 	
 	@Value("${application.date.format}")
@@ -140,15 +142,6 @@ public class VirtualMachineController extends ApplicationController {
 			// get variables
 			List<Variable> variables = terraformService.getVisibleVariables(provider);
 			
-			// extend variables map with creation date
-			extendWithCreationDate(variableMap);
-			
-			// extend variables map with random id
-			extendWithRandomId(variableMap);
-			
-			// extend variables map with default values
-			File privateKeyFile = extendWithDefaultValues(variables, variableMap, tempFileList);
-			
 			// validate parameters
 			List<Variable> errorList = validateValues(variables, variableMap);
 			if (errorList.isEmpty()) {
@@ -156,6 +149,18 @@ public class VirtualMachineController extends ApplicationController {
 				// get credentials
 				Credentials credentials = credentialsService.getCredentials(provider);
 				if (credentials != null) {
+					
+					// extend with mail and group
+					extendWithUserData(credentials, variableMap);
+					
+					// extend variables map with creation date
+					extendWithCreationDate(variableMap);
+					
+					// extend variables map with random id
+					extendWithRandomId(variableMap);
+					
+					// extend variables map with default values
+					File privateKeyFile = extendWithDefaultValues(variables, variableMap, tempFileList);
 	
 					// get response output stream
 					OutputStream outputStream = response.getOutputStream();
@@ -280,6 +285,11 @@ public class VirtualMachineController extends ApplicationController {
 				variableMap.put(fileMapEntry.getKey(), file.getAbsolutePath());
 			}
 		}
+	}	
+	
+	private void extendWithUserData(Credentials credentials, Map<String, Object> variableMap) {
+		variableMap.put(VAR_NAME_OWNER, sessionUserService.getUser().getEmail());
+		variableMap.put(VAR_NAME_GROUP, credentials.getGroup());
 	}	
 	
 	private void extendWithCreationDate(Map<String, Object> variableMap) {

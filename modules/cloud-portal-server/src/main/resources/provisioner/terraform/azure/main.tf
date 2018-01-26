@@ -51,6 +51,9 @@ resource "azurerm_resource_group" "rg" {
   tags {
     Name = "${var.title}"
     Description = "${var.description}"
+    CreationDate = "${var.creation_date}"
+    OwnedBy = "${var.owner}"
+    OwnerGroup = "${var.group}"
   }
 }
 
@@ -63,6 +66,9 @@ resource "azurerm_virtual_network" "vnet" {
   tags {
     Name = "${var.title}"
     Description = "${var.description}"
+    CreationDate = "${var.creation_date}"
+    OwnedBy = "${var.owner}"
+    OwnerGroup = "${var.group}"
   }
 }
 
@@ -81,6 +87,9 @@ resource "azurerm_network_security_group" "nsg" {
   tags {
     Name = "${var.title}"
     Description = "${var.description}"
+    CreationDate = "${var.creation_date}"
+    OwnedBy = "${var.owner}"
+    OwnerGroup = "${var.group}"
   }
 }
 
@@ -160,6 +169,9 @@ resource "azurerm_network_interface" "nic" {
   tags {
     Name = "${var.title}"
     Description = "${var.description}"
+    CreationDate = "${var.creation_date}"
+    OwnedBy = "${var.owner}"
+    OwnerGroup = "${var.group}"
   }
 
   depends_on = ["azurerm_network_security_group.nsg"]
@@ -175,6 +187,9 @@ resource "azurerm_public_ip" "pip" {
   tags {
     Name = "${var.title}"
     Description = "${var.description}"
+    CreationDate = "${var.creation_date}"
+    OwnedBy = "${var.owner}"
+    OwnerGroup = "${var.group}"
   }
 }
 
@@ -188,6 +203,9 @@ resource "azurerm_storage_account" "stor" {
   tags {
     Name = "${var.title}"
     Description = "${var.description}"
+    CreationDate = "${var.creation_date}"
+    OwnedBy = "${var.owner}"
+    OwnerGroup = "${var.group}"
   }
 }
 
@@ -267,6 +285,9 @@ resource "azurerm_virtual_machine" "linux" {
   tags {
     Name = "${var.title}"
     Description = "${var.description}"
+    CreationDate = "${var.creation_date}"
+    OwnedBy = "${var.owner}"
+    OwnerGroup = "${var.group}"
   }
 
   depends_on = ["azurerm_storage_account.stor"]
@@ -309,6 +330,9 @@ resource "azurerm_virtual_machine" "windows" {
   tags {
     Name = "${var.title}"
     Description = "${var.description}"
+    CreationDate = "${var.creation_date}"
+    OwnedBy = "${var.owner}"
+    OwnerGroup = "${var.group}"
   }  
 
   depends_on = ["azurerm_storage_account.stor"]

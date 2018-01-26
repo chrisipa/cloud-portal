@@ -48,6 +48,9 @@ resource "aws_security_group" "nsg" {
   tags {
     Name = "${var.title}"
     Description = "${var.description}"
+    CreationDate = "${var.creation_date}"
+    OwnedBy = "${var.owner}"
+    OwnerGroup = "${var.group}"
   }  
 }
 
@@ -136,6 +139,9 @@ resource "aws_instance" "linux" {
   tags {
     Name = "${var.title}"
     Description = "${var.description}"
+    CreationDate = "${var.creation_date}"
+    OwnedBy = "${var.owner}"
+    OwnerGroup = "${var.group}"
   }
   
   connection {
@@ -186,6 +192,9 @@ resource "aws_instance" "windows" {
   tags {
     Name = "${var.title}"
     Description = "${var.description}"
+    CreationDate = "${var.creation_date}"
+    OwnedBy = "${var.owner}"
+    OwnerGroup = "${var.group}"
   }
   
   connection {

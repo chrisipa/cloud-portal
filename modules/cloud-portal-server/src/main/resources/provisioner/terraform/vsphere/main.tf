@@ -64,6 +64,14 @@ data "vsphere_custom_attribute" "creation_date" {
   name = "CreationDate"
 }
 
+data "vsphere_custom_attribute" "owned_by" {
+  name = "OwnedBy"
+}
+
+data "vsphere_custom_attribute" "owner_group" {
+  name = "OwnerGroup"
+}
+
 resource "vsphere_virtual_machine" "linux" {
 
   count = "${local.is_linux}"
@@ -113,7 +121,9 @@ resource "vsphere_virtual_machine" "linux" {
   custom_attributes = "${map(
     data.vsphere_custom_attribute.title.id, "${var.title}",
     data.vsphere_custom_attribute.description.id, "${var.description}",
-    data.vsphere_custom_attribute.creation_date.id, "${var.creation_date}"
+    data.vsphere_custom_attribute.creation_date.id, "${var.creation_date}",
+    data.vsphere_custom_attribute.owned_by.id, "${var.owner}",
+    data.vsphere_custom_attribute.owner_group.id, "${var.group}"
   )}"
 }
 
@@ -197,7 +207,9 @@ resource "vsphere_virtual_machine" "windows" {
   custom_attributes = "${map(
     data.vsphere_custom_attribute.title.id, "${var.title}",
     data.vsphere_custom_attribute.description.id, "${var.description}",
-    data.vsphere_custom_attribute.creation_date.id, "${var.creation_date}"
+    data.vsphere_custom_attribute.creation_date.id, "${var.creation_date}",
+    data.vsphere_custom_attribute.owned_by.id, "${var.owner}",
+    data.vsphere_custom_attribute.owner_group.id, "${var.group}"
   )}"
 }
 

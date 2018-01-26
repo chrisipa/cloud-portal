@@ -1,6 +1,6 @@
 variableGroups: 
 
-  - title: ID
+  - title: System Generated
     hidden: true
     variables:
     
@@ -10,6 +10,27 @@ variableGroups:
         type: string
         required: true
         defaults: []
+        
+      - title: Creation Date
+        name: creation_date
+        description: Current timestamp as date format
+        type: string
+        required: true
+        defaults: []  
+    
+      - title: Owner
+        name: owner
+        description: Owner of the vm
+        type: string
+        required: true
+        defaults: []  
+        
+      - title: Group
+        name: group
+        description: Group of the vm
+        type: string
+        required: true
+        defaults: []        
   
   - title: Credentials
     hidden: true
