@@ -1,0 +1,6 @@
+- hosts: all
+  become: true
+  roles:
+  - basic
+  - docker
+  - docker-compose

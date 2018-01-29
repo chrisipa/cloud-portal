@@ -1,0 +1,11 @@
+- name: "Download docker-compose and make executable"
+  get_url:
+    url: https://github.com/docker/compose/releases/download/1.18.0/docker-compose-Linux-x86_64
+    dest: /usr/local/bin/docker-compose
+    mode: 0755
+
+- name: "Download docker-compose-wrapper and make executable"
+  get_url:
+    url: https://raw.githubusercontent.com/chrisipa/docker-compose-wrapper/master/docker-compose-wrapper
+    dest: /usr/local/bin/docker-compose-wrapper
+    mode: 0755

@@ -1,0 +1,54 @@
+- name: "Copy alias definition to profile.d folder"
+  copy:
+    src: ../files/alias.sh
+    dest: /etc/profile.d/alias.sh
+    owner: root
+    group: root
+    mode: 0755
+
+- name: "Copy path definition to profile.d folder"
+  copy:
+    src: ../files/path.sh
+    dest: /etc/profile.d/path.sh
+    owner: root
+    group: root
+    mode: 0755 
+
+- name: "Copy prompt definition to profile.d folder"
+  copy:
+    src: ../files/prompt.sh
+    dest: /etc/profile.d/prompt.sh
+    owner: root
+    group: root
+    mode: 0755    
+
+- name: "Enable history search"    
+  lineinfile: 
+    dest: /etc/inputrc
+    line: '{{ item }}'
+  with_items:
+    - '"\e[5~": history-search-backward'
+    - '"\e[6~": history-search-forward'
+
+- name: "Install ntpdate package"
+  apt: pkg=ntpdate state=installed    
+
+- name: Setup cron job for time synchronization
+  cron:
+    name: "Time sync"
+    minute: 0
+    hour: 0
+    user: root
+    job: "ntpdate -u '{{ time_server }}'"
+
+- name: "Change kernel limits"
+  copy:
+    src: ../files/99-limits.conf
+    dest: /etc/security/limits.d/99-limits.conf
+    owner: root
+    group: root
+    mode: 0644  
+
+- name: "Set hostname"    
+  hostname:
+    name: "{{ inventory_hostname }}"
