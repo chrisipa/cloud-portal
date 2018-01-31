@@ -1,0 +1,96 @@
+- name: Create cloud portal root folder
+  file:
+    path: "{{ application_folder }}"
+    state: directory
+    owner: "{{ ansible_env.SUDO_USER }}"
+    group: "{{ ansible_env.SUDO_USER }}"
+    mode: 0755
+    
+- name: Create cloud portal compose folder
+  file:
+    path: "{{ application_folder }}/compose"
+    state: directory
+    owner: "{{ ansible_env.SUDO_USER }}"
+    group: "{{ ansible_env.SUDO_USER }}"
+    mode: 0755
+
+- name: Create docker-compose.yml file
+  template:
+    src: ../templates/docker-compose.yml
+    dest: "{{ application_folder }}/compose/docker-compose.yml"
+    owner: "{{ ansible_env.SUDO_USER }}"
+    group: "{{ ansible_env.SUDO_USER }}"
+    mode: 0644
+    
+- name: Create cloud portal ssl folder
+  file:
+    path: "{{ application_folder }}/ssl"
+    state: directory
+    owner: "{{ ansible_env.SUDO_USER }}"
+    group: "{{ ansible_env.SUDO_USER }}"
+    mode: 0755
+        
+- name: Create cloud portal certificate folder
+  file:
+    path: "{{ application_folder }}/ssl/{{ inventory_hostname }}"
+    state: directory
+    owner: "{{ ansible_env.SUDO_USER }}"
+    group: "{{ ansible_env.SUDO_USER }}"
+    mode: 0755    
+    
+- name: "Copy ca cert file to certificate folder"
+  copy:
+    src: "{{ ssl_ca_file_path }}"
+    dest: "{{ application_folder }}/ssl/{{ inventory_hostname }}/ca.crt"
+    owner: "{{ ansible_env.SUDO_USER }}"
+    group: "{{ ansible_env.SUDO_USER }}"
+    mode: 0644
+    
+- name: "Copy server cert file to certificate folder"
+  copy:
+    src: "{{ ssl_cert_file_path }}"
+    dest: "{{ application_folder }}/ssl/{{ inventory_hostname }}/server.crt"
+    owner: "{{ ansible_env.SUDO_USER }}"
+    group: "{{ ansible_env.SUDO_USER }}"
+    mode: 0644
+    
+- name: "Copy server key file to certificate folder"
+  copy:
+    src: "{{ ssl_key_file_path }}"
+    dest: "{{ application_folder }}/ssl/{{ inventory_hostname }}/server.key"
+    owner: "{{ ansible_env.SUDO_USER }}"
+    group: "{{ ansible_env.SUDO_USER }}"
+    mode: 0644         
+    
+- name: Create cloud portal apache folder
+  file:
+    path: "{{ application_folder }}/apache"
+    state: directory
+    owner: "{{ ansible_env.SUDO_USER }}"
+    group: "{{ ansible_env.SUDO_USER }}"
+    mode: 0755    
+    
+- name: "Copy vhosts.conf to apache folder"
+  copy:
+    src: ../files/vhosts.conf
+    dest: "{{ application_folder }}/apache/vhosts.conf"
+    owner: "{{ ansible_env.SUDO_USER }}"
+    group: "{{ ansible_env.SUDO_USER }}"
+    mode: 0644    
+    
+- name: Copy cloud-portal init script to /etc/init.d 
+  template:
+    src: ../templates/cloud-portal
+    dest: "/etc/init.d/cloud-portal"
+    owner: "root"
+    group: "root"
+    mode: 0755
+    
+- name: Update cloud-portal containers 
+  shell: /etc/init.d/cloud-portal update
+    
+- name: Register init script as service
+  service:
+    name: cloud-portal
+    state: started    
+    enabled: yes

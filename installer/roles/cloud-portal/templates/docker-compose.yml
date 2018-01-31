@@ -1,0 +1,50 @@
+mongodb:
+  image: 'mongo:3.4.10'
+  volumes:
+    - '{{ timestamp_file }}:{{ timestamp_file }}:ro'
+    - '{{ timezone_file }}:{{ timezone_file }}:ro'
+    - '{{ application_folder }}/backup:/backup'
+    - '{{ application_folder }}/data:/data/db'
+
+tomcat:
+  image: 'chrisipa/cloud-portal:latest'
+  links:
+    - 'mongodb'
+  volumes:
+    - '{{ timestamp_file }}:{{ timestamp_file }}:ro'
+    - '{{ timezone_file }}:{{ timezone_file }}:ro'
+    - '{{ application_folder }}/logs:/opt/tomcat/logs'
+  environment:
+    - 'application.title={{ application_title }}'
+    - 'application.admin.group={{ application_admin_group }}'
+    - 'encryptor.secret={{ encryptor_secret }}'
+    - 'ldap.base.dn=DC={{ ldap_base_dn }}'
+    - 'ldap.group.attribute={{ ldap_group_attribute }}'
+    - 'ldap.login.attribute={{ ldap_login_attribute }}'
+    - 'ldap.password={{ ldap_password }}'
+    - 'ldap.principal={{ ldap_principal }}'
+    - 'ldap.url.string={{ ldap_url_string }}'
+    - 'ldap.user.search.filter={{ ldap_user_search_filter }}'
+    - 'mail.from={{ mail_from }}'
+    - 'mail.host={{ mail_host }}'
+    - 'mail.send={{ mail_send }}'
+    - 'spring.data.mongodb.uri={{ spring_data_mongodb_uri }}'
+
+apache:
+  image: 'chrisipa/apache:latest'
+  links:
+    - 'tomcat'
+  volumes:
+    - '{{ timestamp_file }}:{{ timestamp_file }}:ro'
+    - '{{ timezone_file }}:{{ timezone_file }}:ro'
+    - '{{ application_folder }}/apache/vhosts.conf:/etc/apache2/conf-enabled/vhosts.conf:ro'
+    - '{{ application_folder }}/ssl/{{ inventory_hostname }}:/opt/ssl/apache2'
+    - '{{ application_folder }}/logs:/var/log/apache2'
+  ports:
+    - '{{ apache_http_port }}:{{ apache_http_port }}'
+    - '{{ apache_https_port }}:{{ apache_https_port }}'
+  environment:
+    - 'AJP_HOST=tomcat'
+    - 'AJP_PORT={{ tomcat_ajp_port }}'
+    - 'SERVER_NAME={{ inventory_hostname }}'
+    - 'SERVER_ALIAS={{ inventory_hostname }}'

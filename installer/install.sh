@@ -1,8 +1,68 @@
 #!/bin/bash
 
-# read ssh user
-read -p "SSH Host: " hostname
-read -p "SSH User: " user
-read -p "Time Server: " timeServer
+# ---------------------------------------------------------------
+# Function for printing the usage of this script
+# ---------------------------------------------------------------
+function usage() {
 
-ansible-playbook -e "ansible_python_interpreter=/usr/bin/python3" -K -u "$user" -i "$hostname," --extra-vars "time_server=$timeServer" playbook.yml
+    # print help text
+    cat <<USAGE
+
+Usage:
+  $0 [Options] <Args>
+
+Options:
+  -u <username>         SSH username
+  -h <hostname>         SSH hostname
+  -v <variable file>    Variable file path
+  -a <ssl ca file>      SSL ca file path
+  -c <ssl cert file>    SSL cert file path
+  -k <ssl key file>     SSL key file path
+
+Example:
+  $0 -u my-username -h my.server.host -v vars.json -a ca.crt -c server.crt -k server.key 
+
+USAGE
+
+    # exit with error
+    exit -1
+}
+
+# get command line args
+while getopts u:h:v:a:c:k: opt
+do
+    case $opt in
+        u)
+            username="$OPTARG"
+        ;;
+        h)
+            hostname="$OPTARG"
+        ;;
+        v)
+            variableFilePath="$OPTARG"
+        ;;   
+        a)
+            sslCaFilePath="$OPTARG"
+        ;;   
+        c)
+            sslCertFilePath="$OPTARG"
+        ;;   
+        k)
+            sslKeyFilePath="$OPTARG"
+        ;;   
+        \?)
+            log "ERROR" "Invalid option: -$OPTARG"
+            exit -1
+        ;;
+    esac
+done
+
+# check command line args
+if ([ "$username" == "" ] || [ "$hostname" == "" ] || [ "$variableFilePath" == "" ] || [ "$sslCaFilePath" == "" ] || [ "$sslCertFilePath" == "" ] || [ "$sslKeyFilePath" == "" ])
+then 
+    # print usage
+    usage
+fi
+
+# execute ansible playbook
+ansible-playbook -e "ansible_python_interpreter=/usr/bin/python3" -K -u "$username" -i "$hostname," --extra-vars "@$variableFilePath" --extra-vars "ssl_ca_file_path=$sslCaFilePath" --extra-vars "ssl_cert_file_path=$sslCertFilePath" --extra-vars "ssl_key_file_path=$sslKeyFilePath" playbook.yml 
