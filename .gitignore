@@ -42,3 +42,5 @@ node
 *.css.map
 # Blobstore of local content-servers
 **/*/*-server-webapp/blobstore
+# Ansible
+*.retry
