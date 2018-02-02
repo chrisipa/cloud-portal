@@ -54,6 +54,7 @@ resource "azurerm_resource_group" "rg" {
     CreationDate = "${var.creation_date}"
     OwnedBy = "${var.owner}"
     OwnerGroup = "${var.group}"
+    ProvisioningSystem = "${var.application_url}"
   }
 }
 
@@ -69,6 +70,7 @@ resource "azurerm_virtual_network" "vnet" {
     CreationDate = "${var.creation_date}"
     OwnedBy = "${var.owner}"
     OwnerGroup = "${var.group}"
+    ProvisioningSystem = "${var.application_url}"
   }
 }
 
@@ -90,6 +92,7 @@ resource "azurerm_network_security_group" "nsg" {
     CreationDate = "${var.creation_date}"
     OwnedBy = "${var.owner}"
     OwnerGroup = "${var.group}"
+    ProvisioningSystem = "${var.application_url}"
   }
 }
 
@@ -172,6 +175,7 @@ resource "azurerm_network_interface" "nic" {
     CreationDate = "${var.creation_date}"
     OwnedBy = "${var.owner}"
     OwnerGroup = "${var.group}"
+    ProvisioningSystem = "${var.application_url}"
   }
 
   depends_on = ["azurerm_network_security_group.nsg"]
@@ -190,6 +194,7 @@ resource "azurerm_public_ip" "pip" {
     CreationDate = "${var.creation_date}"
     OwnedBy = "${var.owner}"
     OwnerGroup = "${var.group}"
+    ProvisioningSystem = "${var.application_url}"
   }
 }
 
@@ -206,6 +211,7 @@ resource "azurerm_storage_account" "stor" {
     CreationDate = "${var.creation_date}"
     OwnedBy = "${var.owner}"
     OwnerGroup = "${var.group}"
+    ProvisioningSystem = "${var.application_url}"
   }
 }
 
@@ -288,6 +294,7 @@ resource "azurerm_virtual_machine" "linux" {
     CreationDate = "${var.creation_date}"
     OwnedBy = "${var.owner}"
     OwnerGroup = "${var.group}"
+    ProvisioningSystem = "${var.application_url}"
   }
 
   depends_on = ["azurerm_storage_account.stor"]
@@ -333,6 +340,7 @@ resource "azurerm_virtual_machine" "windows" {
     CreationDate = "${var.creation_date}"
     OwnedBy = "${var.owner}"
     OwnerGroup = "${var.group}"
+    ProvisioningSystem = "${var.application_url}"
   }  
 
   depends_on = ["azurerm_storage_account.stor"]

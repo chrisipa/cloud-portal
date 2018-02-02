@@ -51,6 +51,7 @@ resource "aws_security_group" "nsg" {
     CreationDate = "${var.creation_date}"
     OwnedBy = "${var.owner}"
     OwnerGroup = "${var.group}"
+    ProvisioningSystem = "${var.application_url}"
   }  
 }
 
@@ -142,6 +143,7 @@ resource "aws_instance" "linux" {
     CreationDate = "${var.creation_date}"
     OwnedBy = "${var.owner}"
     OwnerGroup = "${var.group}"
+    ProvisioningSystem = "${var.application_url}"
   }
   
   connection {
@@ -195,6 +197,7 @@ resource "aws_instance" "windows" {
     CreationDate = "${var.creation_date}"
     OwnedBy = "${var.owner}"
     OwnerGroup = "${var.group}"
+    ProvisioningSystem = "${var.application_url}"
   }
   
   connection {

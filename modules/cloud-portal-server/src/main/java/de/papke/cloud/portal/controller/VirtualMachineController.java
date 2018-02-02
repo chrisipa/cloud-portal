@@ -61,10 +61,14 @@ public class VirtualMachineController extends ApplicationController {
 	private static final String VAR_NAME_CREATION_DATE = "creation_date";
 	private static final String VAR_NAME_OWNER = "owner";
 	private static final String VAR_NAME_GROUP = "group";
+	private static final String VAR_NAME_APPLICATION_URL = "application_url";
 	private static final String EMPTY_SCRIPT_NAME = "empty";
 	
 	@Value("${application.date.format}")
 	private SimpleDateFormat dateFormat;
+	
+	@Value("${application.url}")
+	private String applicationUrl;
 
 	@Autowired
 	private CredentialsService credentialsService;
@@ -150,14 +154,11 @@ public class VirtualMachineController extends ApplicationController {
 				Credentials credentials = credentialsService.getCredentials(provider);
 				if (credentials != null) {
 					
-					// extend with mail and group
+					// extend with sytem generated data
 					extendWithUserData(credentials, variableMap);
-					
-					// extend variables map with creation date
 					extendWithCreationDate(variableMap);
-					
-					// extend variables map with random id
 					extendWithRandomId(variableMap);
+					extendWithApplicationUrl(variableMap);
 					
 					// extend variables map with default values
 					File privateKeyFile = extendWithDefaultValues(variables, variableMap, tempFileList);
@@ -298,6 +299,10 @@ public class VirtualMachineController extends ApplicationController {
 	
 	private void extendWithRandomId(Map<String, Object> variableMap) {
 		variableMap.put(VAR_NAME_RANDOM_ID, RandomStringUtils.randomAlphanumeric(12).toLowerCase());
+	}
+	
+	private void extendWithApplicationUrl(Map<String, Object> variableMap) {
+		variableMap.put(VAR_NAME_APPLICATION_URL, applicationUrl);
 	}	
 
 	private File extendWithDefaultValues(List<Variable> variables, Map<String, Object> variableMap, List<File> tempFileList) throws IOException {

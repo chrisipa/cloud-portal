@@ -72,6 +72,10 @@ data "vsphere_custom_attribute" "owner_group" {
   name = "OwnerGroup"
 }
 
+data "vsphere_custom_attribute" "provisioning_system" {
+  name = "ProvisioningSystem"
+}
+
 resource "vsphere_virtual_machine" "linux" {
 
   count = "${local.is_linux}"
@@ -123,7 +127,8 @@ resource "vsphere_virtual_machine" "linux" {
     data.vsphere_custom_attribute.description.id, "${var.description}",
     data.vsphere_custom_attribute.creation_date.id, "${var.creation_date}",
     data.vsphere_custom_attribute.owned_by.id, "${var.owner}",
-    data.vsphere_custom_attribute.owner_group.id, "${var.group}"
+    data.vsphere_custom_attribute.owner_group.id, "${var.group}",
+    data.vsphere_custom_attribute.provisioning_system.id, "${var.application_url}"
   )}"
 }
 
@@ -209,7 +214,8 @@ resource "vsphere_virtual_machine" "windows" {
     data.vsphere_custom_attribute.description.id, "${var.description}",
     data.vsphere_custom_attribute.creation_date.id, "${var.creation_date}",
     data.vsphere_custom_attribute.owned_by.id, "${var.owner}",
-    data.vsphere_custom_attribute.owner_group.id, "${var.group}"
+    data.vsphere_custom_attribute.owner_group.id, "${var.group}",
+    data.vsphere_custom_attribute.provisioning_system.id, "${var.application_url}"
   )}"
 }
 

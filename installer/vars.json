@@ -7,6 +7,7 @@
   "spring_data_mongodb_uri" : "mongodb://mongodb:27017/cloud-portal",
   "application_folder" : "/opt/cloud-portal",
   "application_title" : "Cloud Portal",  
+  "application_url" : "http://localhost:8080",
   "application_admin_group" : "My-Admin-Group",
   "encryptor_secret" : "pbGaynvta#ZvpF^@XzE%",
   "ldap_base_dn" : "dc=my,dc=domain",

@@ -15,6 +15,7 @@ tomcat:
     - '{{ timezone_file }}:{{ timezone_file }}:ro'
     - '{{ application_folder }}/logs:/opt/tomcat/logs'
   environment:
+    - 'application.url={{ application_url }}'
     - 'application.title={{ application_title }}'
     - 'application.admin.group={{ application_admin_group }}'
     - 'encryptor.secret={{ encryptor_secret }}'

@@ -3,6 +3,13 @@ variableGroups:
   - title: System Generated
     hidden: true
     variables:
+
+      - title: Application URL
+        name: application_url
+        description: The URL of the self service portal application
+        type: string
+        required: true
+        defaults: []
     
       - title: Random ID
         name: random_id
@@ -30,8 +37,8 @@ variableGroups:
         description: Group of the vm
         type: string
         required: true
-        defaults: []        
-  
+        defaults: []
+        
   - title: Credentials
     hidden: true
     variables:
