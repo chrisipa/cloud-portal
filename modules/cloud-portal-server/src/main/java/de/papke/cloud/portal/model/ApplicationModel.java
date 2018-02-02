@@ -11,6 +11,7 @@ public class ApplicationModel {
     private User user;
 	private List<String> cloudProviderList;
 	private Menu menu;
+	private Boolean devMode;
 
 	public String getApplicationTitle() {
 		return applicationTitle;
@@ -42,5 +43,13 @@ public class ApplicationModel {
 
 	public void setMenu(Menu menu) {
 		this.menu = menu;
+	}
+
+	public Boolean getDevMode() {
+		return devMode;
+	}
+
+	public void setDevMode(Boolean devMode) {
+		this.devMode = devMode;
 	}	
 }

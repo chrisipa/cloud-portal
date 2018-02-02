@@ -23,6 +23,9 @@ public class ApplicationController {
 	@Value("${application.title}")
 	private String applicationTitle;
 	
+	@Value("${application.dev.mode}")
+	private boolean devMode;
+	
 	@Autowired
 	private SessionUserService sessionUserService;
 
@@ -43,6 +46,9 @@ public class ApplicationController {
 		
 		// set application title
 		applicationModel.setApplicationTitle(applicationTitle);
+		
+		// set dev mode
+		applicationModel.setDevMode(devMode);
 		
 		// set username
 		applicationModel.setUser(sessionUserService.getUser());

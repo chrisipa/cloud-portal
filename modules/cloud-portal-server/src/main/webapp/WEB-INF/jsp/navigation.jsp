@@ -11,7 +11,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
         </button>
-        <a class="navbar-brand" href="<c:url value="/" />"><c:out value="${application.applicationTitle}" /></a>
+        <a class="navbar-brand" href="<c:url value="/" />"><c:out value="${application.applicationTitle}" /><c:if test="${application.devMode}"> [dev mode]</c:if></a>        
     </div>
 
     <ul class="nav navbar-top-links navbar-right">
