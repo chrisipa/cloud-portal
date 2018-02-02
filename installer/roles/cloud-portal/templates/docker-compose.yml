@@ -15,8 +15,9 @@ tomcat:
     - '{{ timezone_file }}:{{ timezone_file }}:ro'
     - '{{ application_folder }}/logs:/opt/tomcat/logs'
   environment:
-    - 'application.url={{ application_url }}'
     - 'application.title={{ application_title }}'
+    - 'application.url={{ application_url }}'
+    - 'application.dev.mode={{ application_dev_mode }}'
     - 'application.admin.group={{ application_admin_group }}'
     - 'encryptor.secret={{ encryptor_secret }}'
     - 'ldap.base.dn=DC={{ ldap_base_dn }}'

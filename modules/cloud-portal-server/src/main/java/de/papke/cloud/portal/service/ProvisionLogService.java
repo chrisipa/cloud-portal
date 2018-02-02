@@ -31,8 +31,8 @@ public class ProvisionLogService {
 	private static final String TMP_FILE_PREFIX = "provision-log";
 	private static final String TMP_FILE_SUFFIX = ".zip";
 
-	@Value("${application.debug.mode}")
-	private boolean debugMode;	
+	@Value("${application.dev.mode}")
+	private boolean devMode;	
 	
 	@Value("${application.expiration.auto.minutes}")
 	private int expirationAutoMinutes;	
@@ -120,7 +120,7 @@ public class ProvisionLogService {
 		Date expirationDate = null;
 		long now = System.currentTimeMillis();
 		
-		if (debugMode) {
+		if (devMode) {
 			expirationDate = new Date(now + (expirationAutoMinutes * DateUtils.MILLIS_PER_MINUTE));
 		}
 		else {
