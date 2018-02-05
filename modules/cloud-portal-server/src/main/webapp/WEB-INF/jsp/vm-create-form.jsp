@@ -85,7 +85,13 @@
 										</c:otherwise>
 									</c:choose>
 									<p class="help-block">
-										<c:out value="${variable.description}" />
+									   <c:if test="${not empty variable.url}">
+									       <a href="${variable.url}" target="_blank">
+									   </c:if>
+									   <c:out value="${variable.description}" />
+									   <c:if test="${not empty variable.url}">
+									       </a>
+									   </c:if>
 									</p>
 								</c:forEach>
 							</div>

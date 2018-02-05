@@ -13,10 +13,11 @@ public class Variable {
 	private String type = "";
 	private int index = 0;
 	private String pattern = "";
+	private String url = "";
 	
 	@Override
 	public String toString() {
-		return "title=" + title + ", name=" + name + ", description=" + description + ", defaults=" + defaults + ", required=" + required + ", type=" + type + ", index=" + index + ", pattern" + pattern;
+		return "title=" + title + ", name=" + name + ", description=" + description + ", defaults=" + defaults + ", required=" + required + ", type=" + type + ", index=" + index + ", pattern" + pattern + ", " + url;
 	}
 	
 	public String getTitle() {
@@ -81,5 +82,13 @@ public class Variable {
 
 	public void setPattern(String pattern) {
 		this.pattern = pattern;
+	}
+
+	public String getUrl() {
+		return url;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
 	}
 }
