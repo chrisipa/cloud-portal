@@ -277,12 +277,14 @@ public class DirectoryService {
 				user.setSurName(searchResultEntry.getAttributeValue(surNameAttribute));
 				user.setEmail(searchResultEntry.getAttributeValue(mailAttribute));
 
-				List<String> groups = new ArrayList<>();            	
-				String[] groupAttributeValues = searchResultEntry.getAttributeValues(groupAttribute);
-				for (String groupAttributeValue : groupAttributeValues) {
-					DN groupDN = new DN(groupAttributeValue);
-					String groupName = groupDN.getRDN().getAttributeValues()[0];
-					groups.add(groupName);
+				List<String> groups = new ArrayList<>();        
+				if (searchResultEntry.hasAttribute(groupAttribute)) {
+					String[] groupAttributeValues = searchResultEntry.getAttributeValues(groupAttribute);
+					for (String groupAttributeValue : groupAttributeValues) {
+						DN groupDN = new DN(groupAttributeValue);
+						String groupName = groupDN.getRDN().getAttributeValues()[0];
+						groups.add(groupName);
+					}
 				}
 				
 				user.setGroups(groups);

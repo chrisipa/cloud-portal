@@ -1,7 +1,5 @@
 package de.papke.cloud.portal.service;
 
-import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,8 +27,7 @@ public class UserService {
 
 			user = directoryService.getUser(username);
 			
-			List<String> groups = user.getGroups(); 
-			for (String group : groups) {
+			for (String group : user.getGroups()) {
 				if (group.equals(adminGroup)) {
 					user.setIsAdmin(true);
 				}
