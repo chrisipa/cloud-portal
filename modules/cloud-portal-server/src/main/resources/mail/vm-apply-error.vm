@@ -6,6 +6,8 @@
 <hr />
 <p>Random ID: <strong>${random_id}</strong></p>
 <p>Provisioning ID: <strong>${provisioning_id}</strong></p>
+<p>Title: <strong>${title}</strong></p>
+<p>Description: <strong>${description}</strong></p>
 <hr />
 <p>Best regards</p>
 <p>Your Self Service Cloud Portal</p>

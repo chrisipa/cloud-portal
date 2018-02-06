@@ -202,6 +202,9 @@ public class VirtualMachineService {
 			// get success flag
 			boolean success = commandResult.isSuccess();
 			
+			// add provisioning id
+			variableMap.put(VARIABLE_PROVISIONING_ID, provisionLog.getId());
+			
 			// send mail
 			sendMail(user, action, success, variableMap, attachment);
 		}
