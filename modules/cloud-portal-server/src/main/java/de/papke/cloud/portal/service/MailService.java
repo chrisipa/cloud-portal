@@ -1,6 +1,7 @@
 package de.papke.cloud.portal.service;
 
 import java.io.File;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -70,6 +71,9 @@ public class MailService {
 		mailSender.setProtocol(protocol);
 		mailSender.setUsername(username);
 		mailSender.setPassword(password);
+		
+		// set mail encoding
+		mailSender.setDefaultEncoding(StandardCharsets.UTF_8.name());
 
 		// create java mail properties
 		Properties mailProperties = new Properties();
