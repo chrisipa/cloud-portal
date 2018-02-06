@@ -1,5 +1,6 @@
 package de.papke.cloud.portal.service;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -40,13 +41,16 @@ public class TerraformService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(TerraformService.class);
 
-	private static final String TEXT_INTRODUCTION = "TERRAFORM IS WORKING ON YOUR ACTION. YOU WILL GET AN EMAIL WITH THE RESULTS. PLEASE BE PATIENT!!!\n";
+	private static final String TEXT_INTRODUCTION = "TERRAFORM IS WORKING ON YOUR ACTION. YOU WILL GET AN EMAIL WITH THE RESULTS. PLEASE BE PATIENT!!!\n\n";
 	private static final String FLAG_NO_COLOR = "-no-color";
 	private static final String FLAG_VAR = "-var";
 	private static final String FLAG_FORCE = "-force";
 	private static final String VARIABLE_IDENTIFIER = "variable";
 	private static final String FILE_VARIABLES_YML = "variables.yml";
 	private static final String FILE_VARIABLES_TF = "variables.tf";
+	private static final String FOLDER_INIT = "init";
+	private static final String FOLDER_VM = "vm";
+	private static final String FOLDER_PLUGINS = ".terraform";
 	private static final String PROPERTY_VARIABLES = "variables";
 	private static final String PROPERTY_VARIABLE_GROUPS = "variableGroups";
 
@@ -56,13 +60,22 @@ public class TerraformService {
 	@Autowired
 	private ResourceService resourceService;
 
+	@Autowired
+	private FileService fileService;
+
 	@Value("${terraform.path}")
 	private String terraformPath;
 
 	private Map<String, List<VariableGroup>> providerDefaults = new HashMap<>();
+	private File pluginSourceFolder;
 
 	@PostConstruct
 	public void init() {
+		downloadProviderPluginFiles();
+		retrieveProviderDefaults();
+	}
+
+	private void retrieveProviderDefaults() {
 
 		try {
 
@@ -78,7 +91,7 @@ public class TerraformService {
 
 			Yaml yaml = new Yaml(constructor);
 
-			File terraformFolder = resourceService.getClasspathResource(Constants.FOLDER_TERRAFORM);
+			File terraformFolder = resourceService.getClasspathResource(Constants.FOLDER_TERRAFORM + File.separator + FOLDER_VM);
 			if (!terraformFolder.isFile()) {
 				File[] providerFolderArray = terraformFolder.listFiles();
 				for (File providerFolder : providerFolderArray) {
@@ -97,6 +110,26 @@ public class TerraformService {
 		}
 	}
 
+	private void downloadProviderPluginFiles() {
+
+		// copy init folder to temp
+		String resourcePath = Constants.FOLDER_TERRAFORM + File.separator + FOLDER_INIT;
+		String targetPath = System.getProperty("java.io.tmpdir") + File.separator + Constants.FOLDER_TERRAFORM + File.separator + FOLDER_INIT;
+		File initFolder = fileService.copyResourceToFilesystem(resourcePath, targetPath);
+
+		// execute init command
+		CommandLine initCommand = buildInitCommand(terraformPath);
+		CommandResult commandResult = commandExecutorService.execute(initCommand, initFolder, new ByteArrayOutputStream());
+		
+		// quit program if command was not successful
+		if (!commandResult.isSuccess()) {
+			throw new IllegalStateException("System was not able to download terraform providers. Quitting ...");
+		}
+		
+		// get plugin folder path
+		pluginSourceFolder = new File(targetPath + File.separator + FOLDER_PLUGINS);
+	}
+
 	public CommandResult execute(String action, Credentials credentials, Map<String, Object> variableMap, OutputStream outputStream, File tmpFolder) {
 
 		CommandResult commandResult = null;
@@ -110,9 +143,9 @@ public class TerraformService {
 			// generate variable file
 			generateVariablesFile(credentials.getProvider(), tmpFolder);
 
-			// execute init command
-			CommandLine initCommand = buildInitCommand(terraformPath);
-			commandExecutorService.execute(initCommand, tmpFolder, outputStream);
+			// copy provider plugins to temp folder
+			File pluginTargetFolder = new File(tmpFolder.getAbsolutePath() + File.separator + FOLDER_PLUGINS);
+			fileService.copyFolder(pluginSourceFolder, pluginTargetFolder);
 
 			// get action to execute
 			if (StringUtils.isNotEmpty(action)) {
@@ -222,9 +255,9 @@ public class TerraformService {
 	}
 
 	public List<Variable> getVisibleVariables(String provider) {
-		
+
 		List<Variable> variables = new ArrayList<>();
-		
+
 		for (VariableGroup variableGroup : providerDefaults.get(provider)) {
 			if (!variableGroup.isHidden()) {
 				for (Variable variable : variableGroup.getVariables()) {
@@ -232,7 +265,7 @@ public class TerraformService {
 				}
 			}
 		}
-		
+
 		return variables;
 	}
 }

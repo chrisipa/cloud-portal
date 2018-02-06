@@ -40,7 +40,7 @@ public class VirtualMachineService {
 	private static final String PATTERN_EMPTY_LINE = "(?m)^\\s";
 	private static final String SUFFIX_ATTACHMENT = ".txt";
 	private static final String SUFFIX_ZIP = ".zip";
-	private static final String PREFIX_MAIL_TEMPLATE = "vm";
+	private static final String PREFIX_VM = "vm";
 	private static final String PREFIX_ATTACHMENT = "log";
 	private static final String PART_ERROR = "error";
 	private static final String PART_SUCCESS = "success";
@@ -99,7 +99,8 @@ public class VirtualMachineService {
 			String group = credentials.getGroup();
 			
 			// copy terraform resources to filesystem
-			tmpFolder = fileService.copyResourceToFilesystem(Constants.FOLDER_TERRAFORM + File.separator + provider);
+			String resourceFolderPath = Constants.FOLDER_TERRAFORM + File.separator + PREFIX_VM + File.separator + provider;
+			tmpFolder = fileService.copyResourceToFilesystem(resourceFolderPath);
 
 			// use terraform to provision vms
 			CommandResult commandResult = terraformService.execute(action, credentials, variableMap, outputStream, tmpFolder);
@@ -269,7 +270,7 @@ public class VirtualMachineService {
 	}
 	
 	private String getMailTemplateName(String action, boolean success) {
-		return PREFIX_MAIL_TEMPLATE + Constants.CHAR_DASH + action + Constants.CHAR_DASH + (success ? PART_SUCCESS : PART_ERROR); 
+		return PREFIX_VM + Constants.CHAR_DASH + action + Constants.CHAR_DASH + (success ? PART_SUCCESS : PART_ERROR); 
 	}
 
 	private Map<String, Object> getCommandVariableMap(CommandResult commandResult) {

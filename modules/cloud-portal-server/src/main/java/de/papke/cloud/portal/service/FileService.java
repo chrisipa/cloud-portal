@@ -19,7 +19,11 @@ public class FileService {
 	@Autowired
 	private ResourceService resourceService;
 	
-    public File copyResourceToFilesystem(String resourcePath) {
+	public File copyResourceToFilesystem(String resourcePath) {
+		return copyResourceToFilesystem(resourcePath, null);
+	}
+	
+    public File copyResourceToFilesystem(String resourcePath, String targetPath) {
 
         File tmpFile = null;
 
@@ -29,20 +33,33 @@ public class FileService {
             String resourceName = resource.getName();
             
             if (resource.isFile()) {
-            	String prefix = FilenameUtils.removeExtension(resourceName);
-            	String suffix = FilenameUtils.getExtension(resourceName);
-            	tmpFile = File.createTempFile(prefix, suffix);	
+            	
+            	if (targetPath != null) {
+            		tmpFile = new File(targetPath);
+            	}
+            	else {
+            		String prefix = FilenameUtils.removeExtension(resourceName);
+            		String suffix = FilenameUtils.getExtension(resourceName);
+            		tmpFile = File.createTempFile(prefix, suffix);	
+            	}
+            	
             	FileUtils.copyFile(resource, tmpFile);
             }
             else {
-            	String prefix = resourceName;
-            	Path tmpPath = Files.createTempDirectory(prefix);
-            	tmpFile = new File(tmpPath.toUri());
+            	if (targetPath != null) {
+            		tmpFile = new File(targetPath);
+            	}
+            	else {
+            		String prefix = resourceName;
+            		Path tmpPath = Files.createTempDirectory(prefix);
+            		tmpFile = new File(tmpPath.toUri());
+            	}
+            	
             	FileUtils.copyDirectory(resource, tmpFile);
             }
             
             // set file executable
-            tmpFile.setExecutable(true); // NOSONAR
+            makeExecutable(tmpFile, true);
         }
         catch (Exception e) {
             LOG.error(e.getMessage(), e);
@@ -50,5 +67,30 @@ public class FileService {
 
         return tmpFile;
     }
-
+    
+    public void copyFolder(File sourceFolder, File targetFolder) {
+    	
+    	try {
+    		FileUtils.copyDirectory(sourceFolder, targetFolder);
+    		makeExecutable(targetFolder, true);
+    	}
+    	catch(Exception e) {
+    		LOG.error(e.getMessage(), e);
+    	}
+    }
+    
+    public void makeExecutable(File file) {
+    	makeExecutable(file, false);
+    }
+    
+    public void makeExecutable(File file, boolean recursive) {
+    	
+    	file.setExecutable(true); // NOSONAR
+    	
+    	if (file.isDirectory() &&  recursive) {
+    		for (File child : file.listFiles()) {
+    			makeExecutable(child, recursive);
+    		}
+    	}
+    }
 }
