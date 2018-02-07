@@ -64,5 +64,8 @@ then
     usage
 fi
 
+# read password from command line
+read -s -p "Password: " password
+
 # execute ansible playbook
-ansible-playbook -e "ansible_python_interpreter=/usr/bin/python3" -K -u "$username" -i "$hostname," --extra-vars "@$variableFilePath" --extra-vars "ssl_ca_file_path=$sslCaFilePath" --extra-vars "ssl_cert_file_path=$sslCertFilePath" --extra-vars "ssl_key_file_path=$sslKeyFilePath" playbook.yml 
+ansible-playbook -u "$username" -i "$hostname," --extra-vars "@$variableFilePath" --extra-vars "ssl_ca_file_path=$sslCaFilePath" --extra-vars "ssl_cert_file_path=$sslCertFilePath" --extra-vars "ssl_key_file_path=$sslKeyFilePath" --extra-vars "ansible_sudo_pass=$password" -e "ansible_ssh_pass=$password" -e "ansible_python_interpreter=/usr/bin/python3" "playbook.yml" 
