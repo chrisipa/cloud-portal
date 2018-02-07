@@ -20,7 +20,7 @@ tomcat:
     - 'application.dev.mode={{ application_dev_mode }}'
     - 'application.admin.group={{ application_admin_group }}'
     - 'encryptor.secret={{ encryptor_secret }}'
-    - 'ldap.base.dn=DC={{ ldap_base_dn }}'
+    - 'ldap.base.dn={{ ldap_base_dn }}'
     - 'ldap.group.attribute={{ ldap_group_attribute }}'
     - 'ldap.login.attribute={{ ldap_login_attribute }}'
     - 'ldap.password={{ ldap_password }}'
