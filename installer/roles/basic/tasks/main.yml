@@ -31,7 +31,9 @@
     - '"\e[6~": history-search-forward'
 
 - name: "Install ntpdate package"
-  apt: pkg=ntpdate state=installed    
+  apt: 
+    pkg: ntpdate 
+    state: installed    
 
 - name: Setup cron job for time synchronization
   cron:
