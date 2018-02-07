@@ -37,11 +37,9 @@ import de.papke.cloud.portal.pojo.VariableGroup;
 @Service
 public class TerraformService {
 
-
-
 	private static final Logger LOG = LoggerFactory.getLogger(TerraformService.class);
 
-	private static final String TEXT_INTRODUCTION = "TERRAFORM IS WORKING ON YOUR ACTION. YOU WILL GET AN EMAIL WITH THE RESULTS. PLEASE BE PATIENT!!!\n\n";
+	private static final String TEXT_INTRODUCTION = "TERRAFORM IS WORKING ON YOUR ACTION. PLEASE BE PATIENT!!!\n\n";
 	private static final String FLAG_NO_COLOR = "-no-color";
 	private static final String FLAG_VAR = "-var";
 	private static final String FLAG_FORCE = "-force";
