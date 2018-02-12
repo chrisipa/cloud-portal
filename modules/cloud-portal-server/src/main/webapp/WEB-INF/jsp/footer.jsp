@@ -9,17 +9,20 @@
     <script src="<c:url value="/static/vendor/bootstrap/js/bootstrap.min.js" />"></script>
 
     <!-- Metis Menu Plugin JavaScript -->
-    <script src="<c:url value="/static/vendor/metisMenu/metisMenu.min.js" />"></script>
+    <script src="<c:url value="/static/vendor/metisMenu/metisMenu.min.js" />"></script>       
     
     <!-- DataTables JavaScript -->
     <script src="<c:url value="/static/vendor/datatables/js/jquery.dataTables.min.js" />"></script>
     <script src="<c:url value="/static/vendor/datatables-plugins/dataTables.bootstrap.min.js" />"></script>
     <script src="<c:url value="/static/vendor/datatables-responsive/dataTables.responsive.js" />"></script>
 
-    <!-- Morris Charts JavaScript -->
-    <script src="<c:url value="/static/vendor/raphael/raphael.min.js" />"></script>
-    <script src="<c:url value="/static/vendor/morrisjs/morris.min.js" />"></script>
-    <script src="<c:url value="/static/data/morris-data.js" />"></script>
+    <!-- Flot Charts JavaScript -->
+    <script src="<c:url value="/static/vendor/flot/excanvas.min.js" />"></script>
+    <script src="<c:url value="/static/vendor/flot/jquery.flot.js" />"></script>
+    <script src="<c:url value="/static/vendor/flot/jquery.flot.pie.js" />"></script>
+    <script src="<c:url value="/static/vendor/flot/jquery.flot.resize.js" />"></script>
+    <script src="<c:url value="/static/vendor/flot/jquery.flot.time.js" />"></script>
+    <script src="<c:url value="/static/vendor/flot-tooltip/jquery.flot.tooltip.min.js" />"></script>
 
     <!-- Custom Theme JavaScript -->
     <script src="<c:url value="/static/dist/js/sb-admin-2.js" />"></script>

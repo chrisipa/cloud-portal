@@ -25,3 +25,11 @@ label.error {
 	margin-bottom: 10px;
 	text-align: right;
 }
+
+#provisioning-history-panel {
+	height: 270px;
+}
+
+#provisioning-history-chart {
+    height: 200px;	
+}

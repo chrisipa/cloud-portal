@@ -17,7 +17,7 @@ import de.papke.cloud.portal.service.TerraformService;
 @Controller
 public class ApplicationController {
 	
-	private static final String MODEL_VAR_NAME = "application";
+	protected static final String APPLICATION_MODEL_VAR_NAME = "application";
 	protected static final String REDIRECT_PREFIX = "redirect:";
 
 	@Value("${application.title}")
@@ -36,7 +36,7 @@ public class ApplicationController {
 	private MenuService menuService;
 	
 	protected void fillModel(Map<String, Object> model) {
-		model.put(MODEL_VAR_NAME, getApplicationModel());
+		model.put(APPLICATION_MODEL_VAR_NAME, getApplicationModel());
 	}
 	
 	protected ApplicationModel getApplicationModel() {
