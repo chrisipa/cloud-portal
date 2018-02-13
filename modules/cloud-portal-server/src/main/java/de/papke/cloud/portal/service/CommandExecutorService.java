@@ -8,7 +8,6 @@ import java.util.stream.IntStream;
 
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
-import org.apache.commons.exec.PumpStreamHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -16,6 +15,7 @@ import org.springframework.stereotype.Service;
 import com.unboundid.util.TeeOutputStream;
 
 import de.papke.cloud.portal.pojo.CommandResult;
+import de.papke.cloud.portal.stream.AutoFlushingPumpStreamHandler;
 
 @Service
 public class CommandExecutorService {
@@ -50,7 +50,7 @@ public class CommandExecutorService {
 			// create output stream for command
 			ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 			TeeOutputStream teeOutputStream = new TeeOutputStream(outputStream, byteArrayOutputStream);
-			PumpStreamHandler streamHandler = new PumpStreamHandler(teeOutputStream);
+			AutoFlushingPumpStreamHandler streamHandler = new AutoFlushingPumpStreamHandler(teeOutputStream);
 			executor.setStreamHandler(streamHandler);
 
 			// execute command
