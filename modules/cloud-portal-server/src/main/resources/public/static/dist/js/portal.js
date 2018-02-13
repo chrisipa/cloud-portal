@@ -1,3 +1,10 @@
+function autoScrollIframe() {
+	if ($("#output").is(":visible")) {
+		$("#output")[0].contentWindow.scrollBy(0,10000);
+	}	
+	setTimeout("autoScrollIframe()", 500);	
+}
+
 $(function() {
 	
 	$("form :button").each(function(){
@@ -54,3 +61,5 @@ $(function() {
 	
 	$("ul[data-nav-level='1']").show();
 });
+
+autoScrollIframe();
