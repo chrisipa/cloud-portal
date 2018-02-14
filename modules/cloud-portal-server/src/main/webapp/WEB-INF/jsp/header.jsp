@@ -27,9 +27,6 @@
     <!-- Portal CSS -->
     <link href="<c:url value="/static/dist/css/portal.css" />" rel="stylesheet">
 
-    <!-- Morris Charts CSS -->
-    <link href="<c:url value="/static/vendor/morrisjs/morris.css" />" rel="stylesheet">
-
     <!-- Custom Fonts -->
     <link href="<c:url value="/static/vendor/font-awesome/css/font-awesome.min.css" />" rel="stylesheet" type="text/css">
 
