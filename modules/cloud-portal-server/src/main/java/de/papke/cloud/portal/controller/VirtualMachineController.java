@@ -384,7 +384,7 @@ public class VirtualMachineController extends ApplicationController {
 					}
 				}
 			}
-			else if (variable.isRequired()) {
+			else if (variable.isRequired() && variable.getDefaults().isEmpty()) {
 				errorFound = true;
 			}
 			
