@@ -6,6 +6,8 @@ import java.io.OutputStream;
 
 import org.apache.commons.exec.StreamPumper;
 import org.apache.commons.exec.util.DebugUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Copies all data from an input stream to an output stream.
@@ -15,7 +17,8 @@ import org.apache.commons.exec.util.DebugUtils;
  * Based off of comments here: http://stackoverflow.com/a/7531626/59015
  */
 public class AutoFlushingStreamPumper implements Runnable {
-
+	
+	private static final Logger LOG  = LoggerFactory.getLogger(AutoFlushingPumpStreamHandler.class);
 
 	/** the default size of the internal buffer for copying the streams */
 	private static final int DEFAULT_SIZE = 1024;
@@ -97,7 +100,7 @@ public class AutoFlushingStreamPumper implements Runnable {
 				os.flush();
 			}
 		} catch (Exception e) {
-			// nothing to do - happens quite often with watchdog
+			LOG.error(e.getMessage(), e);
 		} finally {
 			if (closeWhenExhausted) {
 				try {
