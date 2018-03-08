@@ -13,6 +13,7 @@ tomcat:
   volumes:
     - '{{ timestamp_file }}:{{ timestamp_file }}:ro'
     - '{{ timezone_file }}:{{ timezone_file }}:ro'
+    - '{{ application_folder }}/trusted-certs:/opt/ssl/trusted:ro'
     - '{{ application_folder }}/logs:/opt/tomcat/logs'
   environment:
     - 'application.title={{ application_title }}'

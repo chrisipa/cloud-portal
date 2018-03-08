@@ -21,6 +21,22 @@
     owner: "{{ ansible_env.SUDO_USER }}"
     group: "{{ ansible_env.SUDO_USER }}"
     mode: 0644
+
+- name: Create cloud portal trusted certs folder
+  file:
+    path: "{{ application_folder }}/trusted-certs"
+    state: directory
+    owner: "{{ ansible_env.SUDO_USER }}"
+    group: "{{ ansible_env.SUDO_USER }}"
+    mode: 0755
+    
+- name: "Copy ldap cert file to trusted certs folder"
+  copy:
+    src: "{{ ldap_cert_file_path }}"
+    dest: "{{ application_folder }}/trusted-certs/ldap.crt"
+    owner: "{{ ansible_env.SUDO_USER }}"
+    group: "{{ ansible_env.SUDO_USER }}"
+    mode: 0644    
     
 - name: Create cloud portal ssl folder
   file:
@@ -71,8 +87,8 @@
     mode: 0755    
     
 - name: "Copy vhosts.conf to apache folder"
-  copy:
-    src: ../files/vhosts.conf
+  template:
+    src: ../templates/vhosts.conf
     dest: "{{ application_folder }}/apache/vhosts.conf"
     owner: "{{ ansible_env.SUDO_USER }}"
     group: "{{ ansible_env.SUDO_USER }}"

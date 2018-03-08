@@ -18,9 +18,10 @@ Options:
   -a <ssl ca file>      SSL ca file path
   -c <ssl cert file>    SSL cert file path
   -k <ssl key file>     SSL key file path
+  -l <ldap cert file>   LDAP cert file path
 
 Example:
-  $0 -u my-username -h my.server.host -v vars.json -a ca.crt -c server.crt -k server.key 
+  $0 -u my-username -h my.server.host -v vars.json -a ca.crt -c server.crt -k server.key -l ldap.crt 
 
 USAGE
 
@@ -29,7 +30,7 @@ USAGE
 }
 
 # get command line args
-while getopts u:h:v:a:c:k: opt
+while getopts u:h:v:a:c:k:l: opt
 do
     case $opt in
         u)
@@ -50,6 +51,9 @@ do
         k)
             sslKeyFilePath="$OPTARG"
         ;;   
+        l)
+            ldapCertFilePath="$OPTARG"
+        ;;
         \?)
             log "ERROR" "Invalid option: -$OPTARG"
             exit -1
@@ -58,7 +62,7 @@ do
 done
 
 # check command line args
-if ([ "$username" == "" ] || [ "$hostname" == "" ] || [ "$variableFilePath" == "" ] || [ "$sslCaFilePath" == "" ] || [ "$sslCertFilePath" == "" ] || [ "$sslKeyFilePath" == "" ])
+if ([ "$username" == "" ] || [ "$hostname" == "" ] || [ "$variableFilePath" == "" ] || [ "$sslCaFilePath" == "" ] || [ "$sslCertFilePath" == "" ] || [ "$sslKeyFilePath" == "" ] || [ "$ldapCertFilePath" == "" ])
 then 
     # print usage
     usage
@@ -68,4 +72,4 @@ fi
 read -s -p "Password: " password
 
 # execute ansible playbook
-ansible-playbook -u "$username" -i "$hostname," --extra-vars "@$variableFilePath" --extra-vars "ssl_ca_file_path=$sslCaFilePath" --extra-vars "ssl_cert_file_path=$sslCertFilePath" --extra-vars "ssl_key_file_path=$sslKeyFilePath" --extra-vars "ansible_sudo_pass=$password" -e "ansible_ssh_pass=$password" -e "ansible_python_interpreter=/usr/bin/python3" "playbook.yml" 
+ansible-playbook -u "$username" -i "$hostname," --extra-vars "@$variableFilePath" --extra-vars "ssl_ca_file_path=$sslCaFilePath" --extra-vars "ssl_cert_file_path=$sslCertFilePath" --extra-vars "ssl_key_file_path=$sslKeyFilePath" --extra-vars "ldap_cert_file_path=$ldapCertFilePath" --extra-vars "ansible_sudo_pass=$password" -e "ansible_ssh_pass=$password" -e "ansible_python_interpreter=/usr/bin/python3" "playbook.yml" 
