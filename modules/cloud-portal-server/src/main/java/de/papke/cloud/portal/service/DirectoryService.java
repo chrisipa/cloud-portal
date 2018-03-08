@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
+import javax.net.ssl.SSLSocketFactory;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -24,6 +25,7 @@ import com.unboundid.ldap.sdk.SearchResult;
 import com.unboundid.ldap.sdk.SearchResultEntry;
 import com.unboundid.ldap.sdk.SearchScope;
 import com.unboundid.ldap.sdk.controls.SimplePagedResultsControl;
+import com.unboundid.util.ssl.SSLUtil;
 
 import de.papke.cloud.portal.pojo.User;
 
@@ -155,7 +157,9 @@ public class DirectoryService {
 			LDAPURL ldapUrl = new LDAPURL(url);
 			LDAPConnectionOptions ldapConnectionOptions = new LDAPConnectionOptions();
 			ldapConnectionOptions.setConnectTimeoutMillis(timeout);
-			ldapConnection = new LDAPConnection(ldapConnectionOptions, ldapUrl.getHost(), ldapUrl.getPort(), principal, password);
+			SSLUtil sslUtil = new SSLUtil();
+			SSLSocketFactory sslSocketFactory = sslUtil.createSSLSocketFactory();
+			ldapConnection = new LDAPConnection(sslSocketFactory, ldapConnectionOptions, ldapUrl.getHost(), ldapUrl.getPort(), principal, password);
 		}
 		catch (Exception e) {
 			LOG.error(e.getMessage(), e);
