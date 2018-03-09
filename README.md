@@ -7,12 +7,14 @@ Cloud Portal
 
 Overview
 --------
+
 Self service web portal for different Cloud platforms like Azure, AWS and VMWare vSphere.
 
 [![Self Service Cloud Portal - Use Case #1](https://github.com/chrisipa/cloud-portal/raw/master/public/youtube.png)](https://youtu.be/NKZ46OSocp8 "Self Service Cloud Portal - Use Case #1")
 
 Features
 --------
+
 * LDAP authentication & authorization
 * VM provisioning to Azure, AWS and VMWare vSphere using Hashicorp's Terraform
 * VM provisioning history
@@ -24,6 +26,7 @@ Features
 
 Prerequisites
 -------------
+
 * LDAP server must be available
 * SMTP server must be available
 * [Docker](https://docs.docker.com/engine/installation/) must be installed
@@ -31,6 +34,7 @@ Prerequisites
 
 Usage
 -----
+
 1. Create docker compose file `docker-compose.yml` with your configuration data:
   ```yml
 mongodb:
@@ -47,7 +51,7 @@ tomcat:
     - 443:8443
   volumes:
     - /opt/cloud-portal/logs:/opt/tomcat/logs
-  environment:    
+  environment:
     - 'application.title=My Cloud Portal'
     - 'application.admin.group=my-admin-group'
     - 'encryptor.secret=my-encryptor-secret'
@@ -65,6 +69,7 @@ tomcat:
   ```
 
 2. Run docker containers with docker compose:
+
   ```
   docker-compose up -d
   ```
