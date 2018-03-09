@@ -34,6 +34,8 @@
 
         <!-- docker build properties -->
         <registry>docker.io</registry>
+        <pullRegistry>${registry}</pullRegistry>
+        <pushRegistry>${registry}</pushRegistry>
         <tenant>chrisipa</tenant>
         <opt.folder>/opt</opt.folder>
         <tomcat.home>${opt.folder}/tomcat</tomcat.home>
@@ -159,16 +161,15 @@
                 <extensions>true</extensions>
                 <configuration>
                     <verbose>true</verbose>
-                    <registry>${registry}</registry>
                     <images>
                         <image>
-                            <name>${registry}/${tenant}/${project.artifactId}</name>
+                            <name>${pushRegistry}/${tenant}/${project.artifactId}</name>
                             <alias>${project.artifactId}</alias>
                             <build>
                                 <tags>
                                     <tag>${project.version}</tag>
                                 </tags>
-                                <from>${registry}/${tenant}/tomcat-base:9.0.5</from>
+                                <from>${pullRegistry}/${tenant}/tomcat-base:9.0.5</from>
                                 <optimise>true</optimise>
                                 <entryPoint>
                                     <exec>
