@@ -44,7 +44,7 @@ mongodb:
 
 tomcat:
   image: chrisipa/cloud-portal:latest
-  links: 
+  links:
     - mongodb
   ports:
     - 80:8080
@@ -70,6 +70,6 @@ tomcat:
 
 2. Run docker containers with docker compose:
 
-  ```
+  ```bash
   docker-compose up -d
   ```
