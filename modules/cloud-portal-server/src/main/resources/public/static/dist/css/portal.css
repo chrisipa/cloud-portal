@@ -13,6 +13,11 @@ label.error {
     width: auto;
 }
 
+#auto-scroll {
+	float: right;
+	margin-right: 10px;
+}
+
 #datatable_length {
 	margin-bottom: 10px;
 }
