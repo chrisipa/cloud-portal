@@ -62,11 +62,11 @@
 	                    <div class="modal-dialog">
 	                        <div class="modal-content">
 	                            <div class="modal-header">
-	                                <button id="auto-scroll" type="button" class="btn btn-success btn-circle">
-	                                   <i class="fa fa-angle-double-down"></i>
-	                                </button>
-	                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-	                                <h4 class="modal-title" id="myModalLabel">Output</h4>
+	                                <div class="modal-header">
+		                                <button id="close" type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+		                                <button id="auto-scroll" type="button" class="btn btn-danger btn-xs">Auto Scroll</button>
+		                                <h4 class="modal-title" id="myModalLabel">Output</h4>
+		                            </div>
 	                            </div>
 	                            <div class="modal-body">
 	                                <iframe name="output" id="output" frameborder="0" scrolling="yes"></iframe>
