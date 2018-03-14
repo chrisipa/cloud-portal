@@ -5,6 +5,8 @@ import java.util.List;
 
 public class Variable {
 	
+	public static final String TYPE_SECRET = "secret";
+	
 	private String title = "";
 	private String name = "";
 	private String description = "";

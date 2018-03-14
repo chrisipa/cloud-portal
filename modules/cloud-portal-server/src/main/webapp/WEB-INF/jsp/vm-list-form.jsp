@@ -50,7 +50,7 @@
                                     <td><c:out value="${provisionLog.success}" /></td>
                                     <td>
                                     <c:forEach var="variable" items="${provisionLog.variableMap}">
-                                        <p><c:out value="${variable.key}" /> = <c:out value="${variable.value}" /></p>
+                                        <p><c:out value="${variable.key}" /> = <c:out value="${virtualMachine.isSecret(variable.key) ? '****' : variable.value}" /></p>
                                     </c:forEach>
                                     </td>
                                     <td data-order="<fmt:formatDate pattern="yyyy-MM-dd HH:mm" value="${provisionLog.expirationDate}"/>"><fmt:formatDate pattern="dd.MM.yyyy HH:mm:ss" value="${provisionLog.expirationDate}"/></td>
