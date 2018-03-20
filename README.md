@@ -23,6 +23,7 @@ Features
 * Send HTML emails with customizable velocity templates and Terraform log data as attachment
 * Responsive WebUI with generic Terraform variable rendering
 * Optimized RESTful WebService for CD pipeline integrations
+* Dashboards showing important metrics
 
 Prerequisites
 -------------
