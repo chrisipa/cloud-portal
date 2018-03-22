@@ -44,3 +44,5 @@ node
 **/*/*-server-webapp/blobstore
 # Ansible
 *.retry
+# VSCode
+.vscode/
