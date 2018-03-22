@@ -23,7 +23,7 @@ Features
 * Send HTML emails with customizable velocity templates and Terraform log data as attachment
 * Responsive WebUI with generic Terraform variable rendering
 * Optimized RESTful WebService for CD pipeline integrations
-* Dashboards showing important metrics
+* Dashboards showing important provisioning metrics
 
 Prerequisites
 -------------
@@ -37,6 +37,7 @@ Usage
 -----
 
 1. Create docker compose file `docker-compose.yml` with your configuration data:
+
   ```yml
 mongodb:
   image: mongo:3.4.10
