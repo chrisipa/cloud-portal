@@ -16,7 +16,7 @@ sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubun
 sudo apt-get update
 
 # install docker community edition
-sudo apt-get install -y docker-ce
+sudo apt-get install -y docker-ce=17.06.0~ce-0~ubuntu
 
 # allow execution of docker command without sudo
 sudo gpasswd -a $(whoami) docker
