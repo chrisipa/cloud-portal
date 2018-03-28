@@ -1,15 +1,13 @@
-Cloud Portal Client
-===================
+# Cloud Portal Client
 
 [![Build Status](https://papke.it/jenkins/buildStatus/icon?job=cloud-portal)](https://papke.it/jenkins/job/cloud-portal/)
+[![Docker Image](https://img.shields.io/badge/docker%20image-available-blue.svg)](https://hub.docker.com/r/chrisipa/cloud-portal-client/)
 
-Overview
---------
+## Overview
 
 Docker container image for the Cloud Portal CLI client based on debian and curl.
 
-Usage examples
---------------
+## Usage
 
 * Show variable information for creating a vsphere virtual:
 

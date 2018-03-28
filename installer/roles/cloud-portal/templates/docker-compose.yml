@@ -7,7 +7,7 @@ mongodb:
     - '{{ application_folder }}/data:/data/db'
 
 tomcat:
-  image: 'chrisipa/cloud-portal:latest'
+  image: 'chrisipa/cloud-portal-server:latest'
   links:
     - 'mongodb'
   volumes:
