@@ -175,6 +175,9 @@
 
                                     <!-- make entrypoint executable -->
                                     <run>chmod +x /${project.artifactId}.sh</run>
+                                    
+                                    <!-- remove default index.jsp -->
+                                    <run>rm -f ${tomcat.webapps.folder}/ROOT/index.jsp</run>
 
                                 </runCmds>
                                 <assembly>
