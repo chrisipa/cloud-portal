@@ -3,20 +3,19 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <parent>
+        <groupId>de.papke</groupId>
+        <artifactId>cloud-portal-modules</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+    </parent>
+
     <groupId>de.papke</groupId>
     <artifactId>cloud-portal</artifactId>
     <version>0.0.1-SNAPSHOT</version>
 
     <packaging>war</packaging>
 
-    <name>Cloud Portal</name>
-    <description>Server part of Self service web portal.</description>
-
-    <parent>
-        <groupId>de.papke</groupId>
-        <artifactId>cloud-portal-parent</artifactId>
-        <version>0.0.1-SNAPSHOT</version>
-    </parent>
+    <name>Cloud Portal Server</name>
 
     <dependencies>
         <dependency>

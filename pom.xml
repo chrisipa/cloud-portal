@@ -3,24 +3,22 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>de.papke</groupId>
-    <artifactId>cloud-portal-parent</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
-
-    <packaging>pom</packaging>
-
-    <name>Cloud Portal Parent</name>
-    <description>Self service web portal for different Cloud providers like AWS, Azure and VMWare vSphere.</description>
-
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>1.5.1.RELEASE</version>
     </parent>
+    
+    <groupId>de.papke</groupId>
+    <artifactId>cloud-portal-builder</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+
+    <packaging>pom</packaging>
+
+    <name>Cloud Portal Builder</name>
 
     <modules>
-        <module>client</module>
-        <module>server</module>
+        <module>modules</module>
     </modules>
 
     <properties>

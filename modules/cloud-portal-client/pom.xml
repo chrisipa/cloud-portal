@@ -6,13 +6,15 @@
 
     <parent>
         <groupId>de.papke</groupId>
-        <artifactId>cloud-portal-parent</artifactId>
+        <artifactId>cloud-portal-modules</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
     <artifactId>cloud-portal-client</artifactId>
 
     <packaging>docker</packaging>
+
+    <name>Cloud Portal Client</name>
     
     <properties>
         <client.home>${opt.folder}/${project.artifactId}</client.home>
