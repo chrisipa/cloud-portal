@@ -221,43 +221,4 @@ function variables() {
     
     # stop
     exit 0
-}
-
-
-####################
-# SCRIPT EXECUTION #
-####################
-
-echo ""
-echo "###########################"
-echo "# Cloud Portal CLI Client #"
-echo "###########################"
-echo ""
-
-# check for environment variables
-if [ "$CLOUD_PORTAL_URL" == "" ]
-then
-    log "ERROR" "Please specifiy CLOUD_PORTAL_URL as environment variable!"
-    exit -1
-fi
-if [ "$CLOUD_PORTAL_USERNAME" == "" ]
-then
-    log "ERROR" "Please specifiy CLOUD_PORTAL_USERNAME as environment variable!"
-    exit -1
-fi
-if [ "$CLOUD_PORTAL_PASSWORD" == "" ]
-then
-    log "ERROR" "Please specifiy CLOUD_PORTAL_PASSWORD as environment variable!"
-    exit -1
-fi
-if [ "$CLOUD_PORTAL_PROVIDER" == "" ]
-then
-    log "ERROR" "Please specifiy CLOUD_PORTAL_PROVIDER as environment variable!"
-    exit -1
-fi
-
-# show variable information if nothing is entered
-if [ "$#" ==  "0" ]
-then
-    variables    
-fi    
+} 

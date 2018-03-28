@@ -1,0 +1,1 @@
+Docker container image for the Cloud Portal CLI client based on debian and curl.
