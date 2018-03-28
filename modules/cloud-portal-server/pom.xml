@@ -185,7 +185,7 @@
                                                 <includes>
                                                     <include>${project.groupId}:${project.artifactId}:${project.packaging}</include>
                                                 </includes>
-                                                <outputDirectory>${tomcat.webapps.folder}/${project.artifactId}</outputDirectory>
+                                                <outputDirectory>${tomcat.webapps.folder}/ROOT</outputDirectory>
                                                 <unpack>true</unpack>
                                             </dependencySet>
                                         </dependencySets>
@@ -196,14 +196,7 @@
                                                 <includes>
                                                     <include>**/*</include>
                                                 </includes>
-                                            </fileSet>
-                                            <fileSet>
-                                                <directory>${project.basedir}/src/main/resources/docker/ROOT</directory>
-                                                <outputDirectory>${tomcat.webapps.folder}/ROOT</outputDirectory>
-                                                <includes>
-                                                    <include>**/*</include>
-                                                </includes>
-                                            </fileSet>
+                                            </fileSet>                                     
                                         </fileSets>
                                     </inline>
                                 </assembly>
