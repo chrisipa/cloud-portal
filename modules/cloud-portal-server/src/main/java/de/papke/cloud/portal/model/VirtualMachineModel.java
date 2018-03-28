@@ -2,6 +2,7 @@ package de.papke.cloud.portal.model;
 
 import java.util.List;
 
+import de.papke.cloud.portal.constants.Constants;
 import de.papke.cloud.portal.pojo.ProvisionLog;
 import de.papke.cloud.portal.pojo.Variable;
 import de.papke.cloud.portal.pojo.VariableGroup;
@@ -40,7 +41,7 @@ public class VirtualMachineModel {
 		
 		for (VariableGroup variableGroup : providerDefaultsList) {
 			for (Variable variable : variableGroup.getVariables()) {
-				if (variableName.equals(variable.getName()) && variable.getType().equals(Variable.TYPE_SECRET)) {
+				if (variableName.equals(variable.getName()) && variable.getType().equals(Constants.VAR_TYPE_SECRET)) {
 					return true;
 				}
 			}

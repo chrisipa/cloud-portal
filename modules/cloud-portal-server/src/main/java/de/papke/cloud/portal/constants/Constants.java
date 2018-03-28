@@ -32,5 +32,7 @@ public class Constants {
 	
 	public static final String FOLDER_TERRAFORM = "terraform";
 	
+	public static final String VAR_TYPE_SECRET = "secret";
+	
 	private Constants() {}
 }
