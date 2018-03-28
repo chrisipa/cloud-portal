@@ -17,7 +17,7 @@ docker run --rm \
 -e 'CLOUD_PORTAL_USERNAME=my-user@my-domain.com' \
 -e 'CLOUD_PORTAL_PASSWORD=my-password' \
 -e 'CLOUD_PORTAL_PROVIDER=vsphere' \
--e 'CLOUD_PORTAL_ACTION=vm-create' \ 
+-e 'CLOUD_PORTAL_ACTION=vm-create' \
 chrisipa/cloud-portal-client
 ```
 
@@ -29,7 +29,7 @@ docker run --rm \
 -e 'CLOUD_PORTAL_USERNAME=my-user@my-domain.com' \
 -e 'CLOUD_PORTAL_PASSWORD=my-password' \
 -e 'CLOUD_PORTAL_PROVIDER=vsphere' \
--e 'CLOUD_PORTAL_ACTION=vm-create' \ 
+-e 'CLOUD_PORTAL_ACTION=vm-create' \
 chrisipa/cloud-portal-client \
 -F 'title=my-title' \
 -F 'description=my-description' \
@@ -44,7 +44,7 @@ docker run --rm \
 -e 'CLOUD_PORTAL_USERNAME=my-user@my-domain.com' \
 -e 'CLOUD_PORTAL_PASSWORD=my-password' \
 -e 'CLOUD_PORTAL_PROVIDER=vsphere' \
--e 'CLOUD_PORTAL_ACTION=vm-destroy' \ 
+-e 'CLOUD_PORTAL_ACTION=vm-destroy' \
 chrisipa/cloud-portal-client \
-my-provisioning-id 
+my-provisioning-id
 ```
