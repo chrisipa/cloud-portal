@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>de.papke</groupId>
+    <artifactId>cloud-portal</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+
+    <packaging>war</packaging>
+
+    <name>Cloud Portal</name>
+    <description>Server part of Self service web portal.</description>
+
+    <parent>
+        <groupId>de.papke</groupId>
+        <artifactId>cloud-portal-parent</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+    </parent>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-logging</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.janino</groupId>
+            <artifactId>janino</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.ldap</groupId>
+            <artifactId>spring-ldap-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-ldap</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.unboundid</groupId>
+            <artifactId>unboundid-ldapsdk</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mail</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-tomcat</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-mongodb</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.session</groupId>
+            <artifactId>spring-session-data-mongo</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.session</groupId>
+            <artifactId>spring-session</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.tomcat.embed</groupId>
+            <artifactId>tomcat-embed-jasper</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>jstl</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-exec</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.velocity</groupId>
+            <artifactId>velocity</artifactId>
+        </dependency>
+        <dependency>
+		    <groupId>com.jcraft</groupId>
+		    <artifactId>jsch</artifactId>
+		</dependency>
+        <dependency>
+            <groupId>org.yaml</groupId>
+            <artifactId>snakeyaml</artifactId>
+        </dependency>
+    </dependencies>
+
+    <build>
+
+        <finalName>${project.artifactId}</finalName>
+
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>io.fabric8</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+                <extensions>true</extensions>
+                <configuration>
+                    <verbose>true</verbose>
+                    <images>
+                        <image>
+                            <name>${push.registry}/${tenant}/${project.artifactId}</name>
+                            <alias>${project.artifactId}</alias>
+                            <build>
+                                <tags>
+                                    <tag>${project.version}</tag>
+                                </tags>
+                                <from>${pull.registry}/${tenant}/tomcat-base:9.0.5</from>
+                                <optimise>true</optimise>
+                                <entryPoint>
+                                    <exec>
+                                        <args>/${project.artifactId}.sh</args>
+                                    </exec>
+                                </entryPoint>
+                                <cmd>
+                                    <exec>
+                                        <args>catalina.sh</args>
+                                        <args>run</args>
+                                    </exec>
+                                </cmd>
+                                <runCmds>
+
+                                    <!-- update package sources -->
+                                    <run>apt-get update</run>
+
+                                    <!-- install apt transport https -->
+                                    <run>apt-get install -y apt-transport-https</run>
+
+                                    <!-- add azure cli package repo -->
+                                    <run>echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ wheezy main" >> /etc/apt/sources.list.d/azure-cli.list</run>
+                                    <run>apt-key adv --keyserver packages.microsoft.com --recv-keys 52E16F86FEE04B979B07E28DB02C46DF417A0893</run>
+
+                                    <!-- update package sources -->
+                                    <run>apt-get update</run>
+
+                                    <!-- install azure cli -->
+                                    <run>apt-get install -y --no-install-recommends azure-cli</run>
+
+                                    <!-- install aws cli -->
+                                    <run>apt-get install -y --no-install-recommends python-pip</run>
+                                    <run>pip install awscli</run>
+
+                                    <!-- download and install terraform -->
+                                    <run>wget -q https://releases.hashicorp.com/terraform/${terraform.version}/terraform_${terraform.version}_linux_amd64.zip</run>
+                                    <run>unzip -q terraform_${terraform.version}_linux_amd64.zip -d /usr/local/bin</run>
+                                    <run>rm terraform_${terraform.version}_linux_amd64.zip</run>
+                                    
+                                    <!-- clear apt cache -->
+                                    <run>apt-get clean</run>
+
+                                    <!-- make entrypoint executable -->
+                                    <run>chmod +x /${project.artifactId}.sh</run>
+
+                                </runCmds>
+                                <assembly>
+                                    <basedir>/</basedir>
+                                    <inline>
+                                        <dependencySets>
+                                            <dependencySet>
+                                                <includes>
+                                                    <include>${project.groupId}:${project.artifactId}:${project.packaging}</include>
+                                                </includes>
+                                                <outputDirectory>${tomcat.webapps.folder}/${project.artifactId}</outputDirectory>
+                                                <unpack>true</unpack>
+                                            </dependencySet>
+                                        </dependencySets>
+                                        <fileSets>
+                                            <fileSet>                                                
+                                                <directory>${project.basedir}/src/main/resources/docker/entrypoint</directory>
+                                                <outputDirectory>/</outputDirectory>
+                                                <includes>
+                                                    <include>**/*</include>
+                                                </includes>
+                                            </fileSet>
+                                            <fileSet>
+                                                <directory>${project.basedir}/src/main/resources/docker/ROOT</directory>
+                                                <outputDirectory>${tomcat.webapps.folder}/ROOT</outputDirectory>
+                                                <includes>
+                                                    <include>**/*</include>
+                                                </includes>
+                                            </fileSet>
+                                        </fileSets>
+                                    </inline>
+                                </assembly>
+                            </build>
+                            <run>
+                                <namingStrategy>alias</namingStrategy>
+                                <links>
+								    <link>mongodb</link>
+								</links>
+                                <volumes>
+                                    <bind>
+                                        <volume>${host.logs.folder}:${tomcat.logs.folder}</volume>
+                                    </bind>
+                                </volumes>
+                                <ports>
+                                    <port>${tomcat.http.port}:${tomcat.http.port}</port>
+                                    <port>${tomcat.https.port}:${tomcat.https.port}</port>
+                                </ports>
+                                <env>
+                                    <spring.data.mongodb.uri>mongodb://mongodb:27017/cloud-portal</spring.data.mongodb.uri>
+                                </env>
+                            </run>
+                        </image>
+                        <image>
+                            <name>docker.io/mongo:3.4.10</name>
+                            <alias>mongodb</alias>
+                            <run>
+                                <namingStrategy>alias</namingStrategy>                            
+                                <volumes>
+                                    <bind>
+                                        <volume>${host.data.folder}:${mongodb.data.folder}</volume>
+                                    </bind>
+                                </volumes>
+                            </run>
+                        </image>
+                    </images>
+                </configuration>
+            </plugin>
+        </plugins>
+
+    </build>
+
+</project>
+

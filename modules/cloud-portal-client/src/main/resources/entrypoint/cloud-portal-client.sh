@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# include library
-source "$(dirname $(readlink -f $0))/lib.sh"
+# include client library
+source "${CLIENT_HOME}/lib.sh"
 
 # login 
 login 
