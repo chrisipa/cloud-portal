@@ -9,7 +9,7 @@ Docker container image for the Cloud Portal CLI client based on debian and curl.
 
 ## Usage
 
-* Show variable information for creating a vsphere virtual:
+* Show variable information for creating a vsphere virtual machine:
 
 ```bash
 docker run --rm \
