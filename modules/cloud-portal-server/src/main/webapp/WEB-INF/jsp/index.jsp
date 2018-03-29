@@ -84,6 +84,10 @@ $(document).ready(function() {
 	            tickSize: [1, "day"],
 	            timezone: "browser"
 	        },
+	        yaxis: {
+	        	tickSize: 1,
+	        	tickDecimals: 0
+	        },
 	        grid: {
 	            hoverable: true
 	        },
