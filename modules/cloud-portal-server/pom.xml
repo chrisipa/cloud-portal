@@ -9,9 +9,7 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <groupId>de.papke</groupId>
     <artifactId>cloud-portal-server</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
 
     <packaging>war</packaging>
 
