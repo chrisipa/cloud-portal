@@ -30,4 +30,4 @@ sudo curl -L https://raw.githubusercontent.com/chrisipa/docker-compose-wrapper/m
 sudo chmod +x /usr/local/bin/docker-compose-wrapper
 
 # run jenkins container
-sudo docker run -d -p 80:8080 -p 443:8443 chrisipa/jenkins
+sudo docker run --restart=always -d -p 80:8080 -p 443:8443 chrisipa/jenkins
