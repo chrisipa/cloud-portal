@@ -178,7 +178,7 @@
                                     <run>rm -f ${tomcat.webapps.folder}/ROOT/index.jsp</run>
 
                                     <!-- change permissions -->
-                                    <run>chown -R ${user}.${group} ${catalina.home}</run>                                    
+                                    <run>chown -R ${user}.${group} ${tomcat.webapps.folder}</run>                                    
                                 </runCmds>
                                 <user>${user}</user>
                                 <assembly>
