@@ -40,6 +40,8 @@
         <pull.registry>${registry}</pull.registry>
         <push.registry>${registry}</push.registry>
         <tenant>chrisipa</tenant>
+        <user>${tenant}</user>
+        <group>${tenant}</group>
         <opt.folder>/opt</opt.folder>
         <tomcat.home>${opt.folder}/tomcat</tomcat.home>
         <tomcat.webapps.folder>${tomcat.home}/webapps</tomcat.webapps.folder>

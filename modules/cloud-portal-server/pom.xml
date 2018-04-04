@@ -179,7 +179,10 @@
                                     <!-- remove default index.jsp -->
                                     <run>rm -f ${tomcat.webapps.folder}/ROOT/index.jsp</run>
 
+                                    <!-- change permissions -->
+                                    <run>chown -R ${user}.${group} ${catalina.home}</run>                                    
                                 </runCmds>
+                                <user>${user}</user>
                                 <assembly>
                                     <basedir>/</basedir>
                                     <inline>
