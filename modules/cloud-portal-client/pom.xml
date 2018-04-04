@@ -42,13 +42,18 @@
                                     <CLIENT_HOME>${client.home}</CLIENT_HOME>
                                 </env>
                                 <runCmds>
+                                    <!-- create client home folder -->
                                     <run>mkdir -p ${client.home}</run>
+                                    
+                                    <!-- change permissions -->
+                                    <run>chown -R ${user}.${group} ${client.home}</run>                                    
                                 </runCmds>
                                 <entryPoint>
                                     <exec>
                                         <args>/${project.artifactId}.sh</args>
                                     </exec>
                                 </entryPoint>
+                                <user>${user}</user>
                                 <assembly>
                                     <basedir>/</basedir>
                                     <inline>
