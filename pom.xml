@@ -10,12 +10,12 @@
     </parent>
     
     <groupId>de.papke</groupId>
-    <artifactId>cloud-portal-builder</artifactId>
+    <artifactId>cloud-portal</artifactId>
     <version>0.0.1-SNAPSHOT</version>
 
     <packaging>pom</packaging>
 
-    <name>Cloud Portal Builder</name>
+    <name>Cloud Portal</name>
 
     <modules>
         <module>modules</module>
