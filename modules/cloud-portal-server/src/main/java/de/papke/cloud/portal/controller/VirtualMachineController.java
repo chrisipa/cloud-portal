@@ -36,6 +36,7 @@ import de.papke.cloud.portal.constants.Constants;
 import de.papke.cloud.portal.model.VirtualMachineModel;
 import de.papke.cloud.portal.pojo.Credentials;
 import de.papke.cloud.portal.pojo.ProvisionLog;
+import de.papke.cloud.portal.pojo.User;
 import de.papke.cloud.portal.pojo.Variable;
 import de.papke.cloud.portal.pojo.VariableGroup;
 import de.papke.cloud.portal.service.CredentialsService;
@@ -188,9 +189,49 @@ public class VirtualMachineController extends ApplicationController {
 			}
 		}
 	}
-
+	
 	@GetMapping(path = PREFIX + "/delete/action/{provider}/{id}")
-	public void deprovision(Map<String, Object> model,
+	public void delete(Map<String, Object> model,
+			@PathVariable String provider,
+			@PathVariable String id,
+			HttpServletResponse response) {
+		
+		try {
+			
+			// get current user
+			User user = sessionUserService.getUser();
+
+			// check if user is allowed to deprovision the vm
+			if (user.getIsAdmin()) {			
+			
+				// get provision log entry
+				ProvisionLog provisionLog = provisionLogService.get(id);
+				if (provisionLog != null) {
+					
+					// delete provision log entry
+					provisionLogService.delete(id);
+					
+					// print success message
+					success(String.format("Provision log entry with id '%s' was deleted successfully.", id), response);
+				}
+				else {
+					fail(String.format("No provision log entry found for id '%s'.", id), response);
+				}
+			}
+			else {
+				fail(String.format("You are not allowed to delete the entry with the id '%s'", id), response);
+			}
+		}
+		catch(Exception e) {
+			LOG.error(e.getMessage(), e);
+		}
+		
+		// fill model
+		fillModel(model, provider);
+	} 
+
+	@GetMapping(path = PREFIX + "/destroy/action/{provider}/{id}")
+	public void destroy(Map<String, Object> model,
 			@PathVariable String provider,
 			@PathVariable String id,
 			HttpServletResponse response) {
@@ -240,6 +281,11 @@ public class VirtualMachineController extends ApplicationController {
 	
 	private void fail(String message, HttpServletResponse response) throws IOException {
 		response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+		response.getWriter().println(message);
+	}
+	
+	private void success(String message, HttpServletResponse response) throws IOException {
+		response.setStatus(HttpServletResponse.SC_OK);
 		response.getWriter().println(message);
 	}
 	

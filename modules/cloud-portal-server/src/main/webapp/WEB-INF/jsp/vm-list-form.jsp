@@ -3,6 +3,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%--@elvariable id="application" type="de.papke.cloud.portal.model.ApplicationModel"--%>
 <%--@elvariable id="virtualMachine" type="de.papke.cloud.portal.model.VirtualMachineModel"--%>
 
 <jsp:include page="header.jsp" />
@@ -33,9 +34,14 @@
                             <c:forEach items="${virtualMachine.provisionLogList}" var="provisionLog">
                                 <tr>
                                     <td>
-                                        <c:if test="${provisionLog.success == true && provisionLog.command == 'apply'}">
-                                            <button id="delete/action/${virtualMachine.provider}/${provisionLog.id}" type="submit" class="btn btn-danger btn-circle" data-toggle="tooltip" title="Delete item">
+                                        <c:if test="${application.user.isAdmin}">
+                                            <button id="delete/action/${virtualMachine.provider}/${provisionLog.id}" type="submit" class="btn btn-warning btn-circle" data-toggle="tooltip" title="Delete item">
                                                 <i class="fa fa-times"></i>
+                                            </button>
+                                        </c:if>
+                                        <c:if test="${provisionLog.success == true && provisionLog.command == 'apply'}">
+                                            <button id="destroy/action/${virtualMachine.provider}/${provisionLog.id}" type="submit" class="btn btn-danger btn-circle" data-toggle="tooltip" title="Destroy item">
+                                                <i class="fa fa-trash"></i>
                                             </button>
                                         </c:if>
                                         <c:if test="${provisionLog.privateKey != null}">

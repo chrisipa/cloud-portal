@@ -72,6 +72,13 @@ $(function() {
 										$('#myModal').modal('toggle');
 									}
 								}
+								
+								if (buttonId.startsWith('destroy')) {
+									submit = confirm('Do you really want to destroy this item?');
+									if (submit) {
+										$('#myModal').modal('toggle');
+									}
+								}
 									
 								if (submit) {
 									$(form).attr('action', originalActionUrl + "/" + buttonId);
