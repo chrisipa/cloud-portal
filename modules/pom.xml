@@ -9,9 +9,7 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
     
-    <groupId>de.papke</groupId>
     <artifactId>cloud-portal-modules</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
 
     <packaging>pom</packaging>
 
@@ -19,6 +17,7 @@
 
     <modules>
         <module>cloud-portal-client</module>
+        <module>cloud-portal-server-base</module>
         <module>cloud-portal-server</module>
     </modules>
 

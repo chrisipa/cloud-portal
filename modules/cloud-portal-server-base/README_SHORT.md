@@ -1,0 +1,1 @@
+Base image for Cloud Self Service Portal bundled with terraform and its dependencies.

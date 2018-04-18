@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>de.papke</groupId>
+        <artifactId>cloud-portal-modules</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>cloud-portal-server-base</artifactId>
+
+    <packaging>docker</packaging>
+
+    <name>Cloud Portal Server Base</name>
+
+    <build>
+
+        <finalName>${project.artifactId}</finalName>
+
+        <plugins>
+            <plugin>
+                <groupId>io.fabric8</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+                <extensions>true</extensions>
+                <configuration>
+                    <verbose>true</verbose>
+                    <images>
+                        <image>
+                            <name>${push.registry}/${tenant}/${project.artifactId}</name>
+                            <alias>${project.artifactId}</alias>
+                            <build>
+                                <tags>
+                                    <tag>${project.version}</tag>
+                                </tags>
+                                <from>${pull.registry}/${tenant}/tomcat-base:9.0.5</from>
+                                <optimise>true</optimise>
+                                <entryPoint>
+                                    <exec>
+                                        <args>/${project.artifactId}.sh</args>
+                                    </exec>
+                                </entryPoint>
+                                <cmd>
+                                    <exec>
+                                        <args>catalina.sh</args>
+                                        <args>run</args>
+                                    </exec>
+                                </cmd>
+                                <runCmds>
+
+                                    <!-- update package sources -->
+                                    <run>apt-get update</run>
+
+                                    <!-- install apt transport https -->
+                                    <run>apt-get install -y apt-transport-https</run>
+
+                                    <!-- add azure cli package repo -->
+                                    <run>echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ wheezy main" >> /etc/apt/sources.list.d/azure-cli.list</run>
+                                    <run>apt-key adv --keyserver packages.microsoft.com --recv-keys 52E16F86FEE04B979B07E28DB02C46DF417A0893</run>
+
+                                    <!-- update package sources -->
+                                    <run>apt-get update</run>
+
+                                    <!-- install azure cli -->
+                                    <run>apt-get install -y --no-install-recommends azure-cli</run>
+
+                                    <!-- install aws cli -->
+                                    <run>apt-get install -y --no-install-recommends python-pip</run>
+                                    <run>pip install awscli</run>
+
+                                    <!-- download and install terraform -->
+                                    <run>wget -q https://releases.hashicorp.com/terraform/${terraform.version}/terraform_${terraform.version}_linux_amd64.zip</run>
+                                    <run>unzip -q terraform_${terraform.version}_linux_amd64.zip -d /usr/local/bin</run>
+                                    <run>rm terraform_${terraform.version}_linux_amd64.zip</run>
+                                    
+                                    <!-- clear apt cache -->
+                                    <run>apt-get clean</run>
+
+                                </runCmds>
+                                <assembly>
+                                    <basedir>/</basedir>
+                                    <inline>
+                                        <fileSets>
+                                            <fileSet>                                                
+                                                <directory>${project.basedir}/src/main/resources/entrypoint</directory>
+                                                <outputDirectory>/</outputDirectory>
+                                                <includes>
+                                                    <include>**/*</include>
+                                                </includes>
+                                            </fileSet>                                     
+                                        </fileSets>
+                                    </inline>
+                                </assembly>
+                            </build>
+                        </image>
+                    </images>
+                </configuration>
+            </plugin>
+        </plugins>
+
+    </build>
+
+</project>
+

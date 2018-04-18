@@ -128,7 +128,7 @@
                                 <tags>
                                     <tag>${project.version}</tag>
                                 </tags>
-                                <from>${pull.registry}/${tenant}/tomcat-base:9.0.5</from>
+                                <from>${pull.registry}/${tenant}/cloud-portal-server-base:${project.version}</from>
                                 <optimise>true</optimise>
                                 <entryPoint>
                                     <exec>
@@ -142,35 +142,6 @@
                                     </exec>
                                 </cmd>
                                 <runCmds>
-
-                                    <!-- update package sources -->
-                                    <run>apt-get update</run>
-
-                                    <!-- install apt transport https -->
-                                    <run>apt-get install -y apt-transport-https</run>
-
-                                    <!-- add azure cli package repo -->
-                                    <run>echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ wheezy main" >> /etc/apt/sources.list.d/azure-cli.list</run>
-                                    <run>apt-key adv --keyserver packages.microsoft.com --recv-keys 52E16F86FEE04B979B07E28DB02C46DF417A0893</run>
-
-                                    <!-- update package sources -->
-                                    <run>apt-get update</run>
-
-                                    <!-- install azure cli -->
-                                    <run>apt-get install -y --no-install-recommends azure-cli</run>
-
-                                    <!-- install aws cli -->
-                                    <run>apt-get install -y --no-install-recommends python-pip</run>
-                                    <run>pip install awscli</run>
-
-                                    <!-- download and install terraform -->
-                                    <run>wget -q https://releases.hashicorp.com/terraform/${terraform.version}/terraform_${terraform.version}_linux_amd64.zip</run>
-                                    <run>unzip -q terraform_${terraform.version}_linux_amd64.zip -d /usr/local/bin</run>
-                                    <run>rm terraform_${terraform.version}_linux_amd64.zip</run>
-                                    
-                                    <!-- clear apt cache -->
-                                    <run>apt-get clean</run>
-
                                     <!-- remove default index.jsp -->
                                     <run>rm -f ${tomcat.webapps.folder}/ROOT/index.jsp</run>
 

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # include parent entrypoint script
-source /cloud-portal-server-base.sh
+source /tomcat-base.sh
 
 # execute command
 exec "$@"
