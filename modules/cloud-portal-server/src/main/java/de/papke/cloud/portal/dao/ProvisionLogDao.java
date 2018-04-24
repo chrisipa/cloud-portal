@@ -14,4 +14,5 @@ public interface ProvisionLogDao extends MongoRepository<ProvisionLog, String> {
 	public List<ProvisionLog> findByCommandAndExpirationDate(String command, Date expirationDate);
 	public ProvisionLog findById(String id);
 	public List<ProvisionLog> findByGroupInAndProvider(List<String> groups, String provider);
+	public List<ProvisionLog> findByProvider(String provider);
 }

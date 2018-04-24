@@ -49,8 +49,13 @@ public class ProvisionLogService {
 
 		User user = sessionUserService.getUser();
 		if (user != null) {
-			List<String> groups = user.getGroups();
-			provisionLogList = provisionLogDao.findByGroupInAndProvider(groups, provider);
+			if (user.getIsAdmin()) {
+				provisionLogList = provisionLogDao.findByProvider(provider);
+			}
+			else {
+				List<String> groups = user.getGroups();		
+				provisionLogList = provisionLogDao.findByGroupInAndProvider(groups, provider);
+			}
 		}
 
 		return provisionLogList;
