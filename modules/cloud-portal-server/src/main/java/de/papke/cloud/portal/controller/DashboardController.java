@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.PostConstruct;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,9 +25,22 @@ public class DashboardController extends ApplicationController {
 	private static final String PREFIX = "/";
 	private static final String DASHBOARD_MODEL_VAR_NAME = "dashboard";
 	private static final String VAR_IMAGE_NAME = "image_name";
+	private static final Integer DAYS_BEFORE = 30;
+	
+	private Date dateBefore;
 	
 	@Autowired
 	private ProvisionLogService provisionLogService;
+	
+	@PostConstruct
+	private void init() {
+		
+		// get date before specified days
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(new Date());
+		calendar.add(Calendar.DAY_OF_YEAR, - DAYS_BEFORE);
+		dateBefore = calendar.getTime();
+	}
 	
 	@GetMapping(path = PREFIX)
 	public String index(Map<String, Object> model) {
@@ -92,16 +107,20 @@ public class DashboardController extends ApplicationController {
 	private Map<Long, Integer> addProvisioningHistoryToMap(ProvisionLog provisionLog, Map<Long, Integer> provisioningHistoryMap) {
 
 		Date date = provisionLog.getDate();
-		Date calculatedDate = DateUtils.truncate(date, Calendar.DAY_OF_MONTH); // NOSONAR
-		long timeInMillis = calculatedDate.getTime();
 		
-		Integer counter = provisioningHistoryMap.get(timeInMillis);
-		if (counter == null) {
-			counter = 0;
+		if (date.after(dateBefore)) {
+			
+			Date calculatedDate = DateUtils.truncate(date, Calendar.DAY_OF_MONTH); // NOSONAR
+			long timeInMillis = calculatedDate.getTime();
+			
+			Integer counter = provisioningHistoryMap.get(timeInMillis);
+			if (counter == null) {
+				counter = 0;
+			}
+			counter = counter + 1;
+			
+			provisioningHistoryMap.put(timeInMillis, counter);
 		}
-		counter = counter + 1;
-		
-		provisioningHistoryMap.put(timeInMillis, counter);
 		
 		return provisioningHistoryMap;
 	}
