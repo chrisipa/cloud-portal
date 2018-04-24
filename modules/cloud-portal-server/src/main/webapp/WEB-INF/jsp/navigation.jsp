@@ -45,7 +45,7 @@
                 <c:set var="menuEntry" value="${application.menu}" scope="request" />
                 <jsp:include page="menu-entry.jsp">
                     <jsp:param name="level" value="1" />
-                    <jsp:param name="isAdmin" value="${application.user.isAdmin}" />
+                    <jsp:param name="isAdmin" value="${application.user.admin}" />
                 </jsp:include>
             </ul>
         </div>

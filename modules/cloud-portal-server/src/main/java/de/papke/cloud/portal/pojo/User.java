@@ -12,18 +12,18 @@ public class User implements Serializable {
 	private String surName;
 	private String email;
 	private List<String> groups;
-	private Boolean isAdmin;
+	private boolean admin;
 	
 	public User() {}
 	
-	public User(String username, String givenName, String surName, String email, List<String> groups, Boolean isAdmin) {
+	public User(String username, String givenName, String surName, String email, List<String> groups, boolean admin) {
 		super();
 		this.givenName = givenName;
 		this.surName = surName;
 		this.username = username;
 		this.email = email;
 		this.groups = groups;
-		this.isAdmin = isAdmin;
+		this.admin = admin;
 	}
 	
 	public String getUsername() {
@@ -66,11 +66,11 @@ public class User implements Serializable {
 		this.groups = groups;
 	}
 
-	public Boolean getIsAdmin() {
-		return isAdmin;
+	public boolean isAdmin() {
+		return admin;
 	}
 
-	public void setIsAdmin(Boolean isAdmin) {
-		this.isAdmin = isAdmin;
+	public void setAdmin(boolean admin) {
+		this.admin = admin;
 	}
 }

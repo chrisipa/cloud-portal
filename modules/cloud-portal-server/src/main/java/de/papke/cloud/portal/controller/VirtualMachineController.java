@@ -202,7 +202,7 @@ public class VirtualMachineController extends ApplicationController {
 			User user = sessionUserService.getUser();
 
 			// check if user is allowed to deprovision the vm
-			if (user.getIsAdmin()) {			
+			if (user.isAdmin()) {			
 			
 				// get provision log entry
 				ProvisionLog provisionLog = provisionLogService.get(id);

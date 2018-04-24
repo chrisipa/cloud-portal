@@ -29,7 +29,8 @@ public class UserService {
 			
 			for (String group : user.getGroups()) {
 				if (group.equals(adminGroup)) {
-					user.setIsAdmin(true);
+					user.setAdmin(true);
+					break;
 				}
 			}
 		}

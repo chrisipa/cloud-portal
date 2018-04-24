@@ -34,7 +34,7 @@
                             <c:forEach items="${virtualMachine.provisionLogList}" var="provisionLog">
                                 <tr>
                                     <td>
-                                        <c:if test="${application.user.isAdmin}">
+                                        <c:if test="${application.user.admin}">
                                             <button id="delete/action/${virtualMachine.provider}/${provisionLog.id}" type="submit" class="btn btn-warning btn-circle" data-toggle="tooltip" title="Delete item">
                                                 <i class="fa fa-times"></i>
                                             </button>

@@ -49,7 +49,7 @@ public class ProvisionLogService {
 
 		User user = sessionUserService.getUser();
 		if (user != null) {
-			if (user.getIsAdmin()) {
+			if (user.isAdmin()) {
 				provisionLogList = provisionLogDao.findByProvider(provider);
 			}
 			else {

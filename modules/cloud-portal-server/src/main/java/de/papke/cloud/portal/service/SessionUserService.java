@@ -30,7 +30,7 @@ public class SessionUserService {
 	}
 	
 	public boolean isAdmin() {
-		return getUser().getIsAdmin();
+		return getUser().isAdmin();
 	}
 	
 	public void setUser(User user) {
