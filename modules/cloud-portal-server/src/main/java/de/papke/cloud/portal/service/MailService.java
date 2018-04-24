@@ -44,6 +44,9 @@ public class MailService {
 
 	@Value("${mail.from}")
 	private String from;
+	
+	@Value("${mail.cc}")
+	private String cc;
 
 	@Value("${mail.username}")
 	private String username;
@@ -103,7 +106,7 @@ public class MailService {
 	public void send(String to, String subject, String templatePath, List<File> attachmentList, Map variableMap) {
 
 		// logging
-		LOG.info("Sending mail from '{}' to address '{}' with subject '{}'", from, to, subject);
+		LOG.info("Sending mail from '{}' to address '{}' and cc addresses '{}' with subject '{}'", from, to, cc, subject);
 
 		// really send mail
 		if (send) {
@@ -122,6 +125,7 @@ public class MailService {
 					MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage, true);
 					messageHelper.setFrom(from);
 					messageHelper.setTo(to);
+					messageHelper.setCc(cc.split(","));
 					messageHelper.setSubject(subject);
 					messageHelper.setText(text, true);
 					

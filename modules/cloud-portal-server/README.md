@@ -39,6 +39,7 @@ Self service web portal for different Cloud platforms like Azure, AWS and VMWare
       - 'ldap.url.string=ldap://my-ldap-server-1:389,ldap://my-ldap-server-2:389'
       - 'ldap.user.search.filter=(objectClass=inetOrgPerson)'
       - 'mail.from=no-reply@my-domain.com'
+      - 'mail.cc=my-cc-account@my-domain.com'
       - 'mail.host=my-mail-server'
       - 'mail.send=true'
       - 'spring.data.mongodb.uri=mongodb://mongodb:27017/cloud-portal'

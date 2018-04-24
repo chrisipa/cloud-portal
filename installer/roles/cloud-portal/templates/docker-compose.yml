@@ -29,6 +29,7 @@ tomcat:
     - 'ldap.url.string={{ ldap_url_string }}'
     - 'ldap.user.search.filter={{ ldap_user_search_filter }}'
     - 'mail.from={{ mail_from }}'
+    - 'mail.cc={{ mail_cc }}'
     - 'mail.host={{ mail_host }}'
     - 'mail.send={{ mail_send }}'
     - 'spring.data.mongodb.uri={{ spring_data_mongodb_uri }}'

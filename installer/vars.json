@@ -19,6 +19,7 @@
   "ldap_url_string" : "ldap://my-ldap-server-1:389,ldap://my-ldap-server-2:389",
   "ldap_user_search_filter" : "(objectClass=inetOrgPerson)",
   "mail_from" : "my-mail-account@my-domain.com",
+  "mail_cc" : "my-cc-account@my-domain.com",
   "mail_host" : "my-mail-server",
   "mail_send" : "false",
   "time_server" : "my.time.server"
