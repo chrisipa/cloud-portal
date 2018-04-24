@@ -86,6 +86,9 @@ public class DashboardController extends ApplicationController {
 			}
 		}
 		
+		// fill up provisioning history
+		fillUpProvisioningHistory(provisioningHistoryMap);
+		
 		// create dashboard model
 		DashboardModel dashboardModel = new DashboardModel();
 		dashboardModel.setProvisioningHistory(provisioningHistoryMap);
@@ -103,8 +106,21 @@ public class DashboardController extends ApplicationController {
 		
 		return cloudProviderUsageMap;
 	}
+
+	private void fillUpProvisioningHistory(Map<Long, Integer> provisioningHistoryMap) {
+		
+		long start = DateUtils.truncate(dateBefore, Calendar.DAY_OF_MONTH).getTime(); // NOSONAR
+		if (!provisioningHistoryMap.containsKey(start)) {
+			provisioningHistoryMap.put(start, 0);
+		}
+		
+		long end = DateUtils.truncate(new Date(), Calendar.DAY_OF_MONTH).getTime(); // NOSONAR
+		if (!provisioningHistoryMap.containsKey(end)) {
+			provisioningHistoryMap.put(end, 0);
+		}
+	}
 	
-	private Map<Long, Integer> addProvisioningHistoryToMap(ProvisionLog provisionLog, Map<Long, Integer> provisioningHistoryMap) {
+	private void addProvisioningHistoryToMap(ProvisionLog provisionLog, Map<Long, Integer> provisioningHistoryMap) {
 
 		Date date = provisionLog.getDate();
 		
@@ -121,11 +137,9 @@ public class DashboardController extends ApplicationController {
 			
 			provisioningHistoryMap.put(timeInMillis, counter);
 		}
-		
-		return provisioningHistoryMap;
 	}
 	
-	private Map<String, Integer> addProvisioningCommandToMap(ProvisionLog provisionLog, Map<String, Integer> provisioningCommandMap) {
+	private void addProvisioningCommandToMap(ProvisionLog provisionLog, Map<String, Integer> provisioningCommandMap) {
 		
 		String command = provisionLog.getCommand();
 		
@@ -136,11 +150,9 @@ public class DashboardController extends ApplicationController {
 		counter = counter + 1;
 		
 		provisioningCommandMap.put(command, counter);
-		
-		return provisioningCommandMap;
 	}
 	
-	private Map<String, Integer> addOperatingSystemUsageToMap(ProvisionLog provisionLog, Map<String, Integer> operatingSystemUsageMap) {
+	private void addOperatingSystemUsageToMap(ProvisionLog provisionLog, Map<String, Integer> operatingSystemUsageMap) {
 		
 		String imageName = (String) provisionLog.getVariableMap().get(VAR_IMAGE_NAME);
 		if (StringUtils.isNotEmpty(imageName)) {
@@ -153,7 +165,5 @@ public class DashboardController extends ApplicationController {
 
 			operatingSystemUsageMap.put(imageName, counter);
 		}
-		
-		return operatingSystemUsageMap;
 	}
 }
