@@ -34,12 +34,7 @@ public class DashboardController extends ApplicationController {
 	
 	@PostConstruct
 	private void init() {
-		
-		// get date before specified days
-		Calendar calendar = Calendar.getInstance();
-		calendar.setTime(new Date());
-		calendar.add(Calendar.DAY_OF_YEAR, - DAYS_BEFORE);
-		dateBefore = calendar.getTime();
+		this.dateBefore = getDate(DAYS_BEFORE);
 	}
 	
 	@GetMapping(path = PREFIX)
@@ -100,23 +95,32 @@ public class DashboardController extends ApplicationController {
 		model.put(DASHBOARD_MODEL_VAR_NAME, dashboardModel);
 	}
 
+	private Date getDate(int daysBefore) {
+		
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(new Date());
+		calendar.add(Calendar.DAY_OF_YEAR, - daysBefore);
+		
+		return calendar.getTime();
+	}	
+	
 	private Map<String, Integer> addCloudProviderUsageToMap(String provider, Map<String, Integer> cloudProviderUsageMap, List<ProvisionLog> provisionLogList) {
 
 		cloudProviderUsageMap.put(provider, provisionLogList.size());
 		
 		return cloudProviderUsageMap;
-	}
+	}	
 
 	private void fillUpProvisioningHistory(Map<Long, Integer> provisioningHistoryMap) {
 		
-		long start = DateUtils.truncate(dateBefore, Calendar.DAY_OF_MONTH).getTime(); // NOSONAR
-		if (!provisioningHistoryMap.containsKey(start)) {
-			provisioningHistoryMap.put(start, 0);
-		}
-		
-		long end = DateUtils.truncate(new Date(), Calendar.DAY_OF_MONTH).getTime(); // NOSONAR
-		if (!provisioningHistoryMap.containsKey(end)) {
-			provisioningHistoryMap.put(end, 0);
+		for (int i = 0; i <= DAYS_BEFORE; i++) {
+			
+			Date date = getDate(i);
+			long timeInMillis = DateUtils.truncate(date, Calendar.DAY_OF_MONTH).getTime(); // NOSONAR
+			
+			if (!provisioningHistoryMap.containsKey(timeInMillis)) {
+				provisioningHistoryMap.put(timeInMillis, 0);
+			}
 		}
 	}
 	
@@ -124,7 +128,7 @@ public class DashboardController extends ApplicationController {
 
 		Date date = provisionLog.getDate();
 		
-		if (date.after(dateBefore)) {
+		if (date.after(this.dateBefore)) {
 			
 			Date calculatedDate = DateUtils.truncate(date, Calendar.DAY_OF_MONTH); // NOSONAR
 			long timeInMillis = calculatedDate.getTime();
