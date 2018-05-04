@@ -22,8 +22,8 @@ Self service web portal for different Cloud platforms like Azure, AWS and VMWare
 
 ## Prerequisites
 
-* [Setup accounts for Cloud Providers](docs/cloud-portal/README.md)
 * [Check infrastructure requirements](docs/infrastructure/README.md)
+* [Setup accounts for Cloud providers](docs/cloud-portal/README.md)
 * [Install the self service portal](docs/installation/README.md)
 * [Add Cloud credentials with an admin user](docs/credentials-admin/README.md)
 
