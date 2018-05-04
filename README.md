@@ -17,15 +17,15 @@ Self service web portal for different Cloud platforms like Azure, AWS and VMWare
 * Execute bootstrap scripts for automated server configuration
 * Send HTML emails with customizable velocity templates and Terraform log data as attachment
 * Responsive WebUI with generic Terraform variable rendering
-* Optimized RESTful WebService for CD pipeline integrations
+* Optimized RESTful WebServices and CLI client for CD pipeline integrations
 * Dashboards showing important provisioning metrics
 
 ## Prerequisites
 
-* LDAP server must be available
-* SMTP server must be available
-* [Docker](https://docs.docker.com/engine/installation/) must be installed
-* [Docker-Compose](https://docs.docker.com/compose/install/) must be installed
+* [Setup accounts for Cloud Providers](docs/cloud-portal/README.md)
+* [Check infrastructure requirements](docs/infrastructure/README.md)
+* [Install the self service portal](docs/installation/README.md)
+* [Add Cloud credentials with an admin user](docs/credentials-admin/README.md)
 
 ## Usage
 
