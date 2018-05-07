@@ -95,3 +95,7 @@ aws iam create-access-key --user-name my-username
 * SSH is used for executing bash scripts for bootstrapping
 * Make sure to turn on the SSH server
 * Use LVM for hard drive partitioning (otherwise live resizing of partitions will not work)
+
+### Resource Pools
+
+* It is recommended to create a new resource pool for every team or group using the self service portal in terms of hardware resource isolation
