@@ -6,7 +6,7 @@
 
 Self service web portal for different Cloud platforms like Azure, AWS and VMWare vSphere.
 
-[![Self Service Cloud Portal - Use Case #1](docs/screencast/images/youtube.png)](https://youtu.be/NKZ46OSocp8 "Self Service Cloud Portal - Use Case #1")
+[![Self Service Cloud Portal - Use Case #1](https://github.com/chrisipa/cloud-portal/raw/master/docs/screencast/images/youtube.png)](https://youtu.be/NKZ46OSocp8 "Self Service Cloud Portal - Use Case #1")
 
 ## Features
 
