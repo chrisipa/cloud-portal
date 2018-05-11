@@ -106,7 +106,7 @@ function login() {
     log "INFO" "Creating a session with username '$CLOUD_PORTAL_USERNAME' and login url '$loginUrl'"
     
     # create session and save to cookie file
-    redirectUrl=$(curl -w "%{redirect_url}" -s -X POST -c "$cookieFile" -F "username=$CLOUD_PORTAL_USERNAME" -F "password=$CLOUD_PORTAL_PASSWORD" "$loginUrl")
+    redirectUrl=$(curl -N -w "%{redirect_url}" -s -X POST -c "$cookieFile" -F "username=$CLOUD_PORTAL_USERNAME" -F "password=$CLOUD_PORTAL_PASSWORD" "$loginUrl")
     
     # check if login failed
     if [[ "$redirectUrl" == *error ]]
@@ -127,7 +127,7 @@ function logout() {
     log "INFO" "Destroying a session with logout url '$logoutUrl'"
 
     # destroy session
-    curl -s -X GET -b "$cookieFile" "$logoutUrl" > "$outputFile" >> /dev/null
+    curl -N -s -X GET -b "$cookieFile" "$logoutUrl" > "$outputFile" >> /dev/null
     
     # cleanup
     cleanup
@@ -145,7 +145,7 @@ function apply() {
     log "INFO" "Creating virtual machine for cloud provider '$CLOUD_PORTAL_PROVIDER' and apply url '$applyUrl'"
     
     # create virtual machine for cloud provider
-    curl -w "\nstatus_code = %{http_code}" -s -X POST -b "$cookieFile" -F "provider=$CLOUD_PORTAL_PROVIDER" "$@" "$applyUrl" | tee "$outputFile"      
+    curl -N -w "\nstatus_code = %{http_code}" -s -X POST -b "$cookieFile" -F "provider=$CLOUD_PORTAL_PROVIDER" "$@" "$applyUrl" | tee "$outputFile"      
     
     # check if status code is valid
     statusCode=$(getVariableFromOutput "status_code")
@@ -172,7 +172,7 @@ function destroy() {
     log "INFO" "Destroying virtual machine for cloud provider '$CLOUD_PORTAL_PROVIDER' and id '$id'"
     
     # destroy virtual machine for cloud provider
-    curl -w "\nstatus_code = %{http_code}" -s -X GET -b "$cookieFile" "$destroyUrl" | tee "$outputFile"
+    curl -N -w "\nstatus_code = %{http_code}" -s -X GET -b "$cookieFile" "$destroyUrl" | tee "$outputFile"
     
     # check if status code is valid
     statusCode=$(getVariableFromOutput "status_code")
@@ -214,7 +214,7 @@ function variables() {
     log "INFO" "Getting variable information from url '$variablesUrl'"
 
     # get usage 
-    curl -X GET -b "$cookieFile" "$variablesUrl"
+    curl -N -X GET -b "$cookieFile" "$variablesUrl"
 
     # logout
     login

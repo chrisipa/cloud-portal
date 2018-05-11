@@ -13,7 +13,7 @@ Docker container image for the Cloud Portal CLI client based on debian and curl.
 
 ```bash
 docker run --rm \
--e 'CLOUD_PORTAL_URL=https://my-cloud-portal-host/cloud-portal' \
+-e 'CLOUD_PORTAL_URL=https://my-cloud-portal-host' \
 -e 'CLOUD_PORTAL_USERNAME=my-user@my-domain.com' \
 -e 'CLOUD_PORTAL_PASSWORD=my-password' \
 -e 'CLOUD_PORTAL_PROVIDER=vsphere' \
@@ -25,7 +25,7 @@ chrisipa/cloud-portal-client
 
 ```bash
 docker run --rm \
--e 'CLOUD_PORTAL_URL=https://my-cloud-portal-host/cloud-portal' \
+-e 'CLOUD_PORTAL_URL=https://my-cloud-portal-host' \
 -e 'CLOUD_PORTAL_USERNAME=my-user@my-domain.com' \
 -e 'CLOUD_PORTAL_PASSWORD=my-password' \
 -e 'CLOUD_PORTAL_PROVIDER=vsphere' \
@@ -36,11 +36,11 @@ chrisipa/cloud-portal-client \
 -F 'password=P@ssword1'
 ```
 
-* Destroy a virtual machine:
+* Destroy a vsphere virtual machine:
 
 ```bash
 docker run --rm \
--e 'CLOUD_PORTAL_URL=https://my-cloud-portal-host/cloud-portal' \
+-e 'CLOUD_PORTAL_URL=https://my-cloud-portal-host' \
 -e 'CLOUD_PORTAL_USERNAME=my-user@my-domain.com' \
 -e 'CLOUD_PORTAL_PASSWORD=my-password' \
 -e 'CLOUD_PORTAL_PROVIDER=vsphere' \
