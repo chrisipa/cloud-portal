@@ -22,6 +22,7 @@ import de.papke.cloud.portal.service.ProvisionLogService;
 @Controller
 public class DashboardController extends ApplicationController {
 	
+	private static final String NONE = "none";
 	private static final String PREFIX = "/";
 	private static final String DASHBOARD_MODEL_VAR_NAME = "dashboard";
 	private static final String VAR_IMAGE_NAME = "image_name";
@@ -68,21 +69,27 @@ public class DashboardController extends ApplicationController {
 			// get provisioning log list by provider
 			List<ProvisionLog> provisionLogList = provisionLogService.getList(provider);
 
-			// add cloud provider usage to map
-			addCloudProviderUsageToMap(provider, cloudProviderUsageMap, provisionLogList);
-			
-			// iterate over provisioning log list
-			for (ProvisionLog provisionLog : provisionLogList) {
+			if (!provisionLogList.isEmpty()) {
 				
-				// add statistics to maps
-				addProvisioningHistoryToMap(provisionLog, provisioningHistoryMap);
-				addProvisioningCommandToMap(provisionLog, provisioningCommandMap);
-				addOperatingSystemUsageToMap(provisionLog, operatingSystemUsageMap);
+				// add cloud provider usage to map
+				addCloudProviderUsageToMap(provider, cloudProviderUsageMap, provisionLogList);
+				
+				// iterate over provisioning log list
+				for (ProvisionLog provisionLog : provisionLogList) {
+					
+					// add statistics to maps
+					addProvisioningHistoryToMap(provisionLog, provisioningHistoryMap);
+					addProvisioningCommandToMap(provisionLog, provisioningCommandMap);
+					addOperatingSystemUsageToMap(provisionLog, operatingSystemUsageMap);
+				}
 			}
 		}
 		
-		// fill up provisioning history
+		// fill up maps with dummy values
 		fillUpProvisioningHistory(provisioningHistoryMap);
+		fillUpMapWithNoneValue(provisioningCommandMap);
+		fillUpMapWithNoneValue(cloudProviderUsageMap);
+		fillUpMapWithNoneValue(operatingSystemUsageMap);
 		
 		// create dashboard model
 		DashboardModel dashboardModel = new DashboardModel();
@@ -111,6 +118,12 @@ public class DashboardController extends ApplicationController {
 		return cloudProviderUsageMap;
 	}	
 
+	private void fillUpMapWithNoneValue(Map<String, Integer> map) {
+		if (map.isEmpty()) {
+			map.put(NONE, 1);
+		}
+	}
+	
 	private void fillUpProvisioningHistory(Map<Long, Integer> provisioningHistoryMap) {
 		
 		for (int i = 0; i <= DAYS_BEFORE; i++) {
