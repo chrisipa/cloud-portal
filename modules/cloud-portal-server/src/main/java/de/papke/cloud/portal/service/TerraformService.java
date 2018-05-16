@@ -51,6 +51,8 @@ public class TerraformService {
 	private static final String FOLDER_PLUGINS = ".terraform";
 	private static final String PROPERTY_VARIABLES = "variables";
 	private static final String PROPERTY_VARIABLE_GROUPS = "variableGroups";
+	
+	private static final Integer NUMBER_OF_RETRIES = 60;
 
 	@Autowired
 	private CommandExecutorService commandExecutorService;
@@ -69,7 +71,7 @@ public class TerraformService {
 
 	@PostConstruct
 	public void init() {
-		downloadProviderPluginFiles();
+		retryDownloadProviderPluginFiles();
 		retrieveProviderDefaults();
 	}
 
@@ -107,9 +109,22 @@ public class TerraformService {
 			LOG.error(e.getMessage(), e);
 		}
 	}
+	
+	private void retryDownloadProviderPluginFiles() {
+		
+		for (int i = 0; i < NUMBER_OF_RETRIES; i++) {
+			try {
+				downloadProviderPluginFiles();
+				break;
+			}
+			catch (IllegalStateException e) {	
+				LOG.error(e.getMessage());
+			}
+		}
+	}
 
 	private void downloadProviderPluginFiles() {
-
+	
 		// copy init folder to temp
 		String resourcePath = Constants.FOLDER_TERRAFORM + File.separator + FOLDER_INIT;
 		String targetPath = System.getProperty("java.io.tmpdir") + File.separator + Constants.FOLDER_TERRAFORM + File.separator + FOLDER_INIT;
