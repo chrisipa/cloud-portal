@@ -14,6 +14,7 @@ public class Variable {
 	private int index = 0;
 	private String pattern = "";
 	private String url = "";
+	private List<Relation> relations = new ArrayList<>();
 	
 	@Override
 	public String toString() {
@@ -90,5 +91,13 @@ public class Variable {
 
 	public void setUrl(String url) {
 		this.url = url;
+	}
+
+	public List<Relation> getRelations() {
+		return relations;
+	}
+
+	public void setRelations(List<Relation> relations) {
+		this.relations = relations;
 	}
 }

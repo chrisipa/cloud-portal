@@ -92,12 +92,14 @@
 										</c:otherwise>
 									</c:choose>
 									<p class="help-block">
-									   <c:if test="${not empty variable.url}">
-									       <a href="${variable.url}" target="_blank">
+									   <c:url value="${variable.url}" var="variableUrl" />
+									   <c:if test="${not empty variableUrl}">
+									       <a href="${variableUrl}" target="_blank">
 									   </c:if>
 									   <c:out value="${variable.description}" />
-									   <c:if test="${not empty variable.url}">
-									       </a>
+									   <c:if test="${not empty variableUrl}">
+										          <i class="fa fa-question-circle"></i>
+                                           </a>
 									   </c:if>
 									</p>
 								</c:forEach>

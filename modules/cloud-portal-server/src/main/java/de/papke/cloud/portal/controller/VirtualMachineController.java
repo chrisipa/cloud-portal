@@ -36,6 +36,7 @@ import de.papke.cloud.portal.constants.Constants;
 import de.papke.cloud.portal.model.VirtualMachineModel;
 import de.papke.cloud.portal.pojo.Credentials;
 import de.papke.cloud.portal.pojo.ProvisionLog;
+import de.papke.cloud.portal.pojo.Relation;
 import de.papke.cloud.portal.pojo.User;
 import de.papke.cloud.portal.pojo.Variable;
 import de.papke.cloud.portal.pojo.VariableGroup;
@@ -432,6 +433,19 @@ public class VirtualMachineController extends ApplicationController {
 			}
 			else if (variable.isRequired() && variable.getDefaults().isEmpty()) {
 				errorFound = true;
+			}
+			
+			List<Relation> relations = variable.getRelations();
+			for (Relation relation : relations) {
+				
+				String relationName = relation.getName();
+				String relationType = relation.getType();
+				Object relationValue = variableMap.get(relationName);
+				Object variableValue = variableMap.get(variableName);
+				
+				if (relationType.equals("equals") && !variableValue.equals(relationValue)) {
+					errorFound = true;
+				}
 			}
 			
 			if (errorFound) {

@@ -33,7 +33,8 @@ docker run --rm \
 chrisipa/cloud-portal-client \
 -F 'title=my-title' \
 -F 'description=my-description' \
--F 'password=P@ssword1'
+-F 'password=P@ssword1' \ 
+-F 'password_repeat=P@ssword1' 
 ```
 
 * Destroy a vsphere virtual machine:

@@ -194,7 +194,19 @@ variableGroups:
       description: Password for admin user.
       type: secret   
       required: true
-      pattern: "(?=^.{8,255}$)((?=.*\\d)(?=.*[A-Z])(?=.*[a-z])|(?=.*\\d)(?=.*[^A-Za-z0-9])(?=.*[a-z])|(?=.*[^A-Za-z0-9])(?=.*[A-Z])(?=.*[a-z])|(?=.*\\d)(?=.*[A-Z])(?=.*[^A-Za-z0-9]))^.*"    
+      pattern: "(?=^.{8,255}$)((?=.*\\d)(?=.*[A-Z])(?=.*[a-z])|(?=.*\\d)(?=.*[^A-Za-z0-9])(?=.*[a-z])|(?=.*[^A-Za-z0-9])(?=.*[A-Z])(?=.*[a-z])|(?=.*\\d)(?=.*[A-Z])(?=.*[^A-Za-z0-9]))^.*"
+      url: /static/html/help/passwords.html  
+      
+    - title: Password (Repeat)
+      name: password_repeat
+      description: Repeat password for admin user.
+      type: secret   
+      required: true
+      url: /static/html/help/passwords.html
+      relations:
+      
+      - name: password
+        type: equals         
     
     - title: Public Key
       name: public_key_file
