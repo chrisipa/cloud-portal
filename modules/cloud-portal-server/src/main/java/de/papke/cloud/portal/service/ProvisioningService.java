@@ -30,10 +30,10 @@ import de.papke.cloud.portal.pojo.User;
 import de.papke.cloud.portal.util.ZipUtil;
 
 @Service
-public class VirtualMachineService {
+public class ProvisioningService {
 
 
-	private static final Logger LOG = LoggerFactory.getLogger(VirtualMachineService.class);
+	private static final Logger LOG = LoggerFactory.getLogger(ProvisioningService.class);
 
 	private static final String PATTERN_FILE = "_file";
 	private static final String PATTERN_OUTPUTS = "Outputs:";
@@ -99,7 +99,7 @@ public class VirtualMachineService {
 			String group = credentials.getGroup();
 			
 			// copy terraform resources to filesystem
-			String resourceFolderPath = Constants.FOLDER_TERRAFORM + File.separator + PREFIX_VM + File.separator + provider;
+			String resourceFolderPath = Constants.FOLDER_PROVISIONER + File.separator + Constants.FOLDER_TERRAFORM + File.separator + PREFIX_VM + File.separator + provider;
 			tmpFolder = fileService.copyResourceToFilesystem(resourceFolderPath);
 
 			// use terraform to provision vms

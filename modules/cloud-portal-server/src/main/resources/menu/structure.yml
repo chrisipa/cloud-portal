@@ -73,6 +73,18 @@ menus:
          path: /vm/create/form/azure
          icon: fa-plus
          
+    - title: VMWare ESXi
+      icon: fa-cloud
+      menus:
+      
+       - title: List
+         path: /vm/list/form/esxi
+         icon: fa-list
+         
+       - title: Create
+         path: /vm/create/form/esxi
+         icon: fa-plus
+         
     - title: VMWare vSphere
       icon: fa-cloud
       menus:

@@ -2,12 +2,9 @@ package de.papke.cloud.portal.service;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.URI;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,15 +20,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.yaml.snakeyaml.TypeDescription;
-import org.yaml.snakeyaml.Yaml;
-import org.yaml.snakeyaml.constructor.Constructor;
 
 import de.papke.cloud.portal.constants.Constants;
 import de.papke.cloud.portal.pojo.CommandResult;
 import de.papke.cloud.portal.pojo.Credentials;
 import de.papke.cloud.portal.pojo.Variable;
-import de.papke.cloud.portal.pojo.VariableConfig;
 import de.papke.cloud.portal.pojo.VariableGroup;
 
 @Service
@@ -44,13 +37,9 @@ public class TerraformService {
 	private static final String FLAG_VAR = "-var";
 	private static final String FLAG_FORCE = "-force";
 	private static final String VARIABLE_IDENTIFIER = "variable";
-	private static final String FILE_VARIABLES_YML = "variables.yml";
 	private static final String FILE_VARIABLES_TF = "variables.tf";
 	private static final String FOLDER_INIT = "init";
-	private static final String FOLDER_VM = "vm";
 	private static final String FOLDER_PLUGINS = ".terraform";
-	private static final String PROPERTY_VARIABLES = "variables";
-	private static final String PROPERTY_VARIABLE_GROUPS = "variableGroups";
 	
 	private static final Integer NUMBER_OF_RETRIES = 60;
 
@@ -58,58 +47,21 @@ public class TerraformService {
 	private CommandExecutorService commandExecutorService;
 
 	@Autowired
-	private ResourceService resourceService;
-
-	@Autowired
 	private FileService fileService;
+	
+	@Autowired
+	private VariableService variableService;
 
 	@Value("${terraform.path}")
 	private String terraformPath;
 
-	private Map<String, List<VariableGroup>> providerDefaults = new HashMap<>();
 	private File pluginSourceFolder;
 
 	@PostConstruct
 	public void init() {
 		retryDownloadProviderPluginFiles();
-		retrieveProviderDefaults();
 	}
 
-	private void retrieveProviderDefaults() {
-
-		try {
-
-			Constructor constructor = new Constructor(VariableConfig.class);
-
-			TypeDescription variableConfigTypeDescription = new TypeDescription(VariableConfig.class);
-			variableConfigTypeDescription.putListPropertyType(PROPERTY_VARIABLE_GROUPS, VariableGroup.class);
-			constructor.addTypeDescription(variableConfigTypeDescription);
-
-			TypeDescription variableGroupTypeDescription = new TypeDescription(VariableGroup.class);
-			variableGroupTypeDescription.putListPropertyType(PROPERTY_VARIABLES, Variable.class);
-			constructor.addTypeDescription(variableGroupTypeDescription);
-
-			Yaml yaml = new Yaml(constructor);
-
-			File terraformFolder = resourceService.getClasspathResource(Constants.FOLDER_TERRAFORM + File.separator + FOLDER_VM);
-			if (!terraformFolder.isFile()) {
-				File[] providerFolderArray = terraformFolder.listFiles();
-				for (File providerFolder : providerFolderArray) {
-					File variableFile = new File(new URI(providerFolder.toURI() + File.separator + FILE_VARIABLES_YML));
-					if (variableFile.exists()) {
-						VariableConfig variableConfig = yaml.loadAs(new FileInputStream(variableFile), VariableConfig.class);
-						List<VariableGroup> variableGroupList = variableConfig.getVariableGroups();
-						providerDefaults.put(providerFolder.getName(), variableGroupList);
-					}
-
-				}
-			}
-		}
-		catch (Exception e) {
-			LOG.error(e.getMessage(), e);
-		}
-	}
-	
 	private void retryDownloadProviderPluginFiles() {
 		
 		for (int i = 0; i < NUMBER_OF_RETRIES; i++) {
@@ -126,7 +78,7 @@ public class TerraformService {
 	private void downloadProviderPluginFiles() {
 	
 		// copy init folder to temp
-		String resourcePath = Constants.FOLDER_TERRAFORM + File.separator + FOLDER_INIT;
+		String resourcePath = Constants.FOLDER_PROVISIONER + File.separator + Constants.FOLDER_TERRAFORM + File.separator + FOLDER_INIT;
 		String targetPath = System.getProperty("java.io.tmpdir") + File.separator + Constants.FOLDER_TERRAFORM + File.separator + FOLDER_INIT;
 		File initFolder = fileService.copyResourceToFilesystem(resourcePath, targetPath);
 
@@ -185,7 +137,9 @@ public class TerraformService {
 		File variablesFile = new File(tmpFolder.getAbsolutePath() + File.separator + FILE_VARIABLES_TF);
 		StringBuilder variablesBuilder = new StringBuilder();
 
+		Map<String, List<VariableGroup>> providerDefaults = variableService.getProviderDefaults();
 		List<VariableGroup> variableGroupList = providerDefaults.get(provider);
+		
 		for (VariableGroup variableGroup : variableGroupList) {
 			for (Variable variable : variableGroup.getVariables()) {
 				variablesBuilder
@@ -244,41 +198,5 @@ public class TerraformService {
 		executionMap.putAll(credentials.getSecretMap());
 
 		return executionMap;
-	}
-
-	public Map<String, List<VariableGroup>> getProviderDefaults() {
-		return providerDefaults;
-	}
-
-	public Map<String, List<VariableGroup>> getVisibleProviderDefaults() {
-
-		Map<String, List<VariableGroup>> visibleProviderDefaults = new HashMap<>();
-
-		for (Entry<String, List<VariableGroup>> entry : providerDefaults.entrySet()) {
-			List<VariableGroup> visibleVariableGroupList = new ArrayList<>();
-			for (VariableGroup variableGroup : entry.getValue()) {
-				if (!variableGroup.isHidden()) {
-					visibleVariableGroupList.add(variableGroup);
-				}
-			}
-			visibleProviderDefaults.put(entry.getKey(), visibleVariableGroupList);
-		}
-
-		return visibleProviderDefaults;
-	}
-
-	public List<Variable> getVisibleVariables(String provider) {
-
-		List<Variable> variables = new ArrayList<>();
-
-		for (VariableGroup variableGroup : providerDefaults.get(provider)) {
-			if (!variableGroup.isHidden()) {
-				for (Variable variable : variableGroup.getVariables()) {
-					variables.add(variable);
-				}
-			}
-		}
-
-		return variables;
 	}
 }

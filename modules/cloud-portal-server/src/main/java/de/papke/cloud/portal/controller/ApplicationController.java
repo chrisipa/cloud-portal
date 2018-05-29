@@ -12,7 +12,7 @@ import de.papke.cloud.portal.model.ApplicationModel;
 import de.papke.cloud.portal.pojo.VariableGroup;
 import de.papke.cloud.portal.service.MenuService;
 import de.papke.cloud.portal.service.SessionUserService;
-import de.papke.cloud.portal.service.TerraformService;
+import de.papke.cloud.portal.service.VariableService;
 
 @Controller
 public class ApplicationController {
@@ -30,7 +30,7 @@ public class ApplicationController {
 	private SessionUserService sessionUserService;
 
 	@Autowired
-	private TerraformService terraformService;
+	private VariableService variableService;
 	
 	@Autowired
 	private MenuService menuService;
@@ -54,7 +54,7 @@ public class ApplicationController {
 		applicationModel.setUser(sessionUserService.getUser());
 
 		// get cloud provider defaults map
-		Map<String, List<VariableGroup>> cloudProviderDefaultsMap = terraformService.getVisibleProviderDefaults();
+		Map<String, List<VariableGroup>> cloudProviderDefaultsMap = variableService.getVisibleProviderDefaults();
 
 		// set cloud providers
 		List<String> cloudProviderList = new ArrayList<>();

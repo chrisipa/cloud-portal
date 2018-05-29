@@ -43,9 +43,9 @@ import de.papke.cloud.portal.pojo.VariableGroup;
 import de.papke.cloud.portal.service.CredentialsService;
 import de.papke.cloud.portal.service.KeyPairService;
 import de.papke.cloud.portal.service.ProvisionLogService;
+import de.papke.cloud.portal.service.ProvisioningService;
 import de.papke.cloud.portal.service.SessionUserService;
-import de.papke.cloud.portal.service.TerraformService;
-import de.papke.cloud.portal.service.VirtualMachineService;
+import de.papke.cloud.portal.service.VariableService;
 
 @Controller
 public class VirtualMachineController extends ApplicationController {
@@ -76,10 +76,10 @@ public class VirtualMachineController extends ApplicationController {
 	private CredentialsService credentialsService;
 
 	@Autowired
-	private VirtualMachineService virtualMachineService;
+	private ProvisioningService provisioningService;
 
 	@Autowired
-	private TerraformService terraformService;
+	private VariableService variableService;
 
 	@Autowired
 	private ProvisionLogService provisionLogService;
@@ -116,7 +116,7 @@ public class VirtualMachineController extends ApplicationController {
 		try {
 			StringBuilder usageBuilder = new StringBuilder();
 			
-			List<Variable> variables = terraformService.getVisibleVariables(provider);
+			List<Variable> variables = variableService.getVisibleVariables(provider);
 			for (Variable variable : variables) {
 				usageBuilder.append(renderVariable(variable));
 				usageBuilder.append(Constants.CHAR_NEW_LINE);
@@ -146,7 +146,7 @@ public class VirtualMachineController extends ApplicationController {
 			writeFilesAndAddToMap(request, variableMap, tempFileList);
 			
 			// get variables
-			List<Variable> variables = terraformService.getVisibleVariables(provider);
+			List<Variable> variables = variableService.getVisibleVariables(provider);
 			
 			// validate parameters
 			List<Variable> errorList = validateValues(variables, variableMap);
@@ -169,7 +169,7 @@ public class VirtualMachineController extends ApplicationController {
 					OutputStream outputStream = response.getOutputStream();
 	
 					// provision VM
-					virtualMachineService.provision(action, credentials, variableMap, privateKeyFile, outputStream);
+					provisioningService.provision(action, credentials, variableMap, privateKeyFile, outputStream);
 				}
 				else {
 					fail(String.format("No credentials found for cloud provider '%s'. Please contact your administrator.", provider), response);
@@ -257,7 +257,7 @@ public class VirtualMachineController extends ApplicationController {
 						OutputStream outputStream = response.getOutputStream();
 						
 						// provision VM
-						virtualMachineService.deprovision(provisionLog, credentials, outputStream);
+						provisioningService.deprovision(provisionLog, credentials, outputStream);
 					}
 					else {
 						fail(String.format("You are not allowed to deprovision the entry with the id '%s'", id), response);
@@ -507,7 +507,7 @@ public class VirtualMachineController extends ApplicationController {
 		fillModel(model);
 
 		// get cloud provider defaults map
-		Map<String, List<VariableGroup>> cloudProviderDefaultsMap = terraformService.getVisibleProviderDefaults();
+		Map<String, List<VariableGroup>> cloudProviderDefaultsMap = variableService.getVisibleProviderDefaults();
 
 		// create virtual machine model
 		VirtualMachineModel virtualMachineModel = new VirtualMachineModel();
