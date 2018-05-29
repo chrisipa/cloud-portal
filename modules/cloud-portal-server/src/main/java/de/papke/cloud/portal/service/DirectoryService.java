@@ -27,12 +27,15 @@ import com.unboundid.ldap.sdk.SearchScope;
 import com.unboundid.ldap.sdk.controls.SimplePagedResultsControl;
 import com.unboundid.util.ssl.SSLUtil;
 
+import de.papke.cloud.portal.constants.Constants;
 import de.papke.cloud.portal.pojo.User;
 
 @Service
 public class DirectoryService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(DirectoryService.class);
+	
+	private static final String SECURE_SCHEME = "ldaps";
 
 	@Value("${ldap.url.string}")
 	private String urlString;
@@ -52,6 +55,9 @@ public class DirectoryService {
 	@Value("${ldap.login.attribute}")
 	private String loginAttribute;
 
+	@Value("${ldap.displayname.attribute}")
+	private String displayNameAttribute;
+	
 	@Value("${ldap.givenname.attribute}")
 	private String givenNameAttribute;
 
@@ -63,6 +69,9 @@ public class DirectoryService {
 
 	@Value("${ldap.group.attribute}")
 	private String groupAttribute;
+	
+	@Value("${ldap.member.attribute}")
+	private String memberAttribute;
 
 	@Value("${ldap.timeout}")
 	private Integer timeout;
@@ -104,6 +113,10 @@ public class DirectoryService {
 
 		return success;
 	}
+	
+	private String getNameFromDN(String dnString) throws LDAPException {
+		return new DN(dnString).getRDN().getAttributeValues()[0];
+	}
 
 	private String getLoginDn(String username) {
 
@@ -129,6 +142,10 @@ public class DirectoryService {
 
 	private Filter getLoginFilter(String username) {
 		return Filter.createEqualityFilter(loginAttribute, username);
+	}
+	
+	private Filter getMemberFilter(String userDn) {
+		return Filter.createEqualityFilter(memberAttribute, userDn);
 	}
 
 	private LDAPConnection getUserConnection(String principal, String password) {
@@ -157,8 +174,13 @@ public class DirectoryService {
 			LDAPURL ldapUrl = new LDAPURL(url);
 			LDAPConnectionOptions ldapConnectionOptions = new LDAPConnectionOptions();
 			ldapConnectionOptions.setConnectTimeoutMillis(timeout);
-			SSLUtil sslUtil = new SSLUtil();
-			SSLSocketFactory sslSocketFactory = sslUtil.createSSLSocketFactory();
+
+			SSLSocketFactory sslSocketFactory = null;
+			if (ldapUrl.getScheme().equals(SECURE_SCHEME)) {
+				SSLUtil sslUtil = new SSLUtil();
+				sslSocketFactory = sslUtil.createSSLSocketFactory();
+			}
+			
 			ldapConnection = new LDAPConnection(sslSocketFactory, ldapConnectionOptions, ldapUrl.getHost(), ldapUrl.getPort(), principal, password);
 		}
 		catch (Exception e) {
@@ -264,30 +286,62 @@ public class DirectoryService {
 
 		return searchResultEntries;
 	}    
-
+	
 	public User getUser(String username) {
 
 		User user = new User();
 
 		try {
 
-			List<SearchResultEntry> searchResultEntries = search(getLoginFilter(username));
-			if (!searchResultEntries.isEmpty()) {
+			List<SearchResultEntry> userEntryList = search(getLoginFilter(username));
+			if (!userEntryList.isEmpty()) {
 
-				SearchResultEntry searchResultEntry = searchResultEntries.get(0);
+				SearchResultEntry userEntry = userEntryList.get(0);
 
+				String givenName = null;
+				String surName = null;
+				
+				if (StringUtils.isNotEmpty(displayNameAttribute)) {
+					
+					StringBuilder givenNameBuilder = new StringBuilder();
+					StringBuilder surNameBuilder = new StringBuilder();
+					
+					String displayName = userEntry.getAttributeValue(displayNameAttribute);
+					String[] displayNameArray = displayName.split(Constants.CHAR_WHITESPACE);
+					
+					for (int i = 0; i < displayNameArray.length; i++) {
+						if (i < displayNameArray.length - 1) {
+							givenNameBuilder.append(displayNameArray[i]);
+						}
+						else {
+							surNameBuilder.append(displayNameArray[i]);
+						}
+					}
+					
+					givenName = givenNameBuilder.toString();
+					surName = surNameBuilder.toString();
+				}
+				else {
+					givenName = userEntry.getAttributeValue(givenNameAttribute);
+					surName = userEntry.getAttributeValue(surNameAttribute);
+				}
+				
 				user.setUsername(username);
-				user.setGivenName(searchResultEntry.getAttributeValue(givenNameAttribute));
-				user.setSurName(searchResultEntry.getAttributeValue(surNameAttribute));
-				user.setEmail(searchResultEntry.getAttributeValue(mailAttribute));
-
+				user.setGivenName(givenName);
+				user.setSurName(surName);
+				user.setEmail(userEntry.getAttributeValue(mailAttribute));
+				
 				List<String> groups = new ArrayList<>();        
-				if (searchResultEntry.hasAttribute(groupAttribute)) {
-					String[] groupAttributeValues = searchResultEntry.getAttributeValues(groupAttribute);
+				if (userEntry.hasAttribute(groupAttribute)) {
+					String[] groupAttributeValues = userEntry.getAttributeValues(groupAttribute);
 					for (String groupAttributeValue : groupAttributeValues) {
-						DN groupDN = new DN(groupAttributeValue);
-						String groupName = groupDN.getRDN().getAttributeValues()[0];
-						groups.add(groupName);
+						groups.add(getNameFromDN(groupAttributeValue));
+					}
+				}
+				else {
+					List<SearchResultEntry> groupEntryList = search(getMemberFilter(userEntry.getDN()));
+					for (SearchResultEntry groupEntry : groupEntryList) {
+						groups.add(getNameFromDN(groupEntry.getDN()));
 					}
 				}
 				
