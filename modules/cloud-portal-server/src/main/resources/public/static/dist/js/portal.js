@@ -1,6 +1,14 @@
 var autoScroll = false;
 var autoScrollTimeout;
 
+// IE polyfill for startsWith function
+if (!String.prototype.startsWith) {
+	String.prototype.startsWith = function(searchString, position){
+		position = position || 0;
+		return this.substr(position, searchString.length) === searchString;
+	};
+}
+
 function startAutoScrollIframe() {
 	$("#output")[0].contentWindow.scrollBy(0,10000);
 	autoScrollTimeout = setTimeout("startAutoScrollIframe()", 500);	

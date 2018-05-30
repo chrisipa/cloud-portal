@@ -65,6 +65,7 @@ public class VirtualMachineController extends ApplicationController {
 	private static final String VAR_NAME_GROUP = "group";
 	private static final String VAR_NAME_APPLICATION_URL = "application_url";
 	private static final String EMPTY_SCRIPT_NAME = "empty";
+	private static final String RESPONSE_CONTENT_TYPE_TEXT_PLAIN = "text/plain; charset=utf-8";
 	
 	@Value("${application.date.format}")
 	private SimpleDateFormat dateFormat;
@@ -129,7 +130,7 @@ public class VirtualMachineController extends ApplicationController {
 		}
 	}
 
-	@PostMapping(path = PREFIX + "/create/action/{action}", produces="text/plain")
+	@PostMapping(path = PREFIX + "/create/action/{action}")
 	@ResponseBody
 	public void provision(
 			@PathVariable String action,
@@ -141,6 +142,9 @@ public class VirtualMachineController extends ApplicationController {
 		List<File> tempFileList = new ArrayList<>();
 
 		try {
+			
+			// set response content type
+			response.setContentType(RESPONSE_CONTENT_TYPE_TEXT_PLAIN);
 
 			// iterate over file map
 			writeFilesAndAddToMap(request, variableMap, tempFileList);
@@ -199,6 +203,9 @@ public class VirtualMachineController extends ApplicationController {
 		
 		try {
 			
+			// set response content type
+			response.setContentType(RESPONSE_CONTENT_TYPE_TEXT_PLAIN);
+			
 			// get current user
 			User user = sessionUserService.getUser();
 
@@ -238,6 +245,9 @@ public class VirtualMachineController extends ApplicationController {
 			HttpServletResponse response) {
 
 		try {
+			
+			// set response content type
+			response.setContentType(RESPONSE_CONTENT_TYPE_TEXT_PLAIN);
 
 			// get credentials
 			Credentials credentials = credentialsService.getCredentials(provider);
