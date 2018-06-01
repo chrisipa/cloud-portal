@@ -15,4 +15,4 @@ For the cloud self service portal to work we need to have some existing infrastr
 
 * Mail notification be turned on to show the provisioning log and the result variables like hostname etc
 * To send this mails you have to configure your desired SMTP server
-* See all configs in [application.properties](../../modules/cloud-portal-server/src/main/resources/application.properties) file starting with the **smtp** prefix  
+* See all configs in [application.properties](../../modules/cloud-portal-server/src/main/resources/application.properties) file starting with the **mail** prefix  
