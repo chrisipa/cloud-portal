@@ -14,6 +14,7 @@ public class ProvisionLog {
 	private String username;
 	private String group;
 	private String command;
+	private String useCaseId;
 	private String provider;
 	private Boolean success;
 	private Map<String, Object> variableMap;
@@ -22,13 +23,14 @@ public class ProvisionLog {
 	
 	public ProvisionLog() {}
 	
-	public ProvisionLog(Date date, Date expirationDate, String username, String group, String command, String provider, Boolean success, Map<String, Object> variableMap, byte[] privateKey, byte[] result) {
+	public ProvisionLog(Date date, Date expirationDate, String username, String group, String command, String useCaseId, String provider, Boolean success, Map<String, Object> variableMap, byte[] privateKey, byte[] result) {
 		super();
 		this.date = date;
 		this.expirationDate = expirationDate;
 		this.username = username;
 		this.group = group;
 		this.command = command;
+		this.useCaseId = useCaseId;
 		this.provider = provider;
 		this.success = success;
 		this.variableMap = variableMap;
@@ -84,6 +86,14 @@ public class ProvisionLog {
 		this.command = command;
 	}
 
+	public String getUseCaseId() {
+		return useCaseId;
+	}
+	
+	public void setUseCaseId(String useCaseId) {
+		this.useCaseId = useCaseId;
+	}
+	
 	public String getProvider() {
 		return provider;
 	}

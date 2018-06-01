@@ -4,7 +4,7 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%--@elvariable id="application" type="de.papke.cloud.portal.model.ApplicationModel"--%>
-<%--@elvariable id="virtualMachine" type="de.papke.cloud.portal.model.VirtualMachineModel"--%>
+<%--@elvariable id="useCase" type="de.papke.cloud.portal.model.UseCaseModel"--%>
 
 <jsp:include page="header.jsp" />
 
@@ -16,7 +16,7 @@
 		<div class="row">
 			<div class="col-lg-12">
 			    <h4 class="page-header">Virtual Machines List</h4>
-				<form id="main-form" method="get" action="<c:url value="/vm" />" target="output"
+				<form id="main-form" method="get" action="<c:url value="/usecase" />" target="output"
 					role="form">
 					<table id="datatable" class="table table-striped table-bordered" cellspacing="0" width="100%">
                         <thead>
@@ -31,16 +31,16 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <c:forEach items="${virtualMachine.provisionLogList}" var="provisionLog">
+                            <c:forEach items="${useCase.provisionLogs}" var="provisionLog">
                                 <tr>
                                     <td>
                                         <c:if test="${application.user.admin}">
-                                            <button id="delete/action/${virtualMachine.provider}/${provisionLog.id}" type="submit" class="btn btn-warning btn-circle" data-toggle="tooltip" title="Delete item">
+                                            <button id="delete/action/${useCase.id}/${provisionLog.id}" type="submit" class="btn btn-warning btn-circle" data-toggle="tooltip" title="Delete item">
                                                 <i class="fa fa-times"></i>
                                             </button>
                                         </c:if>
                                         <c:if test="${provisionLog.success == true && provisionLog.command == 'apply'}">
-                                            <button id="destroy/action/${virtualMachine.provider}/${provisionLog.id}" type="submit" class="btn btn-danger btn-circle" data-toggle="tooltip" title="Destroy item">
+                                            <button id="destroy/action/${useCase.id}/${provisionLog.id}" type="submit" class="btn btn-danger btn-circle" data-toggle="tooltip" title="Destroy item">
                                                 <i class="fa fa-trash"></i>
                                             </button>
                                         </c:if>
@@ -56,7 +56,7 @@
                                     <td><c:out value="${provisionLog.success}" /></td>
                                     <td>
                                     <c:forEach var="variable" items="${provisionLog.variableMap}">
-                                        <p><c:out value="${variable.key}" /> = <c:out value="${virtualMachine.isSecret(variable.key) ? '****' : variable.value}" /></p>
+                                        <p><c:out value="${variable.key}" /> = <c:out value="${useCase.isSecret(variable.key) ? '****' : variable.value}" /></p>
                                     </c:forEach>
                                     </td>
                                     <td data-order="<fmt:formatDate pattern="yyyy-MM-dd HH:mm" value="${provisionLog.expirationDate}"/>"><fmt:formatDate pattern="dd.MM.yyyy HH:mm:ss" value="${provisionLog.expirationDate}"/></td>

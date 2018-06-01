@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -24,6 +23,7 @@ import org.springframework.stereotype.Service;
 import de.papke.cloud.portal.constants.Constants;
 import de.papke.cloud.portal.pojo.CommandResult;
 import de.papke.cloud.portal.pojo.Credentials;
+import de.papke.cloud.portal.pojo.UseCase;
 import de.papke.cloud.portal.pojo.Variable;
 import de.papke.cloud.portal.pojo.VariableGroup;
 
@@ -49,9 +49,6 @@ public class TerraformService {
 	@Autowired
 	private FileService fileService;
 	
-	@Autowired
-	private VariableService variableService;
-
 	@Value("${terraform.path}")
 	private String terraformPath;
 
@@ -95,7 +92,7 @@ public class TerraformService {
 		pluginSourceFolder = new File(targetPath + File.separator + FOLDER_PLUGINS);
 	}
 
-	public CommandResult execute(String action, Credentials credentials, Map<String, Object> variableMap, OutputStream outputStream, File tmpFolder) {
+	public CommandResult execute(UseCase useCase, String action, Credentials credentials, Map<String, Object> variableMap, OutputStream outputStream, File tmpFolder) {
 
 		CommandResult commandResult = null;
 
@@ -106,7 +103,7 @@ public class TerraformService {
 			outputStream.flush();
 
 			// generate variable file
-			generateVariablesFile(credentials.getProvider(), tmpFolder);
+			generateVariablesFile(useCase, tmpFolder);
 
 			// copy provider plugins to temp folder
 			File pluginTargetFolder = new File(tmpFolder.getAbsolutePath() + File.separator + FOLDER_PLUGINS);
@@ -132,15 +129,12 @@ public class TerraformService {
 		return commandResult;
 	}
 
-	private void generateVariablesFile(String provider, File tmpFolder) throws IOException {
+	private void generateVariablesFile(UseCase useCase, File tmpFolder) throws IOException {
 
 		File variablesFile = new File(tmpFolder.getAbsolutePath() + File.separator + FILE_VARIABLES_TF);
 		StringBuilder variablesBuilder = new StringBuilder();
 
-		Map<String, List<VariableGroup>> providerDefaults = variableService.getProviderDefaults();
-		List<VariableGroup> variableGroupList = providerDefaults.get(provider);
-		
-		for (VariableGroup variableGroup : variableGroupList) {
+		for (VariableGroup variableGroup : useCase.getVariableGroups()) {
 			for (Variable variable : variableGroup.getVariables()) {
 				variablesBuilder
 				.append(VARIABLE_IDENTIFIER)

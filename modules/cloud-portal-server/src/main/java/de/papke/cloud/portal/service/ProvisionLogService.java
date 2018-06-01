@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import de.papke.cloud.portal.constants.Constants;
 import de.papke.cloud.portal.dao.ProvisionLogDao;
 import de.papke.cloud.portal.pojo.ProvisionLog;
+import de.papke.cloud.portal.pojo.UseCase;
 import de.papke.cloud.portal.pojo.User;
 import de.papke.cloud.portal.util.ZipUtil;
 
@@ -43,8 +44,8 @@ public class ProvisionLogService {
 	@Autowired
 	private ProvisionLogDao provisionLogDao;
 
-	public List<ProvisionLog> getList(String provider) {
-
+	public List<ProvisionLog> getListByProvider(String provider) {
+		
 		List<ProvisionLog> provisionLogList = new ArrayList<>();
 
 		User user = sessionUserService.getUser();
@@ -61,6 +62,24 @@ public class ProvisionLogService {
 		return provisionLogList;
 	}
 	
+	public List<ProvisionLog> getListByUseCaseId(String useCaseId) {
+
+		List<ProvisionLog> provisionLogList = new ArrayList<>();
+
+		User user = sessionUserService.getUser();
+		if (user != null) {
+			if (user.isAdmin()) {
+				provisionLogList = provisionLogDao.findByUseCaseId(useCaseId);
+			}
+			else {
+				List<String> groups = user.getGroups();		
+				provisionLogList = provisionLogDao.findByGroupInAndUseCaseId(groups, useCaseId);
+			}
+		}
+
+		return provisionLogList;
+	}
+	
 	public ProvisionLog get(String id) {
 		return provisionLogDao.findById(id);
 	}
@@ -69,7 +88,7 @@ public class ProvisionLogService {
 		return provisionLogDao.findByCommandAndExpirationDate(Constants.ACTION_APPLY, new Date());
 	}
 
-	public ProvisionLog create(String state, String provider, String group, Boolean success, Map<String, Object> variableMap, File privateKeyFile, File tmpFolder) {
+	public ProvisionLog create(String state, UseCase useCase, String group, Boolean success, Map<String, Object> variableMap, File privateKeyFile, File tmpFolder) {
 
 		ProvisionLog provisionLog = null;
 		File zipFile = null;
@@ -94,8 +113,14 @@ public class ProvisionLogService {
 			// get expiration date
 			Date expirationDate = getExpirationDate(variableMap);
 			
+			// get use case id
+			String useCaseId = useCase.getId();
+			
+			// get provider
+			String provider = useCase.getProvider();
+			
 			// create provision log
-			provisionLog = provisionLogDao.save(new ProvisionLog(new Date(), expirationDate, username, group, state, provider, success, variableMap, privateKey, data));
+			provisionLog = provisionLogDao.save(new ProvisionLog(new Date(), expirationDate, username, group, state, useCaseId, provider, success, variableMap, privateKey, data));
 		}
 		catch (Exception e) {
 			LOG.error(e.getMessage(), e);

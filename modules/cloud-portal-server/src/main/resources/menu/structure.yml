@@ -66,11 +66,11 @@ menus:
       menus:
       
       - title: List
-        path: /vm/list/form/aws
+        path: /usecase/list/form/vm-standalone-aws-terraform
         icon: fa-list
         
       - title: Create
-        path: /vm/create/form/aws
+        path: /usecase/create/form/vm-standalone-aws-terraform
         icon: fa-plus
         
     - title: Microsoft Azure
@@ -78,11 +78,11 @@ menus:
       menus:
       
        - title: List
-         path: /vm/list/form/azure
+         path: /usecase/list/form/vm-standalone-azure-terraform
          icon: fa-list
          
        - title: Create
-         path: /vm/create/form/azure
+         path: /usecase/create/form/vm-standalone-azure-terraform
          icon: fa-plus
          
     - title: VMWare ESXi
@@ -90,11 +90,11 @@ menus:
       menus:
       
        - title: List
-         path: /vm/list/form/esxi
+         path: /usecase/list/form/vm-standalone-esxi-ansible
          icon: fa-list
          
        - title: Create
-         path: /vm/create/form/esxi
+         path: /usecase/create/form/vm-standalone-esxi-ansible
          icon: fa-plus         
          
     - title: VMWare vSphere
@@ -102,9 +102,9 @@ menus:
       menus:
       
        - title: List
-         path: /vm/list/form/vsphere
+         path: /usecase/list/form/vm-standalone-vsphere-terraform
          icon: fa-list
          
        - title: Create
-         path: /vm/create/form/vsphere
+         path: /usecase/create/form/vm-standalone-vsphere-terraform
          icon: fa-plus

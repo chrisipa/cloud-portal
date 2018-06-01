@@ -2,7 +2,7 @@
 	pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
-<%--@elvariable id="virtualMachine" type="de.papke.cloud.portal.model.VirtualMachineModel"--%>
+<%--@elvariable id="useCase" type="de.papke.cloud.portal.model.UseCaseModel"--%>
 
 <jsp:include page="header.jsp" />
 
@@ -12,7 +12,7 @@
 
 	<div id="page-wrapper">
 		<form method="post"
-	                action="<c:url value="/vm/create/action" />"
+	                action="<c:url value="/usecase/create/action" />"
 	                target="output" role="form" enctype="multipart/form-data">
 			<div class="row">
 			    <div class="col-lg-12">
@@ -21,7 +21,7 @@
 				</div>    
 			</div>	
 			<div class="row">
-					<c:forEach items="${virtualMachine.providerDefaultsList}"
+					<c:forEach items="${useCase.variableGroups}"
 						var="variableGroup" varStatus="loop">
 						<c:if test="${loop.index % 2 == 0}">
 	                        <div class="col-lg-4">
@@ -113,7 +113,7 @@
 	            <jsp:include page="output.jsp" />
 	        <div class="row">
 	            <div class="col-lg-12">				
-					<input type="hidden" name="provider" value="${virtualMachine.provider}" />
+					<input type="hidden" name="id" value="${useCase.id}" />
 					<button type="submit" id="plan" class="btn btn-warning">Plan</button>
 					<button type="submit" id="apply" class="btn btn-danger">Apply</button>
 					<p>&nbsp;</p>

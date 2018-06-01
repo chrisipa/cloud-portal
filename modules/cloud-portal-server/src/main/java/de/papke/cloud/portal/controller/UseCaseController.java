@@ -33,27 +33,27 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.support.StandardMultipartHttpServletRequest;
 
 import de.papke.cloud.portal.constants.Constants;
-import de.papke.cloud.portal.model.VirtualMachineModel;
+import de.papke.cloud.portal.model.UseCaseModel;
 import de.papke.cloud.portal.pojo.Credentials;
 import de.papke.cloud.portal.pojo.ProvisionLog;
 import de.papke.cloud.portal.pojo.Relation;
+import de.papke.cloud.portal.pojo.UseCase;
 import de.papke.cloud.portal.pojo.User;
 import de.papke.cloud.portal.pojo.Variable;
-import de.papke.cloud.portal.pojo.VariableGroup;
 import de.papke.cloud.portal.service.CredentialsService;
 import de.papke.cloud.portal.service.KeyPairService;
 import de.papke.cloud.portal.service.ProvisionLogService;
 import de.papke.cloud.portal.service.ProvisioningService;
 import de.papke.cloud.portal.service.SessionUserService;
-import de.papke.cloud.portal.service.VariableService;
+import de.papke.cloud.portal.service.UseCaseService;
 
 @Controller
-public class VirtualMachineController extends ApplicationController {
+public class UseCaseController extends ApplicationController {
 
-	private static final Logger LOG = LoggerFactory.getLogger(VirtualMachineController.class);
+	private static final Logger LOG = LoggerFactory.getLogger(UseCaseController.class);
 
-	private static final String PREFIX = "/vm";
-	private static final String MODEL_VAR_NAME = "virtualMachine";
+	private static final String PREFIX = "/usecase";
+	private static final String MODEL_VAR_NAME = "useCase";
 	private static final String VAR_TYPE_FILE = "file";
 	private static final String VAR_NAME_SCRIPT_FILE = "script_file";
 	private static final String VAR_NAME_PRIVATE_KEY_FILE = "private_key_file";
@@ -80,9 +80,6 @@ public class VirtualMachineController extends ApplicationController {
 	private ProvisioningService provisioningService;
 
 	@Autowired
-	private VariableService variableService;
-
-	@Autowired
 	private ProvisionLogService provisionLogService;
 	
 	@Autowired
@@ -90,34 +87,37 @@ public class VirtualMachineController extends ApplicationController {
 	
 	@Autowired
 	private SessionUserService sessionUserService;
+	
+	@Autowired
+	private UseCaseService useCaseService;
 
-	@GetMapping(path = PREFIX + "/list/form/{provider}")
-	public String list(Map<String, Object> model, @PathVariable String provider) {
+	@GetMapping(path = PREFIX + "/list/form/{id}")
+	public String list(Map<String, Object> model, @PathVariable String id) {
 
 		// fill model
-		fillModel(model, provider);
+		fillModel(model, id);
 
 		// return view name
-		return "vm-list-form";
+		return "usecase-list-form";
 	}
 
-	@GetMapping(path = PREFIX + "/create/form/{provider}")
-	public String create(Map<String, Object> model, @PathVariable String provider) {
+	@GetMapping(path = PREFIX + "/create/form/{id}")
+	public String create(Map<String, Object> model, @PathVariable String id) {
 		
 		// fill model
-		fillModel(model, provider);
+		fillModel(model, id);
 		
 		// return view name
-		return "vm-create-form";
+		return "usecase-create-form";
 	}
 	
-	@GetMapping(path = PREFIX + "/variables/{provider}")
-	public void variables(HttpServletResponse response, @PathVariable String provider) {
+	@GetMapping(path = PREFIX + "/variables/{id}")
+	public void variables(HttpServletResponse response, @PathVariable String id) {
 
 		try {
 			StringBuilder usageBuilder = new StringBuilder();
 			
-			List<Variable> variables = variableService.getVisibleVariables(provider);
+			List<Variable> variables = useCaseService.getVisibleVariables(id);
 			for (Variable variable : variables) {
 				usageBuilder.append(renderVariable(variable));
 				usageBuilder.append(Constants.CHAR_NEW_LINE);
@@ -134,7 +134,7 @@ public class VirtualMachineController extends ApplicationController {
 	@ResponseBody
 	public void provision(
 			@PathVariable String action,
-			@RequestParam String provider,
+			@RequestParam String id,
 			@RequestParam Map<String, Object> variableMap,
 			HttpServletRequest request,
 			HttpServletResponse response) {
@@ -146,16 +146,22 @@ public class VirtualMachineController extends ApplicationController {
 			// set response content type
 			response.setContentType(RESPONSE_CONTENT_TYPE_TEXT_PLAIN);
 
+			// get use case
+			UseCase useCase = useCaseService.getUseCaseById(id); 
+			
 			// iterate over file map
 			writeFilesAndAddToMap(request, variableMap, tempFileList);
 			
 			// get variables
-			List<Variable> variables = variableService.getVisibleVariables(provider);
+			List<Variable> variables = useCaseService.getVisibleVariables(id);
 			
 			// validate parameters
 			List<Variable> errorList = validateValues(variables, variableMap);
 			if (errorList.isEmpty()) {
 
+				// get provider
+				String provider = useCase.getProvider();
+				
 				// get credentials
 				Credentials credentials = credentialsService.getCredentials(provider);
 				if (credentials != null) {
@@ -173,7 +179,7 @@ public class VirtualMachineController extends ApplicationController {
 					OutputStream outputStream = response.getOutputStream();
 	
 					// provision VM
-					provisioningService.provision(action, credentials, variableMap, privateKeyFile, outputStream);
+					provisioningService.provision(useCase, action, credentials, variableMap, privateKeyFile, outputStream);
 				}
 				else {
 					fail(String.format("No credentials found for cloud provider '%s'. Please contact your administrator.", provider), response);
@@ -195,10 +201,10 @@ public class VirtualMachineController extends ApplicationController {
 		}
 	}
 	
-	@GetMapping(path = PREFIX + "/delete/action/{provider}/{id}")
+	@GetMapping(path = PREFIX + "/delete/action/{useCaseId}/{provisionLogId}")
 	public void delete(Map<String, Object> model,
-			@PathVariable String provider,
-			@PathVariable String id,
+			@PathVariable String useCaseId,
+			@PathVariable String provisionLogId,
 			HttpServletResponse response) {
 		
 		try {
@@ -213,21 +219,21 @@ public class VirtualMachineController extends ApplicationController {
 			if (user.isAdmin()) {			
 			
 				// get provision log entry
-				ProvisionLog provisionLog = provisionLogService.get(id);
+				ProvisionLog provisionLog = provisionLogService.get(provisionLogId);
 				if (provisionLog != null) {
 					
 					// delete provision log entry
-					provisionLogService.delete(id);
+					provisionLogService.delete(provisionLogId);
 					
 					// print success message
-					success(String.format("Provision log entry with id '%s' was deleted successfully.", id), response);
+					success(String.format("Provision log entry with id '%s' was deleted successfully.", provisionLogId), response);
 				}
 				else {
-					fail(String.format("No provision log entry found for id '%s'.", id), response);
+					fail(String.format("No provision log entry found for id '%s'.", provisionLogId), response);
 				}
 			}
 			else {
-				fail(String.format("You are not allowed to delete the entry with the id '%s'", id), response);
+				fail(String.format("You are not allowed to delete the entry with the id '%s'", provisionLogId), response);
 			}
 		}
 		catch(Exception e) {
@@ -235,13 +241,13 @@ public class VirtualMachineController extends ApplicationController {
 		}
 		
 		// fill model
-		fillModel(model, provider);
+		fillModel(model, useCaseId);
 	} 
 
-	@GetMapping(path = PREFIX + "/destroy/action/{provider}/{id}")
+	@GetMapping(path = PREFIX + "/destroy/action/{useCaseId}/{provisionLogId}")
 	public void destroy(Map<String, Object> model,
-			@PathVariable String provider,
-			@PathVariable String id,
+			@PathVariable String useCaseId,
+			@PathVariable String provisionLogId,
 			HttpServletResponse response) {
 
 		try {
@@ -249,12 +255,18 @@ public class VirtualMachineController extends ApplicationController {
 			// set response content type
 			response.setContentType(RESPONSE_CONTENT_TYPE_TEXT_PLAIN);
 
+			// get use case
+			UseCase useCase = useCaseService.getUseCaseById(useCaseId);
+			
+			// get provider
+			String provider = useCase.getProvider();
+
 			// get credentials
 			Credentials credentials = credentialsService.getCredentials(provider);
 			if (credentials != null) {
 
 				// get provision log entry
-				ProvisionLog provisionLog = provisionLogService.get(id);
+				ProvisionLog provisionLog = provisionLogService.get(provisionLogId);
 				if (provisionLog != null) {
 					
 					// get group
@@ -270,11 +282,11 @@ public class VirtualMachineController extends ApplicationController {
 						provisioningService.deprovision(provisionLog, credentials, outputStream);
 					}
 					else {
-						fail(String.format("You are not allowed to deprovision the entry with the id '%s'", id), response);
+						fail(String.format("You are not allowed to deprovision the entry with the id '%s'", provisionLogId), response);
 					}
 				}
 				else {
-					fail(String.format("No provision log entry found for id '%s'.", id), response);
+					fail(String.format("No provision log entry found for id '%s'.", provisionLogId), response);
 				}
 			}
 			else {
@@ -287,7 +299,7 @@ public class VirtualMachineController extends ApplicationController {
 		}
 
 		// fill model
-		fillModel(model, provider);
+		fillModel(model, useCaseId);
 	} 
 	
 	private void fail(String message, HttpServletResponse response) throws IOException {
@@ -512,25 +524,22 @@ public class VirtualMachineController extends ApplicationController {
 		return variableBuilder.toString();
 	}	
 
-	private void fillModel(Map<String, Object> model, String provider) {
+	private void fillModel(Map<String, Object> model, String id) {
 
 		fillModel(model);
 
-		// get cloud provider defaults map
-		Map<String, List<VariableGroup>> cloudProviderDefaultsMap = variableService.getVisibleProviderDefaults();
+		// create use case model
+		UseCaseModel useCaseModel = new UseCaseModel();
 
-		// create virtual machine model
-		VirtualMachineModel virtualMachineModel = new VirtualMachineModel();
+		// set id
+		useCaseModel.setId(id);
 
-		// set cloud provider
-		virtualMachineModel.setProvider(provider);
-
-		// set cloud provider defaults
-		virtualMachineModel.setProviderDefaultsList(cloudProviderDefaultsMap.get(provider));
+		// set variable groups
+		useCaseModel.getVariableGroups(useCaseService.getVisibleVariableGroups(id));
 
 		// set provision log list
-		virtualMachineModel.setProvisionLogList(provisionLogService.getList(provider));
+		useCaseModel.setProvisionLogs(provisionLogService.getListByUseCaseId(id));
 
-		model.put(MODEL_VAR_NAME, virtualMachineModel);
+		model.put(MODEL_VAR_NAME, useCaseModel);
 	}	
 }

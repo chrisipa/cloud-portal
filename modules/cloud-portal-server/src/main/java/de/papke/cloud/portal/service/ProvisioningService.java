@@ -26,6 +26,7 @@ import de.papke.cloud.portal.constants.Constants;
 import de.papke.cloud.portal.pojo.CommandResult;
 import de.papke.cloud.portal.pojo.Credentials;
 import de.papke.cloud.portal.pojo.ProvisionLog;
+import de.papke.cloud.portal.pojo.UseCase;
 import de.papke.cloud.portal.pojo.User;
 import de.papke.cloud.portal.util.ZipUtil;
 
@@ -47,6 +48,7 @@ public class ProvisioningService {
 	private static final String VARIABLE_SUR_NAME = "surName";
 	private static final String VARIABLE_GIVEN_NAME = "givenName";
 	private static final String VARIABLE_PROVISIONING_ID = "provisioning_id";
+	private static final String VARIABLE_PROVIDER = "provider";
 
 	@Autowired
 	private ProvisionLogService provisionLogService;
@@ -71,6 +73,9 @@ public class ProvisioningService {
 	
 	@Autowired
 	private UserService userService;
+
+	@Autowired
+	private UseCaseService useCaseService;
 	
 	@Scheduled(cron = "${application.expiration.cron.expression}")
 	public void schedule() {
@@ -78,32 +83,31 @@ public class ProvisioningService {
 		for (ProvisionLog provisionLog : provisionLogList) {
 			String username = provisionLog.getUsername();
 			User user = userService.getUser(username);
-			String provider = provisionLog.getProvider();
+			String useCaseId = provisionLog.getUseCaseId();
+			UseCase useCase = useCaseService.getUseCaseById(useCaseId); 
+			String provider = useCase.getProvider();
 			Credentials credentials = credentialsService.getCredentials(user, provider);
 			OutputStream outputStream = new ByteArrayOutputStream();
 			deprovision(user, provisionLog, credentials, outputStream);
 		}
 	}
 
-	public void provision(String action, Credentials credentials, Map<String, Object> variableMap, File privateKeyFile, OutputStream outputStream) {
+	public void provision(UseCase useCase, String action, Credentials credentials, Map<String, Object> variableMap, File privateKeyFile, OutputStream outputStream) {
 
 		File tmpFolder = null;
 		File attachment = null;
 
 		try {
 
-			// get provider from credentials
-			String provider = credentials.getProvider();
-			
 			// get group from credentials
 			String group = credentials.getGroup();
 			
 			// copy terraform resources to filesystem
-			String resourceFolderPath = Constants.FOLDER_PROVISIONER + File.separator + Constants.FOLDER_TERRAFORM + File.separator + PREFIX_VM + File.separator + provider;
-			tmpFolder = fileService.copyResourceToFilesystem(resourceFolderPath);
-
+			tmpFolder = fileService.copyResourceToFilesystem(useCase.getResourceFolderPath());
+			
+			// TODO implement provisioner switch here
 			// use terraform to provision vms
-			CommandResult commandResult = terraformService.execute(action, credentials, variableMap, outputStream, tmpFolder);
+			CommandResult commandResult = terraformService.execute(useCase, action, credentials, variableMap, outputStream, tmpFolder);
 
 			if (action.equals(Constants.ACTION_APPLY)) {
 				
@@ -117,13 +121,17 @@ public class ProvisioningService {
 				variableMap.putAll(commandVariableMap);
 
 				// create provision log
-				ProvisionLog provisionLog = provisionLogService.create(action, provider, group, success, variableMap, privateKeyFile, tmpFolder);
+				ProvisionLog provisionLog = provisionLogService.create(action, useCase, group, success, variableMap, privateKeyFile, tmpFolder);
 				
 				// add provisioning id
 				String provisioningId = provisionLog.getId();
 				String provisioningIdVariableString = VARIABLE_PROVISIONING_ID + Constants.CHAR_WHITESPACE + Constants.CHAR_EQUAL + Constants.CHAR_WHITESPACE + provisioningId;
 				outputStream.write((provisioningIdVariableString).getBytes());
 				variableMap.put(VARIABLE_PROVISIONING_ID, provisioningId);
+				
+				// add provider
+				String provider = useCase.getProvider();
+				variableMap.put(VARIABLE_PROVIDER, provider);
 
 				// get attachment for mail
 				attachment = getAttachment(commandResult);
@@ -179,11 +187,14 @@ public class ProvisioningService {
 				}
 			}
 
+			// get use case
+			UseCase useCase = useCaseService.getUseCaseById(provisionLog.getUseCaseId());
+			
 			// specify action
 			String action = Constants.ACTION_DESTROY;
 			
 			// destroy vm with terraform
-			CommandResult commandResult = terraformService.execute(action, credentials, variableMap, outputStream, resourceFolder);
+			CommandResult commandResult = terraformService.execute(useCase, action, credentials, variableMap, outputStream, resourceFolder);
 			
 			// command was successful?
 			if (commandResult.isSuccess()) {
@@ -205,6 +216,10 @@ public class ProvisioningService {
 			
 			// add provisioning id
 			variableMap.put(VARIABLE_PROVISIONING_ID, provisionLog.getId());
+			
+			// add provider
+			String provider = useCase.getProvider();
+			variableMap.put(VARIABLE_PROVIDER, provider);			
 			
 			// send mail
 			sendMail(user, action, success, variableMap, attachment);

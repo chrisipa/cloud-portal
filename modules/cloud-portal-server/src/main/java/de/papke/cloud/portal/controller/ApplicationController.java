@@ -1,7 +1,5 @@
 package de.papke.cloud.portal.controller;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,10 +7,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 
 import de.papke.cloud.portal.model.ApplicationModel;
-import de.papke.cloud.portal.pojo.VariableGroup;
 import de.papke.cloud.portal.service.MenuService;
 import de.papke.cloud.portal.service.SessionUserService;
-import de.papke.cloud.portal.service.VariableService;
+import de.papke.cloud.portal.service.UseCaseService;
 
 @Controller
 public class ApplicationController {
@@ -30,7 +27,7 @@ public class ApplicationController {
 	private SessionUserService sessionUserService;
 
 	@Autowired
-	private VariableService variableService;
+	private UseCaseService useCaseService;
 	
 	@Autowired
 	private MenuService menuService;
@@ -53,13 +50,8 @@ public class ApplicationController {
 		// set username
 		applicationModel.setUser(sessionUserService.getUser());
 
-		// get cloud provider defaults map
-		Map<String, List<VariableGroup>> cloudProviderDefaultsMap = variableService.getVisibleProviderDefaults();
-
 		// set cloud providers
-		List<String> cloudProviderList = new ArrayList<>();
-		cloudProviderList.addAll(cloudProviderDefaultsMap.keySet());
-		applicationModel.setCloudProviderList(cloudProviderList);
+		applicationModel.setCloudProviderList(useCaseService.getProviders());
 		
 		// set menu
 		applicationModel.setMenu(menuService.getMenu());

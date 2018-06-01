@@ -8,6 +8,7 @@ public class UseCase {
 	private String provider;
 	private String provisioner;
 	private List<VariableGroup> variableGroups; 
+	private String resourceFolderPath; 
 
 	public String getProvider() {
 		return provider;
@@ -39,5 +40,13 @@ public class UseCase {
 
 	public void setVariableGroups(List<VariableGroup> variableGroups) {
 		this.variableGroups = variableGroups;
+	}
+
+	public String getResourceFolderPath() {
+		return resourceFolderPath;
+	}
+
+	public void setResourceFolderPath(String resourceFolderPath) {
+		this.resourceFolderPath = resourceFolderPath;
 	}
 }

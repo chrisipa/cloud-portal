@@ -67,7 +67,7 @@ public class DashboardController extends ApplicationController {
 		for (String provider : applicationModel.getCloudProviderList()) {
 
 			// get provisioning log list by provider
-			List<ProvisionLog> provisionLogList = provisionLogService.getList(provider);
+			List<ProvisionLog> provisionLogList = provisionLogService.getListByProvider(provider);
 
 			if (!provisionLogList.isEmpty()) {
 				
