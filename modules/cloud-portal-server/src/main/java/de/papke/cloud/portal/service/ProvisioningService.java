@@ -11,6 +11,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -37,8 +39,6 @@ public class ProvisioningService {
 	private static final Logger LOG = LoggerFactory.getLogger(ProvisioningService.class);
 
 	private static final String PATTERN_FILE = "_file";
-	private static final String PATTERN_OUTPUTS = "Outputs:";
-	private static final String PATTERN_EMPTY_LINE = "(?m)^\\s";
 	private static final String SUFFIX_ATTACHMENT = ".txt";
 	private static final String SUFFIX_ZIP = ".zip";
 	private static final String PREFIX_VM = "vm";
@@ -49,6 +49,8 @@ public class ProvisioningService {
 	private static final String VARIABLE_GIVEN_NAME = "givenName";
 	private static final String VARIABLE_PROVISIONING_ID = "provisioning_id";
 	private static final String VARIABLE_PROVIDER = "provider";
+	
+	private static final String[] VARIABLE_OUTPUTS = { "host", "random_id", "username"};
 
 	@Autowired
 	private ProvisionLogService provisionLogService;
@@ -58,6 +60,9 @@ public class ProvisioningService {
 
 	@Autowired
 	private TerraformService terraformService;
+	
+	@Autowired
+	private AnsibleService ansibleService;
 
 	@Autowired
 	private MailService mailService;
@@ -79,16 +84,22 @@ public class ProvisioningService {
 	
 	@Scheduled(cron = "${application.expiration.cron.expression}")
 	public void schedule() {
+		
 		List<ProvisionLog> provisionLogList = provisionLogService.getExpired();
+		
 		for (ProvisionLog provisionLog : provisionLogList) {
+
 			String username = provisionLog.getUsername();
 			User user = userService.getUser(username);
 			String useCaseId = provisionLog.getUseCaseId();
 			UseCase useCase = useCaseService.getUseCaseById(useCaseId); 
 			String provider = useCase.getProvider();
 			Credentials credentials = credentialsService.getCredentials(user, provider);
-			OutputStream outputStream = new ByteArrayOutputStream();
-			deprovision(user, provisionLog, credentials, outputStream);
+			
+			if (user != null && credentials != null) {
+				OutputStream outputStream = new ByteArrayOutputStream();
+				deprovision(user, provisionLog, credentials, outputStream);
+			}
 		}
 	}
 
@@ -105,11 +116,21 @@ public class ProvisioningService {
 			// copy terraform resources to filesystem
 			tmpFolder = fileService.copyResourceToFilesystem(useCase.getResourceFolderPath());
 			
-			// TODO implement provisioner switch here
-			// use terraform to provision vms
-			CommandResult commandResult = terraformService.execute(useCase, action, credentials, variableMap, outputStream, tmpFolder);
+			// get provisioner
+			String provisioner = useCase.getProvisioner();
+			
+			// provision use case
+			CommandResult commandResult = null;
+			if (provisioner.equals("terraform")) {
+				commandResult = terraformService.execute(useCase, action, credentials, variableMap, outputStream, tmpFolder);
+			}
+			else {
+				if (provisioner.equals("ansible")) {
+					commandResult = ansibleService.execute(useCase, action, credentials, variableMap, outputStream, tmpFolder);
+				}
+			}
 
-			if (action.equals(Constants.ACTION_APPLY)) {
+			if (commandResult != null && action.equals(Constants.ACTION_APPLY)) {
 				
 				// get success flag
 				boolean success = commandResult.isSuccess();
@@ -297,16 +318,15 @@ public class ProvisioningService {
 			String output = commandResult.getOutput();
 	
 			if (StringUtils.isNotEmpty(output)) {
-				String[] outputArray = output.split(PATTERN_OUTPUTS);
-				if (outputArray.length == 2) {
-					String outputVariablePart = outputArray[1].replaceAll(PATTERN_EMPTY_LINE, StringUtils.EMPTY);
-					for (String line : outputVariablePart.split(Constants.CHAR_NEW_LINE)) {
-						String[] variablePart = line.split(Constants.CHAR_EQUAL);
-						if (variablePart.length == 2) {
-							String key = variablePart[0].trim();
-							String value = variablePart[1].trim();
-							variableMap.put(key, value);
-						}
+				
+				for (String key : VARIABLE_OUTPUTS) {
+					
+					Pattern pattern = Pattern.compile(Constants.CHAR_DOUBLE_QUOTE + key + Constants.CHAR_DOUBLE_QUOTE);
+					Matcher matcher = pattern.matcher(output);
+					
+					if (matcher.find()) {
+						String value = matcher.group(1);
+						variableMap.put(key, value);
 					}
 				}
 			}

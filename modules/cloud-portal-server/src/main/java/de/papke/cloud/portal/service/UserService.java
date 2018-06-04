@@ -27,10 +27,12 @@ public class UserService {
 
 			user = directoryService.getUser(username);
 			
-			for (String group : user.getGroups()) {
-				if (group.equals(adminGroup)) {
-					user.setAdmin(true);
-					break;
+			if (user.getGroups() != null) {
+				for (String group : user.getGroups()) {
+					if (group.equals(adminGroup)) {
+						user.setAdmin(true);
+						break;
+					}
 				}
 			}
 		}

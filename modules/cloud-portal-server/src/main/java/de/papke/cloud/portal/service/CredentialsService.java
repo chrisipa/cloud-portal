@@ -43,7 +43,7 @@ public class CredentialsService {
 	
 	public Credentials getCredentials(User user, String provider) {
 		
-		if (user != null) {
+		if (user != null && user.getGroups() != null) {
 			
 			for (String group : user.getGroups()) {
 				
