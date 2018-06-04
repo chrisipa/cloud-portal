@@ -32,30 +32,6 @@ function log() {
     echo -e "\n$now [$level] $text\n"
 }
 
-# ---------------------------------------------------------------
-# Function for confirming a message on the console
-# ---------------------------------------------------------------
-# $1 - Confirm message to show
-# ---------------------------------------------------------------
-function confirm() {
-
-    # read parameters
-    local question="$1"
-
-    echo ""
-    read -r -p "$question [Y/n] " answer
-    echo ""
-
-    case "$answer" in
-        [yY][eE][sS]|[yY])
-            return 0
-        ;;
-        *)
-            return 1
-        ;;
-    esac
-}
-
 # --------------------------------------------------------
 # Function for cleaning up temporary files
 # --------------------------------------------------------
@@ -134,18 +110,18 @@ function logout() {
 }
 
 # --------------------------------------------------------
-# Function for creating a vm for a cloud platform
+# Function for creating a use case for a cloud platform
 # --------------------------------------------------------
-function apply() {
+function create() {
 
-    # get apply url
-    local applyUrl="$CLOUD_PORTAL_URL/vm/create/action/apply"
+    # get create url
+    local createUrl="$CLOUD_PORTAL_URL/usecase/create/action/$CLOUD_PORTAL_ACTION"
     
     # logging
-    log "INFO" "Creating virtual machine for cloud provider '$CLOUD_PORTAL_PROVIDER' and apply url '$applyUrl'"
+    log "INFO" "Creating cloud portal use case '$CLOUD_PORTAL_USE_CASE' and url '$createUrl'"
     
-    # create virtual machine for cloud provider
-    curl -N -w "\nstatus_code = %{http_code}" -s -X POST -b "$cookieFile" -F "provider=$CLOUD_PORTAL_PROVIDER" "$@" "$applyUrl" | tee "$outputFile"      
+    # create use case for cloud provider
+    curl -N -w "\nstatus_code = %{http_code}" -s -X POST -b "$cookieFile" -F "id=$CLOUD_PORTAL_USE_CASE" "$@" "$createUrl" | tee "$outputFile"      
     
     # check if status code is valid
     statusCode=$(getVariableFromOutput "status_code")
@@ -156,7 +132,7 @@ function apply() {
 }
 
 # --------------------------------------------------------
-# Function for destroying a vm for a cloud platform
+# Function for destroying a use case for a cloud platform
 # --------------------------------------------------------
 # $1 - Provisioning ID
 # --------------------------------------------------------
@@ -166,12 +142,12 @@ function destroy() {
     local id="$1"
     
     # get destroy url
-    local destroyUrl="$CLOUD_PORTAL_URL/vm/delete/action/$CLOUD_PORTAL_PROVIDER/$id"
+    local destroyUrl="$CLOUD_PORTAL_URL/usecase/destroy/action/$CLOUD_PORTAL_USE_CASE/$id"
     
     # logging
-    log "INFO" "Destroying virtual machine for cloud provider '$CLOUD_PORTAL_PROVIDER' and id '$id'"
+    log "INFO" "Destroying cloud portal use case '$CLOUD_PORTAL_USE_CASE' with id '$id'"
     
-    # destroy virtual machine for cloud provider
+    # destroy use case for cloud provider
     curl -N -w "\nstatus_code = %{http_code}" -s -X GET -b "$cookieFile" "$destroyUrl" | tee "$outputFile"
     
     # check if status code is valid
@@ -208,7 +184,7 @@ function variables() {
     login
 
     # get variables url
-    local variablesUrl="$CLOUD_PORTAL_URL/vm/variables/$CLOUD_PORTAL_PROVIDER"
+    local variablesUrl="$CLOUD_PORTAL_URL/usecase/variables/$CLOUD_PORTAL_USE_CASE"
 
     # logging
     log "INFO" "Getting variable information from url '$variablesUrl'"
