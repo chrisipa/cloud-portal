@@ -1,0 +1,190 @@
+variableGroups:
+
+  - title: System Generated
+    hidden: true
+    variables:
+    
+      - title: Application URL
+        name: application_url
+        description: The URL of the self service portal application
+        type: string
+        required: true
+        defaults: []    
+    
+      - title: Random ID
+        name: random_id
+        description: A generated random ID.
+        type: string
+        required: true
+        defaults: []  
+          
+      - title: Creation Date
+        name: creation_date
+        description: Current timestamp as date format
+        type: string
+        required: true
+        defaults: []  
+    
+      - title: Owner
+        name: owner
+        description: Owner of the vm
+        type: string
+        required: true
+        defaults: []  
+        
+      - title: Group
+        name: group
+        description: Group of the vm
+        type: string
+        required: true
+        defaults: []
+        
+  - title: Credentials
+    hidden: true
+    variables:
+      
+      - title: ESXi Hostname
+        name: esxi_hostname
+        description: The hostname of the esxi server to use.
+        type: string
+        required: true
+        defaults: []    
+      
+      - title: ESXi Datastore
+        name: esxi_datastore
+        description: The datastore of the esxi server to use.
+        type: string
+        required: true
+        defaults: []    
+      
+      - title: ESXi Network
+        name: esxi_network
+        description: The network of the esxi server to use.
+        type: string
+        required: true
+        defaults: []    
+      
+      - title: ESXi Username
+        name: esxi_username
+        description: The esxi server username.
+        type: string
+        required: true
+        defaults: []
+        
+      - title: ESXi Password
+        name: esxi_password
+        description: The esxi server password.
+        type: string
+        required: true
+        defaults: []
+
+  - title: General
+    variables:
+    
+    - title: Title
+      name: title
+      description: Title of the virtual machine.
+      type: string   
+      required: true
+      defaults: []
+      
+    - title: Description
+      name: description
+      description: Description of the virtual machine.
+      type: text   
+      required: true
+      defaults: []
+    
+    - title: Expiration Days
+      name: expiration_days
+      description: Days till virtual machine will be removed automatically.
+      type: string   
+      required: true
+      defaults: [ -1 ]
+      pattern: "[0-9]*|-1"
+      
+  - title: VM
+    variables:
+      
+    - title: Image
+      name: image_name
+      description: Virtual machine image to use.
+      type: list   
+      required: true
+      defaults: [ Ubuntu Server Linux 16.04, Windows Server 2016 ]
+      pattern: "Ubuntu Server Linux 16.04|Windows Server 2016"
+      
+    - title: vCores
+      name: vm_cores
+      description: Number of virtual cores of the virtual machine. 
+      type: list   
+      required: true
+      defaults: [ 1, 2, 3, 4, 5, 6, 7, 8 ]
+      pattern: "[1-8]"
+      
+    - title: vRAM
+      name: vm_ram_size
+      description: RAM (in MB) of the virtual machine.
+      type: list   
+      required: true
+      defaults: [ 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536 ]
+      index: 1
+      pattern: "512|1024|2048|4096|8192|16384|32768|65536"
+
+  - title: Storage
+    variables:
+      
+    - title: Disk size
+      name: vm_disk_size
+      description: Storage size (in GB) of the virtual machine.
+      type: string   
+      required: true
+      defaults: [ 50 ] 
+      pattern: "[0-9]*"   
+      
+  - title: Authenticaton
+    variables:
+    
+    - title: Username
+      name: username
+      description: Username for admin user.
+      type: string   
+      required: true
+      defaults: [ vmadmin ]
+           
+    - title: Password
+      name: password
+      description: Password for admin user.
+      type: secret   
+      required: true
+      pattern: "(?=^.{8,255}$)((?=.*\\d)(?=.*[A-Z])(?=.*[a-z])|(?=.*\\d)(?=.*[^A-Za-z0-9])(?=.*[a-z])|(?=.*[^A-Za-z0-9])(?=.*[A-Z])(?=.*[a-z])|(?=.*\\d)(?=.*[A-Z])(?=.*[^A-Za-z0-9]))^.*"
+      url: /static/html/help/passwords.html  
+      
+    - title: Password (Repeat)
+      name: password_repeat
+      description: Repeat password for admin user.
+      type: secret   
+      required: true
+      url: /static/html/help/passwords.html
+      relations:
+      
+      - name: password
+        type: equals      
+    
+    - title: Public Key
+      name: public_key_file
+      description: Public key file for SSH access. 
+      type: file   
+    
+    - title: Private Key
+      name: private_key_file
+      description: Private key file for SSH access. 
+      type: file      
+      
+  - title: Bootstrap
+    variables:
+    
+    - title: Script
+      name: script_file
+      description: Bootstrap script file to execute after vm has been created. 
+      type: file   

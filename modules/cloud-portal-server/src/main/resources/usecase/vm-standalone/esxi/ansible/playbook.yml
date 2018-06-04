@@ -1,0 +1,170 @@
+---
+- hosts: all
+  vars:
+    localhost: 127.0.0.1
+    esxi_datacenter: ha-datacenter
+    esxi_validate_certs: false
+    is_linux: "{{ image_name.find('Linux') != -1 }}"
+    is_windows: "{{ image_name.find('Linux') != -1 }}"
+    vm_scsi: paravirtual
+    vm_network_adapter_type: vmxnet3
+    vm_network_type: standard
+    vm_template_path: "{{ (is_linux == true) | ternary('output-ubuntu-template/disk.vmdk', 'output-windows-template/disk.vmdk') }}"
+    vm_guest_id: "{{ (is_linux == true) | ternary('ubuntu64Guest', 'windows9Server64Guest') }}"
+
+  tasks:
+  
+  - name: Block to check if the VM name exists in inventory 
+    block:
+    - name: Check VMFS filesystem for foldername {{ random_id }}
+      stat:
+        path: /vmfs/volumes/{{ esxi_datastore }}/{{ random_id }}/
+      register: vmfs_vm_name 
+
+    - name: Check if machine {{ random_id }} already exists
+      delegate_to: "{{ localhost }}"
+      vsphere_guest:
+        vcenter_hostname: "{{ esxi_hostname }}"
+        esxi:
+          datacenter: "{{ esxi_datacenter }}"
+          hostname: "{{ esxi_hostname }}"
+        validate_certs: "{{ esxi_validate_certs }}"
+        username: "{{ esxi_username }}"
+        password: "{{ esxi_password }}"
+        guest: "{{ random_id }}"
+        vmware_guest_facts: yes
+      register: inventory_vm_name
+      ignore_errors: yes
+
+  # Throw Warnings if datastore foldername exists or machine is arleady in inventory
+  - name: Machine folder for {{ random_id }} exists on datastore
+    fail:
+      msg:  "There is already a foldername on the datastore {{ esxi_datastore }} with same name as {{ random_id }} Please backup/rename and run again" 
+    when: vmfs_vm_name.stat.exists == true
+  - name: Machine {{ random_id }} already exists in inventory
+    debug:
+      msg: "This VM machine appears to already exist in esxi inventory but not on the datastore; we will forcibly overwrite {{ random_id }}"  
+    when: inventory_vm_name.ansible_facts is defined
+
+
+  # Delete the machine name from if it exists in inventory but not datastore
+  - name: Delete machine {{ random_id }} from inventory 
+    delegate_to: "{{ localhost }}"
+    vsphere_guest:
+      vcenter_hostname: "{{ esxi_hostname }}"
+      esxi:
+        datacenter: "{{ esxi_datacenter }}"
+        hostname: "{{ esxi_hostname }}"
+      validate_certs: "{{ esxi_validate_certs }}"
+      username: "{{ esxi_username }}"
+      password: "{{ esxi_password }}"
+      guest: "{{ random_id }}"
+      state: absent
+      force: yes
+    when: inventory_vm_name.ansible_facts is defined
+  
+  
+  - name: Block to create new Virtual Machine
+    block:
+            
+    - name: Create machine {{ random_id }}
+      delegate_to: "{{ localhost }}"
+      vsphere_guest:
+        vcenter_hostname: "{{ esxi_hostname }}"
+        esxi:
+          datacenter: "{{ esxi_datacenter }}"
+          hostname: "{{ esxi_hostname }}"
+        validate_certs: "{{ esxi_validate_certs }}"
+        username: "{{ esxi_username }}"
+        password: "{{ esxi_password }}"
+        guest: "{{ random_id }}"
+        state: present
+        vm_extra_config:
+          vcpu.hotadd: no 
+          mem.hotadd:  no
+          notes: "{{ description }}"
+        vm_disk:
+          disk1:
+            size_gb: "{{ vm_disk_size }}"
+            type: thin
+            datastore: "{{ esxi_datastore }}"
+        vm_nic:
+          nic1:
+            network: "{{ esxi_network }}"
+            type: "{{ vm_network_adapter_type }}"
+            network_type: "{{ vm_network_type }}"
+        vm_hardware:
+          memory_mb: "{{ vm_ram_size | default (1024) }}"
+          num_cpus: "{{ vm_cores | default (1) }}"
+          scsi: "{{ vm_scsi }}"
+          osid: "{{ vm_guest_id }}"  
+      register: create_vm_status
+    
+    rescue:
+    - name: rm dir for new host on vmfs
+      shell: "rm -rf /vmfs/volumes/{{ esxi_datastore }}/{{ random_id }}"
+      register: rescue_remove_vm
+    - fail:
+        msg: Something went wrong on intial VM creation and we have deleted the newly created datastore file
+      when: rescue_remove_vm is changed     
+
+  - name: Block for vmkfstools image creation
+    block:
+    - name: delete empty disk for new template
+      shell: "rm -r /vmfs/volumes/{{ esxi_datastore }}/{{ random_id }}/{{ random_id }}*.vmdk"
+     
+    - name: create disk from template
+      shell: "vmkfstools -i /vmfs/volumes/{{ esxi_datastore }}/{{ vm_template_path }} /vmfs/volumes/{{ esxi_datastore }}/{{ random_id }}/{{ random_id }}.vmdk -d thin"
+    when: 
+      - create_vm_status is defined and create_vm_status is changed
+  
+      
+  - name: Power on {{ random_id }}
+    delegate_to: "{{ localhost }}"
+    vsphere_guest:
+      vcenter_hostname: "{{ esxi_hostname }}"
+      esxi:
+        datacenter: "{{ esxi_datacenter }}"
+        hostname: "{{ esxi_hostname }}"
+      validate_certs: "{{ esxi_validate_certs }}"
+      username: "{{ esxi_username }}"
+      password: "{{ esxi_password }}"
+      guest: "{{ random_id }}"
+      state: powered_on
+
+  - name: Wait for SSH on new system
+    wait_for_connection:
+      delay: 60
+      timeout: 300
+
+  - name: Get IP of new machine for SSH {{ random_id }}
+    delegate_to: "{{ localhost }}"
+    vsphere_guest:
+      vcenter_hostname: "{{ esxi_hostname }}"
+      esxi:
+        datacenter: "{{ esxi_datacenter }}"
+        hostname: "{{ esxi_hostname }}"
+      validate_certs: "{{ esxi_validate_certs }}"
+      username: "{{ esxi_username }}"
+      password: "{{ esxi_password }}"
+      guest: "{{ random_id }}"
+      vmware_guest_facts: yes
+    register: get_ip_new_vm
+
+  - name: Output random_id variable
+    debug:
+      msg: "random_id = {{ random_id }}"
+      
+  - name: Output host variable
+    debug:
+      msg: "host = {{ get_ip_new_vm.ansible_facts.hw_eth0.ipaddresses[0] }}"
+      
+  - name: Output username variable
+    debug:
+      msg: "username = {{ username }}"
+
+      #- hosts: "{{ get_ip_new_vm.ansible_facts.hw_eth0.ipaddresses }}" 
+      #  - name: SSH to host and set hostname
+      #    delegate_to: "{{ localhost }}"  # "{{ get_ip_new_vm.ansible_facts.hw_eth0.ipaddresses }}"
+      #    raw: "ssh -o StrictHostKeyChecking=no root@{{ get_ip_new_vm.ansible_facts.hw_eth0.ipaddresses[0] }} && hostnamectl set-hostname wienerface.fqdn"
+    # name: "{{ random_id }}"
