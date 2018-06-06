@@ -1,37 +1,35 @@
 package de.papke.cloud.portal.service;
 
 import java.io.File;
-import java.io.OutputStream;
+import java.io.IOException;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
 import org.apache.commons.exec.CommandLine;
-import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import de.papke.cloud.portal.constants.Constants;
-import de.papke.cloud.portal.pojo.CommandResult;
-import de.papke.cloud.portal.pojo.Credentials;
 import de.papke.cloud.portal.pojo.UseCase;
 
 @Service
 public class AnsibleService extends ProvisionerService {
 	
-	private static final Logger LOG = LoggerFactory.getLogger(AnsibleService.class);
-
-	private static final String MSG = "msg";
+	private static final String ANSIBLE_SSH_USER = "ansible_ssh_user";
+	private static final String ANSIBLE_SSH_PASS = "ansible_ssh_pass";
+	private static final String ESXI_HOSTNAME = "esxi_hostname";
+	private static final String ESXI_USERNAME = "esxi_username";
+	private static final String ESXI_PASSWORD = "esxi_password"; // NOSONAR
+	private static final String FLAG_EXTRA_VARS = "--extra-vars";
+	private static final String FLAG_ENVIRONMENT = "-e";
+	private static final String FLAG_INVENTORY = "-i";
 	private static final String FLAG_DRY_RUN = "--check";
+	private static final String OUTPUT_MSG = "msg";
+	private static final String SUFFIX_YML = ".yml";
 
 	public static final String PREFIX = "ansible";
 
-	@Autowired
-	private CommandExecutorService commandExecutorService;	
-	
 	@Value("${ansible.path}")
 	private String ansiblePath;
 	
@@ -41,11 +39,21 @@ public class AnsibleService extends ProvisionerService {
 	}
 	
 	@Override
+	protected String getBinaryPath() {
+		return ansiblePath;
+	}
+
+	@Override
+	protected void prepare(UseCase useCase, File tmpFolder) throws IOException {
+		// do nothing
+	}
+
+	@Override
 	protected Pattern getParsingPattern() {
 		
 		StringBuilder patternBuilder = new StringBuilder()
 				.append(Constants.CHAR_DOUBLE_QUOTE)
-				.append(MSG)
+				.append(OUTPUT_MSG)
 				.append(Constants.CHAR_DOUBLE_QUOTE)
 				.append(Constants.CHAR_DOUBLE_DOT)
 				.append(Constants.CHAR_WHITESPACE)
@@ -67,37 +75,6 @@ public class AnsibleService extends ProvisionerService {
 	}
 	
 	@Override
-	public CommandResult execute(UseCase useCase, String action, Credentials credentials, Map<String, Object> variableMap, OutputStream outputStream, File tmpFolder) {
-
-		CommandResult commandResult = null;
-
-		try {
-
-			// print waiting message
-			outputStream.write(getIntroductionText().getBytes());
-			outputStream.flush();
-
-			// get action to execute
-			if (StringUtils.isNotEmpty(action)) {
-
-				// get execution map
-				Map<String, Object> executionMap = getExecutionMap(credentials, variableMap);
-
-				// build the command string
-				CommandLine actionCommand = buildActionCommand(ansiblePath, action, executionMap);
-
-				// execute action command
-				commandResult = commandExecutorService.execute(actionCommand, tmpFolder, outputStream);
-			}
-		}
-		catch (Exception e) {
-			LOG.error(e.getMessage(), e);
-		}
-
-		return commandResult;
-	}
-	
-	@Override
 	protected CommandLine buildActionCommand(String ansiblePath, String action, Map<String, Object> variableMap) {
 
 		CommandLine actionCommand = new CommandLine(ansiblePath);
@@ -106,17 +83,14 @@ public class AnsibleService extends ProvisionerService {
 			actionCommand.addArgument(FLAG_DRY_RUN);
 		}
 		
-		actionCommand.addArgument("-i");
-		actionCommand.addArgument(variableMap.get("esxi_hostname") + ",");
+		actionCommand.addArgument(FLAG_INVENTORY);
+		actionCommand.addArgument(variableMap.get(ESXI_HOSTNAME) + Constants.CHAR_COMMA);
 		
-		actionCommand.addArgument("-e");
-		actionCommand.addArgument("deprecation_warnings=False");
+		actionCommand.addArgument(FLAG_ENVIRONMENT);
+		actionCommand.addArgument(ANSIBLE_SSH_USER + Constants.CHAR_EQUAL + variableMap.get(ESXI_USERNAME));
 		
-		actionCommand.addArgument("-e");
-		actionCommand.addArgument("ansible_ssh_user=root");
-		
-		actionCommand.addArgument("-e");
-		actionCommand.addArgument("ansible_ssh_pass=" + variableMap.get("esxi_password"));
+		actionCommand.addArgument(FLAG_ENVIRONMENT);
+		actionCommand.addArgument(ANSIBLE_SSH_PASS + Constants.CHAR_EQUAL + variableMap.get(ESXI_PASSWORD));
 		
 		for (Entry<String, Object> variableEntry : variableMap.entrySet()) {
 
@@ -124,11 +98,11 @@ public class AnsibleService extends ProvisionerService {
 			String variableValue = (String) variableEntry.getValue();
 			String variableString = variableName + Constants.CHAR_EQUAL + Constants.CHAR_SINGLE_QUOTE + (variableValue.equals("on") ? "true" : variableValue) + Constants.CHAR_SINGLE_QUOTE;
 
-			actionCommand.addArgument("--extra-vars");
+			actionCommand.addArgument(FLAG_EXTRA_VARS);
 			actionCommand.addArgument(variableString, false);
 		}
 		
-		actionCommand.addArgument(action + ".yml");
+		actionCommand.addArgument(action + SUFFIX_YML);
 
 		return actionCommand;
 	}	

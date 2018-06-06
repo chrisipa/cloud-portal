@@ -3,7 +3,6 @@ package de.papke.cloud.portal.service;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -13,7 +12,6 @@ import javax.annotation.PostConstruct;
 
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +20,6 @@ import org.springframework.stereotype.Service;
 
 import de.papke.cloud.portal.constants.Constants;
 import de.papke.cloud.portal.pojo.CommandResult;
-import de.papke.cloud.portal.pojo.Credentials;
 import de.papke.cloud.portal.pojo.UseCase;
 import de.papke.cloud.portal.pojo.Variable;
 import de.papke.cloud.portal.pojo.VariableGroup;
@@ -66,6 +63,11 @@ public class TerraformService extends ProvisionerService {
 	}
 	
 	@Override
+	protected String getBinaryPath() {
+		return terraformPath;
+	}
+
+	@Override
 	protected Pattern getParsingPattern() {
 		
 		StringBuilder patternBuilder = new StringBuilder()
@@ -85,43 +87,16 @@ public class TerraformService extends ProvisionerService {
 	}	
 
 	@Override
-	public CommandResult execute(UseCase useCase, String action, Credentials credentials, Map<String, Object> variableMap, OutputStream outputStream, File tmpFolder) {
+	protected void prepare(UseCase useCase, File tmpFolder) throws IOException {
+		
+		// generate variable file
+		generateVariablesFile(useCase, tmpFolder);
 
-		CommandResult commandResult = null;
-
-		try {
-
-			// print waiting message
-			outputStream.write(getIntroductionText().getBytes());
-			outputStream.flush();
-
-			// generate variable file
-			generateVariablesFile(useCase, tmpFolder);
-
-			// copy provider plugins to temp folder
-			File pluginTargetFolder = new File(tmpFolder.getAbsolutePath() + File.separator + FOLDER_PLUGINS);
-			fileService.copyFolder(pluginSourceFolder, pluginTargetFolder);
-
-			// get action to execute
-			if (StringUtils.isNotEmpty(action)) {
-
-				// get execution map
-				Map<String, Object> executionMap = getExecutionMap(credentials, variableMap);
-
-				// build the command string
-				CommandLine actionCommand = buildActionCommand(terraformPath, action, executionMap);
-
-				// execute action command
-				commandResult = commandExecutorService.execute(actionCommand, tmpFolder, outputStream);
-			}
-		}
-		catch (Exception e) {
-			LOG.error(e.getMessage(), e);
-		}
-
-		return commandResult;
+		// copy provider plugins to temp folder
+		File pluginTargetFolder = new File(tmpFolder.getAbsolutePath() + File.separator + FOLDER_PLUGINS);
+		fileService.copyFolder(pluginSourceFolder, pluginTargetFolder);
 	}
-	
+
 	@Override
 	protected CommandLine buildActionCommand(String terraformPath, String action, Map<String, Object> variableMap) {
 
