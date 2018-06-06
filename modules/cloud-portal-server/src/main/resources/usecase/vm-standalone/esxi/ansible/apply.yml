@@ -152,7 +152,7 @@
       guest: "{{ random_id }}"
       vmware_guest_facts: yes
     register: get_ip_new_vm
-
+    
   - name: Output variables
     block:
       - name: Output random_id variable
@@ -168,9 +168,3 @@
           msg: "username = {{ username }}"
     when: 
       - create_vm_status is defined and create_vm_status is changed
-
-      #- hosts: "{{ get_ip_new_vm.ansible_facts.hw_eth0.ipaddresses }}" 
-      #  - name: SSH to host and set hostname
-      #    delegate_to: "{{ localhost }}"  # "{{ get_ip_new_vm.ansible_facts.hw_eth0.ipaddresses }}"
-      #    raw: "ssh -o StrictHostKeyChecking=no root@{{ get_ip_new_vm.ansible_facts.hw_eth0.ipaddresses[0] }} && hostnamectl set-hostname wienerface.fqdn"
-    # name: "{{ random_id }}"
