@@ -128,7 +128,7 @@ public class AnsibleService extends ProvisionerService {
 			actionCommand.addArgument(variableString, false);
 		}
 		
-		actionCommand.addArgument("playbook.yml");
+		actionCommand.addArgument(action + ".yml");
 
 		return actionCommand;
 	}	
