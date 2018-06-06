@@ -9,6 +9,11 @@ public class UseCase {
 	private String provisioner;
 	private List<VariableGroup> variableGroups; 
 	private String resourceFolderPath; 
+	
+	@Override
+	public String toString() {
+		return "id=" + id;
+	}
 
 	public String getProvider() {
 		return provider;

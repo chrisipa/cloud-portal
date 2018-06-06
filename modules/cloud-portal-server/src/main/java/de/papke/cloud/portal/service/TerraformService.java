@@ -5,9 +5,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.regex.Pattern;
 
 import javax.annotation.PostConstruct;
 
@@ -28,11 +28,12 @@ import de.papke.cloud.portal.pojo.Variable;
 import de.papke.cloud.portal.pojo.VariableGroup;
 
 @Service
-public class TerraformService {
+public class TerraformService extends ProvisionerService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(TerraformService.class);
 
-	private static final String TEXT_INTRODUCTION = "TERRAFORM IS WORKING ON YOUR ACTION. PLEASE BE PATIENT!!!\n\n";
+	public static final String PREFIX = "terraform";
+	
 	private static final String FLAG_NO_COLOR = "-no-color";
 	private static final String FLAG_VAR = "-var";
 	private static final String FLAG_FORCE = "-force";
@@ -42,7 +43,7 @@ public class TerraformService {
 	private static final String FOLDER_PLUGINS = ".terraform";
 	
 	private static final Integer NUMBER_OF_RETRIES = 60;
-
+	
 	@Autowired
 	private CommandExecutorService commandExecutorService;
 
@@ -58,7 +59,94 @@ public class TerraformService {
 	public void init() {
 		retryDownloadProviderPluginFiles();
 	}
+	
+	@Override
+	protected String getPrefix() {
+		return PREFIX;
+	}
+	
+	@Override
+	protected Pattern getParsingPattern() {
+		
+		StringBuilder patternBuilder = new StringBuilder()
+				.append(Constants.CHAR_PARENTHESES_OPEN)
+				.append(Constants.CHAR_DOT)
+				.append(Constants.CHAR_STAR)
+				.append(Constants.CHAR_PARENTHESES_CLOSE)
+				.append(Constants.CHAR_WHITESPACE)
+				.append(Constants.CHAR_EQUAL)
+				.append(Constants.CHAR_WHITESPACE)
+				.append(Constants.CHAR_PARENTHESES_OPEN)
+				.append(Constants.CHAR_DOT)
+				.append(Constants.CHAR_STAR)
+				.append(Constants.CHAR_PARENTHESES_CLOSE);
+		
+		return Pattern.compile(patternBuilder.toString());
+	}	
 
+	@Override
+	public CommandResult execute(UseCase useCase, String action, Credentials credentials, Map<String, Object> variableMap, OutputStream outputStream, File tmpFolder) {
+
+		CommandResult commandResult = null;
+
+		try {
+
+			// print waiting message
+			outputStream.write(getIntroductionText().getBytes());
+			outputStream.flush();
+
+			// generate variable file
+			generateVariablesFile(useCase, tmpFolder);
+
+			// copy provider plugins to temp folder
+			File pluginTargetFolder = new File(tmpFolder.getAbsolutePath() + File.separator + FOLDER_PLUGINS);
+			fileService.copyFolder(pluginSourceFolder, pluginTargetFolder);
+
+			// get action to execute
+			if (StringUtils.isNotEmpty(action)) {
+
+				// get execution map
+				Map<String, Object> executionMap = getExecutionMap(credentials, variableMap);
+
+				// build the command string
+				CommandLine actionCommand = buildActionCommand(terraformPath, action, executionMap);
+
+				// execute action command
+				commandResult = commandExecutorService.execute(actionCommand, tmpFolder, outputStream);
+			}
+		}
+		catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+		}
+
+		return commandResult;
+	}
+	
+	@Override
+	protected CommandLine buildActionCommand(String terraformPath, String action, Map<String, Object> variableMap) {
+
+		CommandLine actionCommand = new CommandLine(terraformPath);
+		actionCommand.addArgument(action);
+
+		if (action.equals(Constants.ACTION_DESTROY)) {
+			actionCommand.addArgument(FLAG_FORCE);
+		}
+
+		actionCommand.addArgument(FLAG_NO_COLOR);
+
+		for (Entry<String, Object> variableEntry : variableMap.entrySet()) {
+
+			String variableName = variableEntry.getKey();
+			String variableValue = (String) variableEntry.getValue();
+			String variableString = variableName + Constants.CHAR_EQUAL + (variableValue.equals("on") ? "true" : variableValue);
+
+			actionCommand.addArgument(FLAG_VAR);
+			actionCommand.addArgument(variableString, false);
+		}
+
+		return actionCommand;
+	}	
+	
 	private void retryDownloadProviderPluginFiles() {
 		
 		for (int i = 0; i < NUMBER_OF_RETRIES; i++) {
@@ -90,44 +178,7 @@ public class TerraformService {
 		
 		// get plugin folder path
 		pluginSourceFolder = new File(targetPath + File.separator + FOLDER_PLUGINS);
-	}
-
-	public CommandResult execute(UseCase useCase, String action, Credentials credentials, Map<String, Object> variableMap, OutputStream outputStream, File tmpFolder) {
-
-		CommandResult commandResult = null;
-
-		try {
-
-			// print waiting message
-			outputStream.write(TEXT_INTRODUCTION.getBytes());
-			outputStream.flush();
-
-			// generate variable file
-			generateVariablesFile(useCase, tmpFolder);
-
-			// copy provider plugins to temp folder
-			File pluginTargetFolder = new File(tmpFolder.getAbsolutePath() + File.separator + FOLDER_PLUGINS);
-			fileService.copyFolder(pluginSourceFolder, pluginTargetFolder);
-
-			// get action to execute
-			if (StringUtils.isNotEmpty(action)) {
-
-				// get execution map
-				Map<String, Object> executionMap = getExecutionMap(credentials, variableMap);
-
-				// build the command string
-				CommandLine actionCommand = buildActionCommand(terraformPath, action, executionMap);
-
-				// execute action command
-				commandResult = commandExecutorService.execute(actionCommand, tmpFolder, outputStream);
-			}
-		}
-		catch (Exception e) {
-			LOG.error(e.getMessage(), e);
-		}
-
-		return commandResult;
-	}
+	}	
 
 	private void generateVariablesFile(UseCase useCase, File tmpFolder) throws IOException {
 
@@ -159,38 +210,5 @@ public class TerraformService {
 		initCommand.addArgument(FLAG_NO_COLOR);
 
 		return initCommand;
-	}
-
-	private CommandLine buildActionCommand(String terraformPath, String action, Map<String, Object> variableMap) {
-
-		CommandLine actionCommand = new CommandLine(terraformPath);
-		actionCommand.addArgument(action);
-
-		if (action.equals(Constants.ACTION_DESTROY)) {
-			actionCommand.addArgument(FLAG_FORCE);
-		}
-
-		actionCommand.addArgument(FLAG_NO_COLOR);
-
-		for (Entry<String, Object> variableEntry : variableMap.entrySet()) {
-
-			String variableName = variableEntry.getKey();
-			String variableValue = (String) variableEntry.getValue();
-			String variableString = variableName + Constants.CHAR_EQUAL + (variableValue.equals("on") ? "true" : variableValue);
-
-			actionCommand.addArgument(FLAG_VAR);
-			actionCommand.addArgument(variableString, false);
-		}
-
-		return actionCommand;
-	}
-
-	private Map<String, Object> getExecutionMap(Credentials credentials, Map<String, Object> variableMap) {
-
-		Map<String, Object> executionMap = new HashMap<>();
-		executionMap.putAll(variableMap);
-		executionMap.putAll(credentials.getSecretMap());
-
-		return executionMap;
 	}
 }

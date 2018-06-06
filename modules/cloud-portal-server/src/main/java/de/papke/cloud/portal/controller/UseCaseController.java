@@ -43,7 +43,6 @@ import de.papke.cloud.portal.pojo.Variable;
 import de.papke.cloud.portal.service.CredentialsService;
 import de.papke.cloud.portal.service.KeyPairService;
 import de.papke.cloud.portal.service.ProvisionLogService;
-import de.papke.cloud.portal.service.ProvisioningService;
 import de.papke.cloud.portal.service.SessionUserService;
 import de.papke.cloud.portal.service.UseCaseService;
 
@@ -75,9 +74,6 @@ public class UseCaseController extends ApplicationController {
 
 	@Autowired
 	private CredentialsService credentialsService;
-
-	@Autowired
-	private ProvisioningService provisioningService;
 
 	@Autowired
 	private ProvisionLogService provisionLogService;
@@ -149,22 +145,22 @@ public class UseCaseController extends ApplicationController {
 			// get use case
 			UseCase useCase = useCaseService.getUseCaseById(id); 
 			
-			// iterate over file map
-			writeFilesAndAddToMap(request, variableMap, tempFileList);
+			// get provider
+			String provider = useCase.getProvider();
 			
-			// get variables
-			List<Variable> variables = useCaseService.getVisibleVariables(id);
+			// get credentials
+			Credentials credentials = credentialsService.getCredentials(provider);
+			if (credentials != null) {
 			
-			// validate parameters
-			List<Variable> errorList = validateValues(variables, variableMap);
-			if (errorList.isEmpty()) {
-
-				// get provider
-				String provider = useCase.getProvider();
+				// iterate over file map
+				writeFilesAndAddToMap(request, variableMap, tempFileList);
 				
-				// get credentials
-				Credentials credentials = credentialsService.getCredentials(provider);
-				if (credentials != null) {
+				// get variables
+				List<Variable> variables = useCaseService.getVisibleVariables(id);
+				
+				// validate parameters
+				List<Variable> errorList = validateValues(variables, variableMap);
+				if (errorList.isEmpty()) {
 					
 					// extend with sytem generated data
 					extendWithUserData(credentials, variableMap);
@@ -179,14 +175,14 @@ public class UseCaseController extends ApplicationController {
 					OutputStream outputStream = response.getOutputStream();
 	
 					// provision VM
-					provisioningService.provision(useCase, action, credentials, variableMap, privateKeyFile, outputStream);
+					useCaseService.provision(useCase, action, credentials, variableMap, privateKeyFile, outputStream);
 				}
 				else {
-					fail(String.format("No credentials found for cloud provider '%s'. Please contact your administrator.", provider), response);
+					fail(renderVariableErrorMessage(errorList), response);
 				}
 			}
 			else {
-				fail(renderVariableErrorMessage(errorList), response);
+				fail(String.format("No credentials found for cloud provider '%s'. Please contact your administrator.", provider), response);
 			}
 		}
 		catch (Exception e) {
@@ -279,7 +275,7 @@ public class UseCaseController extends ApplicationController {
 						OutputStream outputStream = response.getOutputStream();
 						
 						// provision VM
-						provisioningService.deprovision(provisionLog, credentials, outputStream);
+						useCaseService.deprovision(provisionLog, credentials, outputStream);
 					}
 					else {
 						fail(String.format("You are not allowed to deprovision the entry with the id '%s'", provisionLogId), response);

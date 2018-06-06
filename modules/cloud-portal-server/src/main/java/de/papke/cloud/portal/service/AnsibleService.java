@@ -2,9 +2,9 @@ package de.papke.cloud.portal.service;
 
 import java.io.File;
 import java.io.OutputStream;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.regex.Pattern;
 
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.lang.StringUtils;
@@ -20,12 +20,14 @@ import de.papke.cloud.portal.pojo.Credentials;
 import de.papke.cloud.portal.pojo.UseCase;
 
 @Service
-public class AnsibleService {
+public class AnsibleService extends ProvisionerService {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(AnsibleService.class);
-	
-	private static final String TEXT_INTRODUCTION = "ANSIBLE IS WORKING ON YOUR ACTION. PLEASE BE PATIENT!!!\n\n";
+
+	private static final String MSG = "msg";
 	private static final String FLAG_DRY_RUN = "--check";
+
+	public static final String PREFIX = "ansible";
 
 	@Autowired
 	private CommandExecutorService commandExecutorService;	
@@ -33,6 +35,38 @@ public class AnsibleService {
 	@Value("${ansible.path}")
 	private String ansiblePath;
 	
+	@Override
+	protected String getPrefix() {
+		return PREFIX;
+	}
+	
+	@Override
+	protected Pattern getParsingPattern() {
+		
+		StringBuilder patternBuilder = new StringBuilder()
+				.append(Constants.CHAR_DOUBLE_QUOTE)
+				.append(MSG)
+				.append(Constants.CHAR_DOUBLE_QUOTE)
+				.append(Constants.CHAR_DOUBLE_DOT)
+				.append(Constants.CHAR_WHITESPACE)
+				.append(Constants.CHAR_DOUBLE_QUOTE)
+				.append(Constants.CHAR_PARENTHESES_OPEN)
+				.append(Constants.CHAR_DOT)
+				.append(Constants.CHAR_STAR)
+				.append(Constants.CHAR_PARENTHESES_CLOSE)
+				.append(Constants.CHAR_WHITESPACE)
+				.append(Constants.CHAR_EQUAL)
+				.append(Constants.CHAR_WHITESPACE)
+				.append(Constants.CHAR_PARENTHESES_OPEN)
+				.append(Constants.CHAR_DOT)
+				.append(Constants.CHAR_STAR)
+				.append(Constants.CHAR_PARENTHESES_CLOSE)
+				.append(Constants.CHAR_DOUBLE_QUOTE);
+		
+		return Pattern.compile(patternBuilder.toString());
+	}
+	
+	@Override
 	public CommandResult execute(UseCase useCase, String action, Credentials credentials, Map<String, Object> variableMap, OutputStream outputStream, File tmpFolder) {
 
 		CommandResult commandResult = null;
@@ -40,7 +74,7 @@ public class AnsibleService {
 		try {
 
 			// print waiting message
-			outputStream.write(TEXT_INTRODUCTION.getBytes());
+			outputStream.write(getIntroductionText().getBytes());
 			outputStream.flush();
 
 			// get action to execute
@@ -63,7 +97,8 @@ public class AnsibleService {
 		return commandResult;
 	}
 	
-	private CommandLine buildActionCommand(String ansiblePath, String action, Map<String, Object> variableMap) {
+	@Override
+	protected CommandLine buildActionCommand(String ansiblePath, String action, Map<String, Object> variableMap) {
 
 		CommandLine actionCommand = new CommandLine(ansiblePath);
 
@@ -97,13 +132,4 @@ public class AnsibleService {
 
 		return actionCommand;
 	}	
-	
-	private Map<String, Object> getExecutionMap(Credentials credentials, Map<String, Object> variableMap) {
-
-		Map<String, Object> executionMap = new HashMap<>();
-		executionMap.putAll(variableMap);
-		executionMap.putAll(credentials.getSecretMap());
-
-		return executionMap;
-	}
 }

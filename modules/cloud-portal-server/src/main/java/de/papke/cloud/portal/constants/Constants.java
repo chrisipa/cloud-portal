@@ -3,6 +3,7 @@ package de.papke.cloud.portal.constants;
 public class Constants {
 	
 	public static final String CHAR_EMPTY = "";
+	public static final String CHAR_STAR = "*";
 	public static final String CHAR_DIAMOND = "#";
 	public static final String CHAR_EQUAL = "=";
 	public static final String CHAR_DASH = "-";
@@ -18,6 +19,8 @@ public class Constants {
 	public static final String CHAR_BRAKET_OPEN = "[";
 	public static final String CHAR_BRAKET_CLOSE = "]";
 	public static final String CHAR_COMMA = ",";
+	public static final String CHAR_PARENTHESES_OPEN = "(";
+	public static final String CHAR_PARENTHESES_CLOSE = ")";
 	
 	public static final String ACTION_INIT = "init";
 	public static final String ACTION_APPLY = "apply";
