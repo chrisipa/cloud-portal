@@ -153,17 +153,21 @@
       vmware_guest_facts: yes
     register: get_ip_new_vm
 
-  - name: Output random_id variable
-    debug:
-      msg: "random_id = {{ random_id }}"
-      
-  - name: Output host variable
-    debug:
-      msg: "host = {{ get_ip_new_vm.ansible_facts.hw_eth0.ipaddresses[0] }}"
-      
-  - name: Output username variable
-    debug:
-      msg: "username = {{ username }}"
+  - name: Output variables
+    block:
+      - name: Output random_id variable
+        debug:
+          msg: "random_id = {{ random_id }}"
+          
+      - name: Output host variable
+        debug:
+          msg: "host = {{ get_ip_new_vm.ansible_facts.hw_eth0.ipaddresses[0] }}"
+          
+      - name: Output username variable
+        debug:
+          msg: "username = {{ username }}"
+    when: 
+      - create_vm_status is defined and create_vm_status is changed
 
       #- hosts: "{{ get_ip_new_vm.ansible_facts.hw_eth0.ipaddresses }}" 
       #  - name: SSH to host and set hostname

@@ -1,0 +1,22 @@
+---
+- hosts: all
+  vars:
+    localhost: 127.0.0.1
+    esxi_datacenter: ha-datacenter
+    esxi_validate_certs: false
+
+  tasks:
+  
+  - name: Delete machine {{ random_id }} from inventory 
+    delegate_to: "{{ localhost }}"
+    vsphere_guest:
+      vcenter_hostname: "{{ esxi_hostname }}"
+      esxi:
+        datacenter: "{{ esxi_datacenter }}"
+        hostname: "{{ esxi_hostname }}"
+      validate_certs: "{{ esxi_validate_certs }}"
+      username: "{{ esxi_username }}"
+      password: "{{ esxi_password }}"
+      guest: "{{ random_id }}"
+      state: absent
+      force: yes
