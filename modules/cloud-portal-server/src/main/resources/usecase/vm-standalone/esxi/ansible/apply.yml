@@ -1,16 +1,24 @@
 ---
 - hosts: all
+
+  environment:
+    ANSIBLE_HOST_KEY_CHECKING: false
+    
   vars:
     localhost: 127.0.0.1
     esxi_datacenter: ha-datacenter
     esxi_validate_certs: false
     is_linux: "{{ image_name.find('Linux') != -1 }}"
-    is_windows: "{{ image_name.find('Linux') != -1 }}"
+    is_windows: "{{ image_name.find('Windows') != -1 }}"
     vm_scsi: paravirtual
     vm_network_adapter_type: vmxnet3
     vm_network_type: standard
     vm_template_path: "{{ (is_linux == true) | ternary('output-ubuntu-template/disk.vmdk', 'output-windows-template/disk.vmdk') }}"
     vm_guest_id: "{{ (is_linux == true) | ternary('ubuntu64Guest', 'windows9Server64Guest') }}"
+    linux_default_username: devops
+    linux_default_password: devops
+    windows_default_username: Administrator
+    windows_default_password: DevOps2017
 
   tasks:
   
@@ -36,7 +44,6 @@
       register: inventory_vm_name
       ignore_errors: yes
 
-  # Throw Warnings if datastore foldername exists or machine is arleady in inventory
   - name: Machine folder for {{ random_id }} exists on datastore
     fail:
       msg:  "There is already a foldername on the datastore {{ esxi_datastore }} with same name as {{ random_id }} Please backup/rename and run again" 
@@ -46,8 +53,6 @@
       msg: "This VM machine appears to already exist in esxi inventory but not on the datastore; we will forcibly overwrite {{ random_id }}"  
     when: inventory_vm_name.ansible_facts is defined
 
-
-  # Delete the machine name from if it exists in inventory but not datastore
   - name: Delete machine {{ random_id }} from inventory 
     delegate_to: "{{ localhost }}"
     vsphere_guest:
@@ -110,12 +115,12 @@
 
   - name: Block for vmkfstools image creation
     block:
-    - name: delete empty disk for new template
+    - name: Delete empty disk for new template
       shell: "rm -r /vmfs/volumes/{{ esxi_datastore }}/{{ random_id }}/{{ random_id }}*.vmdk"
       args:
         warn: false
      
-    - name: create disk from template
+    - name: Create disk from template
       shell: "vmkfstools -i /vmfs/volumes/{{ esxi_datastore }}/{{ vm_template_path }} /vmfs/volumes/{{ esxi_datastore }}/{{ random_id }}/{{ random_id }}.vmdk -d thin"
     when: 
       - create_vm_status is defined and create_vm_status is changed
@@ -134,12 +139,12 @@
       guest: "{{ random_id }}"
       state: powered_on
 
-  - name: Wait for SSH on new system
+  - name: Wait for VM to start
     wait_for_connection:
       delay: 60
       timeout: 300
 
-  - name: Get IP of new machine for SSH {{ random_id }}
+  - name: Get IP of new machine {{ random_id }}
     delegate_to: "{{ localhost }}"
     vsphere_guest:
       vcenter_hostname: "{{ esxi_hostname }}"
@@ -152,6 +157,25 @@
       guest: "{{ random_id }}"
       vmware_guest_facts: yes
     register: get_ip_new_vm
+    
+  - name: Execute linux provisioning
+    block:  
+      - name: Create SUDO user {{ username }}
+        delegate_to: "{{ localhost }}"
+        shell: "ansible-playbook -i '{{ get_ip_new_vm.ansible_facts.hw_eth0.ipaddresses[0] }},' -e 'ansible_ssh_user={{ linux_default_username }}' -e 'ansible_ssh_pass={{ linux_default_password }}' -e 'ansible_sudo_pass={{ linux_default_password }}' -e 'username={{ username }}' -e 'password={{ password }}' -e 'public_key_file={{ public_key_file }}' linux_user.yml"
+        register: out
+        
+      - debug: var=out.stdout_lines        
+          
+      - name: Bootstrap linux virtual machine {{ random_id }}
+        delegate_to: "{{ localhost }}"
+        shell: "ansible-playbook -i '{{ get_ip_new_vm.ansible_facts.hw_eth0.ipaddresses[0] }},' -e 'ansible_ssh_user={{ username }}' -e 'ansible_ssh_pass={{ password }}' -e 'ansible_sudo_pass={{ password }}' -e 'script_file={{ script_file }}' linux_bootstrap.yml"
+        register: out
+        
+      - debug: var=out.stdout_lines        
+        
+    when: 
+      - create_vm_status is defined and create_vm_status is changed and is_linux         
     
   - name: Output variables
     block:

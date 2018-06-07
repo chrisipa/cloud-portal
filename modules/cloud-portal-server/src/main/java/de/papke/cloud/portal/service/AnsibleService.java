@@ -22,7 +22,6 @@ public class AnsibleService extends ProvisionerService {
 	private static final String ESXI_USERNAME = "esxi_username";
 	private static final String ESXI_PASSWORD = "esxi_password"; // NOSONAR
 	private static final String FLAG_EXTRA_VARS = "--extra-vars";
-	private static final String FLAG_ENVIRONMENT = "-e";
 	private static final String FLAG_INVENTORY = "-i";
 	private static final String FLAG_DRY_RUN = "--check";
 	private static final String OUTPUT_MSG = "msg";
@@ -86,10 +85,10 @@ public class AnsibleService extends ProvisionerService {
 		actionCommand.addArgument(FLAG_INVENTORY);
 		actionCommand.addArgument(variableMap.get(ESXI_HOSTNAME) + Constants.CHAR_COMMA);
 		
-		actionCommand.addArgument(FLAG_ENVIRONMENT);
+		actionCommand.addArgument(FLAG_EXTRA_VARS);
 		actionCommand.addArgument(ANSIBLE_SSH_USER + Constants.CHAR_EQUAL + variableMap.get(ESXI_USERNAME));
 		
-		actionCommand.addArgument(FLAG_ENVIRONMENT);
+		actionCommand.addArgument(FLAG_EXTRA_VARS);
 		actionCommand.addArgument(ANSIBLE_SSH_PASS + Constants.CHAR_EQUAL + variableMap.get(ESXI_PASSWORD));
 		
 		for (Entry<String, Object> variableEntry : variableMap.entrySet()) {
