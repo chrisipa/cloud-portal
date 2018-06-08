@@ -85,7 +85,7 @@ public class ProvisionLogService {
 	}
 	
 	public List<ProvisionLog> getExpired() {
-		return provisionLogDao.findByCommandAndExpirationDate(Constants.ACTION_APPLY, new Date());
+		return provisionLogDao.findBySuccessAndCommandAndExpirationDate(true, Constants.ACTION_APPLY, new Date());
 	}
 
 	public ProvisionLog create(String state, UseCase useCase, String group, Boolean success, Map<String, Object> variableMap, File privateKeyFile, File tmpFolder) {

@@ -40,5 +40,7 @@ public class Constants {
 	
 	public static final String VAR_TYPE_SECRET = "secret";
 	
+	public static final String PROVISIONER_ESXI = "esxi";
+	
 	private Constants() {}
 }

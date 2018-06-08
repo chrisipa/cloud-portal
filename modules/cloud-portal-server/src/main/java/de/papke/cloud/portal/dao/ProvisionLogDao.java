@@ -10,8 +10,8 @@ import de.papke.cloud.portal.pojo.ProvisionLog;
 
 public interface ProvisionLogDao extends MongoRepository<ProvisionLog, String> {
 	
-	@Query("{ $and: [ { 'command' : ?0 }, { 'expirationDate' : { $lt: ?1 } } ] }")
-	public List<ProvisionLog> findByCommandAndExpirationDate(String command, Date expirationDate);
+	@Query("{ $and: [ { 'success' : ?0 }, { 'command' : ?1 }, { 'expirationDate' : { $lt: ?2 } } ] }")
+	public List<ProvisionLog> findBySuccessAndCommandAndExpirationDate(boolean success, String command, Date expirationDate);
 	public ProvisionLog findById(String id);
 	public List<ProvisionLog> findByUseCaseId(String useCaseId);
 	public List<ProvisionLog> findByGroupInAndUseCaseId(List<String> groups, String useCaseId);

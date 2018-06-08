@@ -1,6 +1,7 @@
 package de.papke.cloud.portal.service;
 
 import java.io.File;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -75,6 +76,15 @@ public class FileService {
     		makeExecutable(targetFolder, true);
     	}
     	catch(Exception e) {
+    		LOG.error(e.getMessage(), e);
+    	}
+    }
+    
+    public void createFile(String text, File targetFile) {
+    	try {
+    		FileUtils.writeStringToFile(targetFile, text, StandardCharsets.UTF_8);
+    	}
+    	catch (Exception e) {
     		LOG.error(e.getMessage(), e);
     	}
     }

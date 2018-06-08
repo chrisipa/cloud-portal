@@ -1,24 +1,15 @@
 ---
 - hosts: all
 
-  environment:
-    ANSIBLE_HOST_KEY_CHECKING: false
-    
   vars:
     localhost: 127.0.0.1
     esxi_datacenter: ha-datacenter
     esxi_validate_certs: false
-    is_linux: "{{ image_name.find('Linux') != -1 }}"
-    is_windows: "{{ image_name.find('Windows') != -1 }}"
     vm_scsi: paravirtual
     vm_network_adapter_type: vmxnet3
     vm_network_type: standard
-    vm_template_path: "{{ (is_linux == true) | ternary('output-ubuntu-template/disk.vmdk', 'output-windows-template/disk.vmdk') }}"
-    vm_guest_id: "{{ (is_linux == true) | ternary('ubuntu64Guest', 'windows9Server64Guest') }}"
-    linux_default_username: devops
-    linux_default_password: devops
-    windows_default_username: Administrator
-    windows_default_password: DevOps2017
+    vm_template_path: "{{ (is_linux == '1') | ternary('output-ubuntu-template/disk.vmdk', 'output-windows-template/disk.vmdk') }}"
+    vm_guest_id: "{{ (is_linux == '1') | ternary('ubuntu64Guest', 'windows9Server64Guest') }}"
 
   tasks:
   
@@ -99,8 +90,8 @@
             type: "{{ vm_network_adapter_type }}"
             network_type: "{{ vm_network_type }}"
         vm_hardware:
-          memory_mb: "{{ vm_ram_size | default (1024) }}"
-          num_cpus: "{{ vm_cores | default (1) }}"
+          memory_mb: "{{ vm_ram_size }}"
+          num_cpus: "{{ vm_cores }}"
           scsi: "{{ vm_scsi }}"
           osid: "{{ vm_guest_id }}"  
       register: create_vm_status
@@ -158,37 +149,11 @@
       vmware_guest_facts: yes
     register: get_ip_new_vm
     
-  - name: Execute linux provisioning
-    block:  
-      - name: Create SUDO user {{ username }}
-        delegate_to: "{{ localhost }}"
-        shell: "ansible-playbook -i '{{ get_ip_new_vm.ansible_facts.hw_eth0.ipaddresses[0] }},' -e 'ansible_ssh_user={{ linux_default_username }}' -e 'ansible_ssh_pass={{ linux_default_password }}' -e 'ansible_sudo_pass={{ linux_default_password }}' -e 'username={{ username }}' -e 'password={{ password }}' -e 'public_key_file={{ public_key_file }}' linux_user.yml"
-        register: out
-        
-      - debug: var=out.stdout_lines        
-          
-      - name: Bootstrap linux virtual machine {{ random_id }}
-        delegate_to: "{{ localhost }}"
-        shell: "ansible-playbook -i '{{ get_ip_new_vm.ansible_facts.hw_eth0.ipaddresses[0] }},' -e 'ansible_ssh_user={{ username }}' -e 'ansible_ssh_pass={{ password }}' -e 'ansible_sudo_pass={{ password }}' -e 'script_file={{ script_file }}' linux_bootstrap.yml"
-        register: out
-        
-      - debug: var=out.stdout_lines        
-        
+  - name: Write IP address to file
+    delegate_to: "{{ localhost }}"
+    copy: 
+      content: "{{ get_ip_new_vm.ansible_facts.hw_eth0.ipaddresses[0] }}" 
+      dest: "{{ playbook_dir }}/ip.txt"
+  
     when: 
-      - create_vm_status is defined and create_vm_status is changed and is_linux         
-    
-  - name: Output variables
-    block:
-      - name: Output random_id variable
-        debug:
-          msg: "random_id = {{ random_id }}"
-          
-      - name: Output host variable
-        debug:
-          msg: "host = {{ get_ip_new_vm.ansible_facts.hw_eth0.ipaddresses[0] }}"
-          
-      - name: Output username variable
-        debug:
-          msg: "username = {{ username }}"
-    when: 
-      - create_vm_status is defined and create_vm_status is changed
+      - get_ip_new_vm is defined

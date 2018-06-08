@@ -30,7 +30,8 @@ public abstract class ProvisionerService {
 	protected abstract String getBinaryPath();
 	protected abstract CommandLine buildActionCommand(String ansiblePath, String action, Map<String, Object> variableMap);
 	protected abstract Pattern getParsingPattern();
-	protected abstract void prepare(UseCase useCase, File tmpFolder) throws IOException;
+	protected abstract void prepare(UseCase useCase, String action, Credentials credentials, Map<String, Object> variableMap, OutputStream outputStream, File tmpFolder) throws IOException;
+	protected abstract void cleanup(UseCase useCase, String action, Credentials credentials, Map<String, Object> variableMap, OutputStream outputStream, File tmpFolder) throws IOException;
 	
 	@Autowired
 	private CommandExecutorService commandExecutorService;
@@ -48,17 +49,20 @@ public abstract class ProvisionerService {
 			// get action to execute
 			if (StringUtils.isNotEmpty(action)) {
 				
-				// prepare execution
-				prepare(useCase, tmpFolder);
-
 				// get execution map
 				Map<String, Object> executionMap = getExecutionMap(credentials, variableMap);
 
 				// build the command string
 				CommandLine actionCommand = buildActionCommand(getBinaryPath(), action, executionMap);
+				
+				// prepare execution
+				prepare(useCase, action, credentials, variableMap, outputStream, tmpFolder);
 
 				// execute action command
 				commandResult = commandExecutorService.execute(actionCommand, tmpFolder, outputStream);
+				
+				// cleanup execution
+				cleanup(useCase, action, credentials, variableMap, outputStream, tmpFolder);
 			}
 		}
 		catch (Exception e) {

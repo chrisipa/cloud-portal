@@ -90,11 +90,11 @@ menus:
       menus:
       
        - title: List
-         path: /usecase/list/form/vm-standalone-esxi-ansible
+         path: /usecase/list/form/vm-standalone-esxi-terraform
          icon: fa-list
          
        - title: Create
-         path: /usecase/create/form/vm-standalone-esxi-ansible
+         path: /usecase/create/form/vm-standalone-esxi-terraform
          icon: fa-plus         
          
     - title: VMWare vSphere

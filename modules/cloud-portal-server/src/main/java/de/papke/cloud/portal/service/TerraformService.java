@@ -3,7 +3,9 @@ package de.papke.cloud.portal.service;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
@@ -20,6 +22,7 @@ import org.springframework.stereotype.Service;
 
 import de.papke.cloud.portal.constants.Constants;
 import de.papke.cloud.portal.pojo.CommandResult;
+import de.papke.cloud.portal.pojo.Credentials;
 import de.papke.cloud.portal.pojo.UseCase;
 import de.papke.cloud.portal.pojo.Variable;
 import de.papke.cloud.portal.pojo.VariableGroup;
@@ -30,11 +33,16 @@ public class TerraformService extends ProvisionerService {
 	private static final Logger LOG = LoggerFactory.getLogger(TerraformService.class);
 
 	public static final String PREFIX = "terraform";
-	
+
+	private static final String ANSIBLE_SSH_USER = "ansible_ssh_user";
+	private static final String ANSIBLE_SSH_PASS = "ansible_ssh_pass"; // NOSONAR
+	private static final String ESXI_USERNAME = "esxi_username";
+	private static final String ESXI_PASSWORD = "esxi_password"; // NOSONAR
 	private static final String FLAG_NO_COLOR = "-no-color";
 	private static final String FLAG_VAR = "-var";
 	private static final String FLAG_FORCE = "-force";
 	private static final String VARIABLE_IDENTIFIER = "variable";
+	private static final String FILE_PARAMETERS_YML = "parameters.yml";
 	private static final String FILE_VARIABLES_TF = "variables.tf";
 	private static final String FOLDER_INIT = "init";
 	private static final String FOLDER_PLUGINS = ".terraform";
@@ -87,7 +95,7 @@ public class TerraformService extends ProvisionerService {
 	}	
 
 	@Override
-	protected void prepare(UseCase useCase, File tmpFolder) throws IOException {
+	protected void prepare(UseCase useCase, String action, Credentials credentials, Map<String, Object> variableMap, OutputStream outputStream, File tmpFolder) throws IOException {
 		
 		// generate variable file
 		generateVariablesFile(useCase, tmpFolder);
@@ -95,7 +103,46 @@ public class TerraformService extends ProvisionerService {
 		// copy provider plugins to temp folder
 		File pluginTargetFolder = new File(tmpFolder.getAbsolutePath() + File.separator + FOLDER_PLUGINS);
 		fileService.copyFolder(pluginSourceFolder, pluginTargetFolder);
+		
+		// get parameter string
+		StringBuilder parameterStringBuilder = new StringBuilder();
+		for (Entry<String, Object> entry : variableMap.entrySet()) {
+			parameterStringBuilder.append(entry.getKey());
+			parameterStringBuilder.append(Constants.CHAR_DOUBLE_DOT);
+			parameterStringBuilder.append(Constants.CHAR_WHITESPACE);
+			parameterStringBuilder.append(entry.getValue());
+			parameterStringBuilder.append(Constants.CHAR_NEW_LINE);
+		}
+		
+		
+		// add ansible ssh user and password
+		if (useCase.getProvider().equals(Constants.PROVISIONER_ESXI)) {
+			
+			Map<String, String> credentialsMap = new HashMap<>();
+			credentialsMap.putAll(credentials.getSecretMap());
+			credentialsMap.put(ANSIBLE_SSH_USER, credentialsMap.get(ESXI_USERNAME));
+			credentialsMap.put(ANSIBLE_SSH_PASS, credentialsMap.get(ESXI_PASSWORD));
+			
+			for (Entry<String, String> entry : credentialsMap.entrySet()) {
+				parameterStringBuilder.append(entry.getKey());
+				parameterStringBuilder.append(Constants.CHAR_DOUBLE_DOT);
+				parameterStringBuilder.append(Constants.CHAR_WHITESPACE);
+				parameterStringBuilder.append(entry.getValue());
+				parameterStringBuilder.append(Constants.CHAR_NEW_LINE);	
+			}			
+		}
+		
+		// write parameter string to yaml file
+		fileService.createFile(parameterStringBuilder.toString(), getParameterFile(tmpFolder));
 	}
+	
+	@Override
+	protected void cleanup(UseCase useCase, String action, Credentials credentials, Map<String, Object> variableMap,
+			OutputStream outputStream, File tmpFolder) throws IOException {
+
+		// remove parameters yaml file
+		FileUtils.deleteQuietly(getParameterFile(tmpFolder));
+	}	
 
 	@Override
 	protected CommandLine buildActionCommand(String terraformPath, String action, Map<String, Object> variableMap) {
@@ -185,5 +232,9 @@ public class TerraformService extends ProvisionerService {
 		initCommand.addArgument(FLAG_NO_COLOR);
 
 		return initCommand;
+	}
+	
+	private File getParameterFile(File tmpFolder) {
+		return new File(tmpFolder.getAbsolutePath() + File.separator + FILE_PARAMETERS_YML);
 	}
 }

@@ -74,7 +74,7 @@ chmod -x \$0" > /root/fsresize.sh
     echo -e "Done. The system will reboot automatically and resize the filesystem during reboot.\n"
     # sleep 15
     # Reboot is necessary in most cases for the kernel to read the new partition table.
-    shutdown -r +1
+    reboot
   else
     echo -e "Aborted by user.\n"
     exit 1

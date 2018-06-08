@@ -75,9 +75,6 @@ public class UseCaseService {
 	private TerraformService terraformService;
 	
 	@Autowired
-	private AnsibleService ansibleService;
-
-	@Autowired
 	private MailService mailService;
 	
 	@Autowired
@@ -422,11 +419,6 @@ public class UseCaseService {
 		ProvisionerService configManagementService = null;
 		if (provisioner.equals(TerraformService.PREFIX)) {
 			configManagementService = terraformService;
-		}
-		else {
-			if (provisioner.equals(AnsibleService.PREFIX)) {
-				configManagementService = ansibleService;
-			}
 		}
 		
 		return configManagementService;
