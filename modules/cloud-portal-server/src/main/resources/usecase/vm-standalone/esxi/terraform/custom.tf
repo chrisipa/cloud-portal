@@ -6,7 +6,12 @@ locals {
   windows_default_password = "DevOps2017"
   
   image_templates_map = {
-    "Ubuntu Server Linux 16.04" = "TPL_UBUNTU_SERVER_16.04.3_LTS"
-    "Windows Server 2016" = "TPL_WIN_2016"  
+    "Ubuntu Server Linux 16.04" = "output-ubuntu-template/disk.vmdk"
+    "Windows Server 2016" = "output-windows-template/disk.vmdk"  
+  }
+  
+  image_guest_id_map = {
+    "Ubuntu Server Linux 16.04" = "ubuntu64Guest"
+    "Windows Server 2016" = "windows9Server64Guest"  
   }
 }

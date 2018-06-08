@@ -18,13 +18,16 @@ locals {
   windows_prepare_script_path = "${local.windows_script_folder_path}\\prepare.ps1"
   windows_user_script_path = "${local.windows_script_folder_path}\\user.ps1"
   windows_cleanup_script_path = "${local.windows_script_folder_path}\\cleanup.ps1"
+  
+  vm_template_path = "${lookup(local.image_templates_map, var.image_name)}"
+  vm_guest_id = "${lookup(local.image_guest_id_map, var.image_name)}"
 }
 
-resource "null_resource" "vmprovisioning" {
+resource "null_resource" "vm_provisioning" {
   
   provisioner "local-exec" {
     when    = "create"
-    command = "ansible-playbook -i '${var.esxi_hostname},' -e 'is_linux=${local.is_linux}' -e 'is_windows=${local.is_windows}' -e '@parameters.yml' apply.yml"
+    command = "ansible-playbook -i '${var.esxi_hostname},' -e 'vm_guest_id=${local.vm_guest_id}' -e 'vm_template_path=${local.vm_template_path}' -e '@parameters.yml' apply.yml"
   } 
   
   provisioner "local-exec" {
@@ -35,10 +38,10 @@ resource "null_resource" "vmprovisioning" {
 
 data "local_file" "ipfile" {
     filename = "${path.module}/ip.txt"
-    depends_on = ["null_resource.vmprovisioning"]
+    depends_on = ["null_resource.vm_provisioning"]
 }
 
-resource "null_resource" "userprovisioning" {
+resource "null_resource" "linux_user_creation" {
   
   count = "${local.is_linux}"
   
@@ -64,10 +67,10 @@ resource "null_resource" "userprovisioning" {
     ]
   }  
 
-  depends_on = ["null_resource.vmprovisioning"]
+  depends_on = ["null_resource.vm_provisioning"]
 }
 
-resource "null_resource" "linuxprovisioning" {
+resource "null_resource" "linux_bootstrapping" {
   
   count = "${local.is_linux}"
   
@@ -100,5 +103,62 @@ resource "null_resource" "linuxprovisioning" {
     ]
   } 
   
-  depends_on = ["null_resource.userprovisioning"]
+  depends_on = ["null_resource.linux_user_creation"]
+}
+
+resource "null_resource" "windows_user_creation" {
+  
+  count = "${local.is_windows}"
+  
+  connection {
+    type = "winrm"
+    host = "${data.local_file.ipfile.content}"
+    user = "${local.windows_default_username}" 
+    password = "${local.windows_default_password}"          
+    timeout = "10m"      
+  }
+  
+  provisioner "remote-exec" {
+    inline = [
+      "NET USER ${var.username} ${var.password} /add /y /expires:never",
+      "NET LOCALGROUP Administrators ${var.username} /add",
+      "WMIC USERACCOUNT WHERE \"Name='${var.username}'\" SET PasswordExpires=FALSE"
+    ]
+  }  
+
+  depends_on = ["null_resource.vm_provisioning"]
+}
+
+resource "null_resource" "windows_bootstrapping" {
+  
+  count = "${local.is_windows}"
+  
+  connection {
+    type = "winrm"
+    host = "${data.local_file.ipfile.content}"
+    user = "${var.username}" 
+    password = "${var.password}"          
+    timeout = "10m"      
+  }
+
+  provisioner "file" {
+    source      = "${local.windows_script_folder_name}"
+    destination = "${local.windows_script_folder_path}"  
+  }
+
+  provisioner "file" {
+    source = "${var.script_file}"
+    destination = "${local.windows_user_script_path}" 
+  } 
+  
+  provisioner "remote-exec" {
+    inline = [
+      "Powershell.exe -ExecutionPolicy Unrestricted -File ${local.windows_prepare_script_path}",      
+      "Powershell.exe -ExecutionPolicy Unrestricted -File ${local.windows_user_script_path}",
+      "Powershell.exe -ExecutionPolicy Unrestricted -File ${local.windows_cleanup_script_path}",
+      "Powershell.exe -ExecutionPolicy Unrestricted -Command Remove-Item ${local.windows_script_folder_path} -Force -Recurse"      
+    ]
+  } 
+  
+  depends_on = ["null_resource.windows_user_creation"]
 }

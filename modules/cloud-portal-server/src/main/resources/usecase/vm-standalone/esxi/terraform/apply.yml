@@ -8,8 +8,6 @@
     vm_scsi: paravirtual
     vm_network_adapter_type: vmxnet3
     vm_network_type: standard
-    vm_template_path: "{{ (is_linux == '1') | ternary('output-ubuntu-template/disk.vmdk', 'output-windows-template/disk.vmdk') }}"
-    vm_guest_id: "{{ (is_linux == '1') | ternary('ubuntu64Guest', 'windows9Server64Guest') }}"
 
   tasks:
   
