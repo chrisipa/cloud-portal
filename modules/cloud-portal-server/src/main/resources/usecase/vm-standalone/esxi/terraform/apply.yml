@@ -8,8 +8,13 @@
     vm_scsi: paravirtual
     vm_network_adapter_type: vmxnet3
     vm_network_type: standard
+    is_linux: "{{ image_name.find('Linux') != -1 }}"
+    is_windows: "{{ image_name.find('Windows') != -1 }}"
 
   tasks:
+  
+  - debug:
+      msg: "vm_notes: {{ vm_notes }}"  
   
   - name: Block to check if the VM name exists in inventory 
     block:
@@ -76,7 +81,7 @@
         vm_extra_config:
           vcpu.hotadd: no 
           mem.hotadd:  no
-          notes: "{{ description }}"
+          notes: "{{ vm_notes }}"
         vm_disk:
           disk1:
             size_gb: "{{ vm_disk_size }}"
@@ -150,7 +155,7 @@
   - name: Write IP address to file
     delegate_to: "{{ localhost }}"
     copy: 
-      content: "{{ get_ip_new_vm.ansible_facts.hw_eth0.ipaddresses[0] }}" 
+      content: "{{ (is_linux == true) | ternary(get_ip_new_vm.ansible_facts.hw_eth0.ipaddresses[0], get_ip_new_vm.ansible_facts.hw_eth0.ipaddresses[1]) }}" 
       dest: "{{ playbook_dir }}/ip.txt"
   
     when: 

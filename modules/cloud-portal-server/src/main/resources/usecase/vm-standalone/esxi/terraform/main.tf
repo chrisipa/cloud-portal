@@ -21,18 +21,19 @@ locals {
   
   vm_template_path = "${lookup(local.image_templates_map, var.image_name)}"
   vm_guest_id = "${lookup(local.image_guest_id_map, var.image_name)}"
+  vm_notes = "Title: ${var.title}\\nDescription: ${var.description}\\nCreationDate: ${var.creation_date}\\nOwnedBy: ${var.owner}\\nOwnerGroup: ${var.group}\\nProvisioningSystem: ${var.application_url}"
 }
 
 resource "null_resource" "vm_provisioning" {
   
   provisioner "local-exec" {
     when    = "create"
-    command = "ansible-playbook -i '${var.esxi_hostname},' -e 'vm_guest_id=${local.vm_guest_id}' -e 'vm_template_path=${local.vm_template_path}' -e '@parameters.yml' apply.yml"
+    command = "ansible-playbook -i \"${var.esxi_hostname},\" -e \"vm_guest_id='${local.vm_guest_id}'\" -e \"vm_template_path='${local.vm_template_path}'\" -e \"vm_notes='${local.vm_notes}'\" -e \"@parameters.yml\" apply.yml"
   } 
   
   provisioner "local-exec" {
     when    = "destroy"
-    command = "ansible-playbook -i '${var.esxi_hostname},' -e '@parameters.yml' destroy.yml"
+    command = "ansible-playbook -i \"${var.esxi_hostname},\" -e \"@parameters.yml\" destroy.yml"
   }
 }
 
