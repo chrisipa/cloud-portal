@@ -1,0 +1,12 @@
+---
+- hosts: all
+  become: true
+
+  tasks:
+  
+  - name: Create test file
+    file:
+      path: /tmp/i-was-here.txt
+      owner: root
+      group: root
+      mode: 0644   
