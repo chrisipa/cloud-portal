@@ -13,9 +13,6 @@
 
   tasks:
   
-  - debug:
-      msg: "vm_notes: {{ vm_notes }}"  
-  
   - name: Block to check if the VM name exists in inventory 
     block:
     - name: Check VMFS filesystem for foldername {{ random_id }}
@@ -116,6 +113,9 @@
      
     - name: Create disk from template
       shell: "vmkfstools -i /vmfs/volumes/{{ esxi_datastore }}/{{ vm_template_path }} /vmfs/volumes/{{ esxi_datastore }}/{{ random_id }}/{{ random_id }}.vmdk -d thin"
+      
+    - name: Grow created disk to specified size
+      shell: "vmkfstools -X {{ vm_disk_size }}g /vmfs/volumes/{{ esxi_datastore }}/{{ random_id }}/{{ random_id }}.vmdk"
     when: 
       - create_vm_status is defined and create_vm_status is changed
   
