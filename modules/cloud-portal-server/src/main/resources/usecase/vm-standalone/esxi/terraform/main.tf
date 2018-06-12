@@ -97,7 +97,7 @@ resource "null_resource" "linux_bootstrapping" {
   provisioner "remote-exec" {
     inline = [
       "echo '${var.password}' | sudo -S echo test",
-      "bash '${local.linux_prepare_script_path}'",
+      "bash '${local.linux_prepare_script_path}' '${var.random_id}'",
       "bash '${local.linux_user_script_path}'",
       "bash '${local.linux_cleanup_script_path}'",
       "rm -rf ${local.linux_script_folder_path}"
@@ -154,7 +154,7 @@ resource "null_resource" "windows_bootstrapping" {
   
   provisioner "remote-exec" {
     inline = [
-      "Powershell.exe -ExecutionPolicy Unrestricted -File ${local.windows_prepare_script_path}",      
+      "Powershell.exe -ExecutionPolicy Unrestricted -File ${local.windows_prepare_script_path} ${var.random_id}",      
       "Powershell.exe -ExecutionPolicy Unrestricted -File ${local.windows_user_script_path}",
       "Powershell.exe -ExecutionPolicy Unrestricted -File ${local.windows_cleanup_script_path}",
       "Powershell.exe -ExecutionPolicy Unrestricted -Command Remove-Item ${local.windows_script_folder_path} -Force -Recurse"      
