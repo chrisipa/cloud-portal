@@ -5,6 +5,7 @@ import java.util.List;
 public class UseCase {
 	
 	private String id;
+	private String name;
 	private String provider;
 	private String provisioner;
 	private List<VariableGroup> variableGroups; 
@@ -13,6 +14,14 @@ public class UseCase {
 	@Override
 	public String toString() {
 		return "id=" + id;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	public String getProvider() {

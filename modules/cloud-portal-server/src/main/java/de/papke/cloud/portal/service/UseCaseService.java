@@ -56,7 +56,6 @@ public class UseCaseService {
 	private static final String PATTERN_FILE = "_file";
 	private static final String SUFFIX_ATTACHMENT = ".txt";
 	private static final String SUFFIX_ZIP = ".zip";
-	private static final String PREFIX_VM = "vm";
 	private static final String PREFIX_ATTACHMENT = "log";
 	private static final String PART_ERROR = "error";
 	private static final String PART_SUCCESS = "success";
@@ -119,8 +118,10 @@ public class UseCaseService {
 				for (File providerFolder : useCaseFolder.listFiles()) {
 					for (File provisionerFolder : providerFolder.listFiles()) {
 						
+						String useCaseName = useCaseFolder.getName();
+						
 						StringBuilder useCaseIdBuilder = new StringBuilder();
-						useCaseIdBuilder.append(useCaseFolder.getName());
+						useCaseIdBuilder.append(useCaseName);
 						useCaseIdBuilder.append(Constants.CHAR_DASH);
 						useCaseIdBuilder.append(providerFolder.getName());
 						useCaseIdBuilder.append(Constants.CHAR_DASH);
@@ -140,7 +141,7 @@ public class UseCaseService {
 						StringBuilder resourcePathBuilder = new StringBuilder();
 						resourcePathBuilder.append(useCaseRootFolder.getName());
 						resourcePathBuilder.append(File.separator);
-						resourcePathBuilder.append(useCaseFolder.getName());
+						resourcePathBuilder.append(useCaseName);
 						resourcePathBuilder.append(File.separator);
 						resourcePathBuilder.append(providerFolder.getName());
 						resourcePathBuilder.append(File.separator);
@@ -148,6 +149,7 @@ public class UseCaseService {
 						
 						UseCase useCase = new UseCase();
 						useCase.setId(id);
+						useCase.setName(useCaseName);
 						useCase.setProvider(provider);
 						useCase.setProvisioner(provisioner);
 						useCase.setVariableGroups(variableGroups);
@@ -233,7 +235,7 @@ public class UseCaseService {
 					attachment = getAttachment(commandResult);
 		
 					// send mail
-					sendMail(action, success, variableMap, attachment);
+					sendMail(useCase, action, success, variableMap, attachment);
 				}
 			}
 			else {
@@ -326,7 +328,7 @@ public class UseCaseService {
 				variableMap.put(VARIABLE_PROVIDER, provider);			
 				
 				// send mail
-				sendMail(user, action, success, variableMap, attachment);
+				sendMail(user, useCase, action, success, variableMap, attachment);
 			}
 			else {
 				LOG.error("No provisioner found for use case '{}'", useCase);
@@ -353,11 +355,11 @@ public class UseCaseService {
 		return tmpFolder;
 	}
 	
-	private File sendMail(String action, boolean success, Map<String, Object> variableMap, File attachment) {
-		return sendMail(sessionUserService.getUser(), action, success, variableMap, attachment);
+	private File sendMail(UseCase useCase, String action, boolean success, Map<String, Object> variableMap, File attachment) {
+		return sendMail(sessionUserService.getUser(), useCase, action, success, variableMap, attachment);
 	}
 	
-	private File sendMail(User user, String action, boolean success, Map<String, Object> variableMap, File attachment) {
+	private File sendMail(User user, UseCase useCase, String action, boolean success, Map<String, Object> variableMap, File attachment) {
 		
 		// get mail address
 		String email = user.getEmail();
@@ -368,7 +370,7 @@ public class UseCaseService {
 
 		// send mail
 		if (StringUtils.isNotEmpty(email)) {
-			String mailTemplateName = getMailTemplateName(action, success);
+			String mailTemplateName = getMailTemplateName(useCase, action, success);
 			String mailSubject = getMailSubject(mailTemplateName);
 			String mailTemplatePath = mailTemplateService.getMailTemplatePath(mailTemplateName);
 			mailService.send(email, mailSubject, mailTemplatePath, attachment, variableMap);
@@ -392,8 +394,8 @@ public class UseCaseService {
 		return mailSubjectBuilder.toString();
 	}
 	
-	private String getMailTemplateName(String action, boolean success) {
-		return PREFIX_VM + Constants.CHAR_DASH + action + Constants.CHAR_DASH + (success ? PART_SUCCESS : PART_ERROR); 
+	private String getMailTemplateName(UseCase useCase, String action, boolean success) {
+		return useCase.getName() + Constants.CHAR_DASH + action + Constants.CHAR_DASH + (success ? PART_SUCCESS : PART_ERROR); 
 	}
 
 	private File getAttachment(CommandResult commandResult) throws IOException {

@@ -17,11 +17,6 @@ public class MailTemplateService {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(MailTemplateService.class);
 
-	public static final String VM_PROVISION_SUCCESS = "vm-provision-success";
-	public static final String VM_PROVISION_ERROR = "vm-provision-error";
-	public static final String VM_DEPROVISION_SUCCESS = "vm-deprovision-success";
-	public static final String VM_DEPROVISION_ERROR = "vm-deprovision-error";
-
 	private static final String TEMPLATE_FOLDER_NAME = "mail";
 	
 	private Map<String, String> mailTemplateMap = new HashMap<>();
