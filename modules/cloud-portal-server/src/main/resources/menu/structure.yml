@@ -62,6 +62,26 @@ menus:
          path: /credentials/create/form/vsphere
          icon: fa-plus
          
+ - title: DevOps Tools
+   icon: fa-gears
+   menus:        
+   
+    - title: Jenkins
+      icon: fa-user-md
+      menus:    
+      
+        - title: VMWare vSphere
+          icon: fa-cloud
+          menus:
+          
+           - title: List
+             path: /usecase/list/form/jenkins-standalone-vsphere-terraform
+             icon: fa-list
+             
+           - title: Create
+             path: /usecase/create/form/jenkins-standalone-vsphere-terraform
+             icon: fa-plus          
+         
  - title: Virtual Machines
    icon: fa-television 
    menus:
