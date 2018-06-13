@@ -1,6 +1,9 @@
 package de.papke.cloud.portal.controller;
 
+import java.io.IOException;
 import java.util.Map;
+
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,6 +19,7 @@ public class ApplicationController {
 	
 	protected static final String APPLICATION_MODEL_VAR_NAME = "application";
 	protected static final String REDIRECT_PREFIX = "redirect:";
+	protected static final String VIEW_NOT_ALLOWED = "not-allowed";
 
 	@Value("${application.title}")
 	private String applicationTitle;
@@ -57,5 +61,15 @@ public class ApplicationController {
 		applicationModel.setMenu(menuService.getMenu());
 		
 		return applicationModel;
+	}
+	
+	protected void fail(String message, HttpServletResponse response) throws IOException {
+		response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+		response.getWriter().println(message);
+	}
+	
+	protected void success(String message, HttpServletResponse response) throws IOException {
+		response.setStatus(HttpServletResponse.SC_OK);
+		response.getWriter().println(message);
 	}
 }

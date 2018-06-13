@@ -4,6 +4,11 @@ menus:
    path: /
    icon: fa-dashboard
    
+ - title: Scripting Console
+   path: /console
+   icon: fa-terminal 
+   secure: true    
+   
  - title: Credentials Admin
    icon: fa-key
    secure: true

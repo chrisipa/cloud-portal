@@ -33,6 +33,9 @@ public class CredentialsController extends ApplicationController {
 			@PathVariable String provider,
 			@RequestParam Map<String, String> variableMap) {
 
+		// fill model
+		fillModel(model, provider);		
+		
 		if (sessionUserService.isAdmin()) {
 
 			// get group
@@ -44,40 +47,42 @@ public class CredentialsController extends ApplicationController {
 			// create credentials
 			credentialsService.create(group, provider, variableMap);
 
-			// fill model
-			fillModel(model, provider);
+			// return to list view
+			return REDIRECT_PREFIX + LIST_PATH_PREFIX + "/" + provider;
 		}
-
-		// return to list view
-		return REDIRECT_PREFIX + LIST_PATH_PREFIX + "/" + provider;
+		else {
+			return VIEW_NOT_ALLOWED;
+		}
 	}
 
 	@GetMapping(value = PREFIX + "/create/form/{provider}")
 	public String createForm(Map<String, Object> model,
 			@PathVariable String provider) {
 
+		// fill model
+		fillModel(model, provider);		
+		
 		if (sessionUserService.isAdmin()) {
-			
-			// fill model
-			fillModel(model, provider);
+			return "credentials-create-form-" + provider;
 		}
-
-		// return view name
-		return "credentials-create-form-" + provider;
+		else {
+			return VIEW_NOT_ALLOWED;
+		}
 	}
 
 	@GetMapping(value = LIST_PATH_PREFIX + "/{provider}")
 	public String list(Map<String, Object> model,
 			@PathVariable String provider) {
 
-		if (sessionUserService.isAdmin()) {
+		// fill model
+		fillModel(model, provider);		
 		
-			// fill model
-			fillModel(model, provider);
+		if (sessionUserService.isAdmin()) {
+			return LIST_VIEW_PREFIX + provider;
 		}
-
-		// return view name
-		return LIST_VIEW_PREFIX + provider;
+		else {
+			return VIEW_NOT_ALLOWED;
+		}
 	}	
 
 	@GetMapping(path = PREFIX + "/delete/action/{provider}/{id}")
@@ -85,17 +90,20 @@ public class CredentialsController extends ApplicationController {
 			@PathVariable String provider,
 			@PathVariable String id) {
 
+		// fill model
+		fillModel(model, provider);		
+		
 		if (sessionUserService.isAdmin()) {
 		
 			// delete credentials
 			credentialsService.delete(id);
 	
-			// fill model
-			fillModel(model, provider);
+			// return to list view
+			return REDIRECT_PREFIX + LIST_PATH_PREFIX + "/" + provider;
 		}
-
-		// return to list view
-		return REDIRECT_PREFIX + LIST_PATH_PREFIX + "/" + provider;
+		else {
+			return VIEW_NOT_ALLOWED;
+		}
 	}	
 
 	private CredentialsModel getCredentialsModel(String provider) {

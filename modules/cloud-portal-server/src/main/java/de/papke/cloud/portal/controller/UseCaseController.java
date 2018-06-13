@@ -64,7 +64,6 @@ public class UseCaseController extends ApplicationController {
 	private static final String VAR_NAME_GROUP = "group";
 	private static final String VAR_NAME_APPLICATION_URL = "application_url";
 	private static final String EMPTY_SCRIPT_NAME = "empty";
-	private static final String RESPONSE_CONTENT_TYPE_TEXT_PLAIN = "text/plain; charset=utf-8";
 	
 	@Value("${application.date.format}")
 	private SimpleDateFormat dateFormat;
@@ -140,7 +139,7 @@ public class UseCaseController extends ApplicationController {
 		try {
 			
 			// set response content type
-			response.setContentType(RESPONSE_CONTENT_TYPE_TEXT_PLAIN);
+			response.setContentType(Constants.RESPONSE_CONTENT_TYPE_TEXT_PLAIN);
 
 			// get use case
 			UseCase useCase = useCaseService.getUseCaseById(id); 
@@ -206,7 +205,7 @@ public class UseCaseController extends ApplicationController {
 		try {
 			
 			// set response content type
-			response.setContentType(RESPONSE_CONTENT_TYPE_TEXT_PLAIN);
+			response.setContentType(Constants.RESPONSE_CONTENT_TYPE_TEXT_PLAIN);
 			
 			// get current user
 			User user = sessionUserService.getUser();
@@ -249,7 +248,7 @@ public class UseCaseController extends ApplicationController {
 		try {
 			
 			// set response content type
-			response.setContentType(RESPONSE_CONTENT_TYPE_TEXT_PLAIN);
+			response.setContentType(Constants.RESPONSE_CONTENT_TYPE_TEXT_PLAIN);
 
 			// get use case
 			UseCase useCase = useCaseService.getUseCaseById(useCaseId);
@@ -297,16 +296,6 @@ public class UseCaseController extends ApplicationController {
 		// fill model
 		fillModel(model, useCaseId);
 	} 
-	
-	private void fail(String message, HttpServletResponse response) throws IOException {
-		response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-		response.getWriter().println(message);
-	}
-	
-	private void success(String message, HttpServletResponse response) throws IOException {
-		response.setStatus(HttpServletResponse.SC_OK);
-		response.getWriter().println(message);
-	}
 	
 	private static File writeMultipartFile(MultipartFile multipartFile) {
 

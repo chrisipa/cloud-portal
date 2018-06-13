@@ -9,6 +9,11 @@ if (!String.prototype.startsWith) {
 	};
 }
 
+function resetFile() {
+    document.forms[0].file.setAttribute('type', 'input');
+    document.forms[0].file.setAttribute('type', 'file');
+}
+
 function startAutoScrollIframe() {
 	$("#output")[0].contentWindow.scrollBy(0,10000);
 	autoScrollTimeout = setTimeout("startAutoScrollIframe()", 500);	
@@ -70,6 +75,11 @@ $(function() {
 								
 								if (buttonId == "plan" || buttonId == "apply") {
 									$('#myModal').modal('toggle');
+								}
+								
+								if (buttonId == "execute") {
+									var editor = ace.edit("editor");
+									$('#script').val(editor.getValue());
 								}
 								
 								var submit = true;

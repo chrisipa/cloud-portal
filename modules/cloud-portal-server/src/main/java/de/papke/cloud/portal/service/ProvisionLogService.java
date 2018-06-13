@@ -43,6 +43,10 @@ public class ProvisionLogService {
 
 	@Autowired
 	private ProvisionLogDao provisionLogDao;
+	
+	public List<ProvisionLog> getList() {
+		return provisionLogDao.findAll();
+	}
 
 	public List<ProvisionLog> getListByProvider(String provider) {
 		

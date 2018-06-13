@@ -6,7 +6,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button id="close" type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-                <button id="auto-scroll" type="button" class="btn btn-danger btn-xs">Auto Scroll</button>
+                <button id="auto-scroll" type="button" class="btn btn-danger btn-xs btn-right-cross">Auto Scroll</button>
                 <h4 class="modal-title" id="myModalLabel">Output</h4>
             </div>
             <div class="modal-body">

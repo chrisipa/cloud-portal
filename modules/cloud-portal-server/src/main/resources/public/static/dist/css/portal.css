@@ -1,7 +1,17 @@
-#output {
-    border: 1px solid #999999;
-    height: 700px;
-    width: 100%;
+.inline {
+	display: inline !important;
+}
+
+.no-padding {
+	padding: 0px;
+}
+
+.no-margin {
+	margin: 0px;
+}
+
+.script {
+    height: 650px; 
 }
 
 label.error {
@@ -13,9 +23,23 @@ label.error {
     width: auto;
 }
 
-#auto-scroll {
+.btn-right {
 	float: right;
-	margin-right: 10px;
+}
+
+.btn-right-cross {
+    float: right;
+    margin-right: 10px;
+}
+
+#output {
+    border: 1px solid #999999;
+    height: 700px;
+    width: 100%;
+}
+
+#result {
+    width: 100%;
 }
 
 #datatable_length {

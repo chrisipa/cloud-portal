@@ -16,20 +16,19 @@
     <title><c:out value="${application.applicationTitle}" /></title>
 
     <!-- Bootstrap Core CSS -->
-    <link href="<c:url value="/static/vendor/bootstrap/css/bootstrap.min.css" />" rel="stylesheet">
+    <link rel="stylesheet" href="<c:url value="/static/vendor/bootstrap/css/bootstrap.min.css" />" rel="stylesheet">
 
     <!-- MetisMenu CSS -->
-    <link href="<c:url value="/static/vendor/metisMenu/metisMenu.min.css" />" rel="stylesheet">
+    <link rel="stylesheet" href="<c:url value="/static/vendor/metisMenu/metisMenu.min.css" />" rel="stylesheet">
 
     <!-- Custom CSS -->
-    <link href="<c:url value="/static/dist/css/sb-admin-2.css" />" rel="stylesheet">
+    <link rel="stylesheet" href="<c:url value="/static/dist/css/sb-admin-2.css" />" rel="stylesheet">
     
     <!-- Portal CSS -->
-    <link href="<c:url value="/static/dist/css/portal.css" />" rel="stylesheet">
+    <link rel="stylesheet" href="<c:url value="/static/dist/css/portal.css" />" rel="stylesheet">
 
     <!-- Custom Fonts -->
-    <link href="<c:url value="/static/vendor/font-awesome/css/font-awesome.min.css" />" rel="stylesheet" type="text/css">
-
+    <link rel="stylesheet" href="<c:url value="/static/vendor/font-awesome/css/font-awesome.min.css" />" rel="stylesheet" type="text/css">
 </head>
 
 <body>
