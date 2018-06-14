@@ -34,6 +34,37 @@ aws iam add-user-to-group --user-name my-username --group-name my-groupname
 aws iam create-access-key --user-name my-username
 ```
 
+## VMware ESXi
+
+### SSH Service
+
+* Enable SSH access on ESXi Host:
+
+![Screenshot](images/esxi-enable-ssh.png)
+
+### User Account
+
+* Use your **root** account for the SSH login
+
+### Virtual Machine Templates
+
+* Make sure to create a virtual machine template for Windows Server 2016 and Ubuntu Server 16.04 LTS 
+* This can be done manually or with the help of [Packer](https://www.packer.io/)
+* It is important to activate DHCP for the network interface
+* The default user credentials and template names can be found in this Terraform file [custom.tf](../../modules/cloud-portal-server/src/main/resources/usecase/vm-standalone/esxi/terraform/custom.tf):
+  * It is recommended to overwrite these values for production usage
+
+#### Windows Server 2016
+
+* [WinRM](https://msdn.microsoft.com/en-us/library/aa384426(v=vs.85).aspx) is used for executing the Powershell scripts for bootstrapping
+* Use this [script](../../public/bootstrap/allow-winrm.cmd) to create a firewall rule and allow execution via HTTP
+
+#### Ubuntu Server 16.04 LTS
+
+* SSH is used for executing bash scripts for bootstrapping
+* Make sure to turn on the SSH server
+* Use LVM for hard drive partitioning (otherwise live resizing of partitions will not work)
+
 ## VMware vSphere
 
 ### User Account
@@ -82,8 +113,8 @@ aws iam create-access-key --user-name my-username
 * Make sure to create a virtual machine template for Windows Server 2016 and Ubuntu Server 16.04 LTS 
 * This can be done manually or with the help of [Packer](https://www.packer.io/)
 * It is important to activate DHCP for the network interface
-* The default user credentials can be found in this Terraform file [custom.tf](../../modules/cloud-portal-server/src/main/resources/terraform/vm/vsphere/custom.tf)
-* It is recommended to overwrite these credentials for production usage
+* The default user credentials and template names can be found in this Terraform file [custom.tf](../../modules/cloud-portal-server/src/main/resources/usecase/vm-standalone/vsphere/terraform/custom.tf):
+  * It is recommended to overwrite these values for production usage
 
 #### Windows Server 2016
 
