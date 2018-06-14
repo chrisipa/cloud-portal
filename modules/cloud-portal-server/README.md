@@ -1,12 +1,11 @@
 # Cloud Portal Server
 
 [![Build Status](https://papke.it/jenkins/buildStatus/icon?job=cloud-portal)](https://papke.it/jenkins/job/cloud-portal/)
-[![Code Analysis](https://img.shields.io/badge/code%20analysis-available-blue.svg)](https://papke.it/sonar/overview?id=219)
 [![Docker Image](https://img.shields.io/badge/docker%20image-available-blue.svg)](https://hub.docker.com/r/chrisipa/cloud-portal-server/)
 
 ## Overview
 
-Self service web portal for different Cloud platforms like Azure, AWS and VMWare vSphere.
+Self service web portal for different Cloud platforms like Azure, AWS and VMware vSphere.
 
 ## Usage
 

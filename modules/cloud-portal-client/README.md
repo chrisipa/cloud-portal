@@ -16,20 +16,36 @@ docker run --rm \
 -e 'CLOUD_PORTAL_URL=https://my-cloud-portal-host' \
 -e 'CLOUD_PORTAL_USERNAME=my-user@my-domain.com' \
 -e 'CLOUD_PORTAL_PASSWORD=my-password' \
--e 'CLOUD_PORTAL_PROVIDER=vsphere' \
--e 'CLOUD_PORTAL_ACTION=vm-create' \
+-e 'CLOUD_PORTAL_USE_CASE=vm-standalone-vsphere-terraform' \
+-e 'CLOUD_PORTAL_ACTION=plan' \
 chrisipa/cloud-portal-client
 ```
 
-* Create a vsphere virtual machine:
+* Plan creation of a vsphere virtual machine:
 
 ```bash
 docker run --rm \
 -e 'CLOUD_PORTAL_URL=https://my-cloud-portal-host' \
 -e 'CLOUD_PORTAL_USERNAME=my-user@my-domain.com' \
 -e 'CLOUD_PORTAL_PASSWORD=my-password' \
--e 'CLOUD_PORTAL_PROVIDER=vsphere' \
--e 'CLOUD_PORTAL_ACTION=vm-create' \
+-e 'CLOUD_PORTAL_USE_CASE=vm-standalone-vsphere-terraform' \
+-e 'CLOUD_PORTAL_ACTION=plan' \
+chrisipa/cloud-portal-client \
+-F 'title=my-title' \
+-F 'description=my-description' \
+-F 'password=P@ssword1' \ 
+-F 'password_repeat=P@ssword1' 
+```
+
+* Execute creation of a vsphere virtual machine:
+
+```bash
+docker run --rm \
+-e 'CLOUD_PORTAL_URL=https://my-cloud-portal-host' \
+-e 'CLOUD_PORTAL_USERNAME=my-user@my-domain.com' \
+-e 'CLOUD_PORTAL_PASSWORD=my-password' \
+-e 'CLOUD_PORTAL_USE_CASE=vm-standalone-vsphere-terraform' \
+-e 'CLOUD_PORTAL_ACTION=apply' \
 chrisipa/cloud-portal-client \
 -F 'title=my-title' \
 -F 'description=my-description' \
@@ -44,8 +60,8 @@ docker run --rm \
 -e 'CLOUD_PORTAL_URL=https://my-cloud-portal-host' \
 -e 'CLOUD_PORTAL_USERNAME=my-user@my-domain.com' \
 -e 'CLOUD_PORTAL_PASSWORD=my-password' \
--e 'CLOUD_PORTAL_PROVIDER=vsphere' \
--e 'CLOUD_PORTAL_ACTION=vm-destroy' \
+-e 'CLOUD_PORTAL_USE_CASE=vm-standalone-vsphere-terraform' \
+-e 'CLOUD_PORTAL_ACTION=destroy' \
 chrisipa/cloud-portal-client \
 my-provisioning-id
 ```

@@ -1,1 +1,1 @@
-Self service web portal for different Cloud platforms like Azure, AWS and VMWare vSphere.
+Self service web portal for different Cloud platforms like Azure, AWS and VMware vSphere.

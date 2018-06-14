@@ -1,6 +1,6 @@
 # Cloud Providers
 
-The self service portal currently supports automated provisionings to Azure, AWS and VMWare vSphere environments.
+The self service portal currently supports automated provisionings to Azure, AWS and VMware vSphere environments.
 For Terraform to work you will have to setup accounts in your preferred Cloud platform.
 
 ## Azure
@@ -34,7 +34,7 @@ aws iam add-user-to-group --user-name my-username --group-name my-groupname
 aws iam create-access-key --user-name my-username
 ```
 
-## VMWare vSphere
+## VMware vSphere
 
 ### User Account
 

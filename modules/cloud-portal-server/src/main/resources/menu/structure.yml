@@ -38,7 +38,7 @@ menus:
          path: /credentials/create/form/azure
          icon: fa-plus
          
-    - title: VMWare ESXi
+    - title: VMware ESXi
       icon: fa-cloud
       menus:
       
@@ -50,7 +50,7 @@ menus:
          path: /credentials/create/form/esxi
          icon: fa-plus          
          
-    - title: VMWare vSphere
+    - title: VMware vSphere
       icon: fa-cloud
       menus:
       
@@ -70,7 +70,7 @@ menus:
       icon: fa-user-md
       menus:    
       
-        - title: VMWare vSphere
+        - title: VMware vSphere
           icon: fa-cloud
           menus:
           
@@ -110,7 +110,7 @@ menus:
          path: /usecase/create/form/vm-standalone-azure-terraform
          icon: fa-plus
          
-    - title: VMWare ESXi
+    - title: VMware ESXi
       icon: fa-cloud
       menus:
       
@@ -122,7 +122,7 @@ menus:
          path: /usecase/create/form/vm-standalone-esxi-terraform
          icon: fa-plus         
          
-    - title: VMWare vSphere
+    - title: VMware vSphere
       icon: fa-cloud
       menus:
       
