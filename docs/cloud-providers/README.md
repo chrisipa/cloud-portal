@@ -5,6 +5,7 @@
   * [Microsoft Azure](https://azure.microsoft.com)
   * [VMware ESXi](https://www.vmware.com/products/vsphere-hypervisor.html)
   * [VMware vSphere](https://www.vmware.com/products/vsphere.html)
+  
 * For [Terraform](https://www.terraform.io/) to work with your preferred Cloud provider you have to do some preparations
 
 ## Amazon Web Services
