@@ -1,21 +1,13 @@
 # Cloud Providers
 
-The self service portal currently supports automated provisionings to Azure, AWS and VMware vSphere environments.
-For Terraform to work you will have to setup accounts in your preferred Cloud platform.
+* The self service portal currently supports automated provisionings to:
+  * [Amazon Web Services](https://aws.amazon.com)
+  * [Microsoft Azure](https://azure.microsoft.com)
+  * [VMware ESXi](https://www.vmware.com/products/vsphere-hypervisor.html)
+  * [VMware vSphere](https://www.vmware.com/products/vsphere.html)
+* For [Terraform](https://www.terraform.io/) to work with your preferred Cloud provider you have to do some preparations
 
-## Azure
-
-### Service Principal
-
-#### Manual
-
-* [Create a service principal manually](https://www.terraform.io/docs/providers/azurerm/authenticating_via_service_principal.html)
-
-#### Automated
-
-* [Use script file](https://github.com/mheap/terraform-azure-credentials/blob/master/create_credentials)
-
-## AWS
+## Amazon Web Services
 
 ### Access Key / Secret Key
 
@@ -33,6 +25,18 @@ aws iam create-user --user-name my-username
 aws iam add-user-to-group --user-name my-username --group-name my-groupname
 aws iam create-access-key --user-name my-username
 ```
+
+## Microsoft Azure
+
+### Service Principal
+
+#### Manual
+
+* [Create a service principal manually](https://www.terraform.io/docs/providers/azurerm/authenticating_via_service_principal.html)
+
+#### Automated
+
+* [Use script file](https://github.com/mheap/terraform-azure-credentials/blob/master/create_credentials)
 
 ## VMware ESXi
 
