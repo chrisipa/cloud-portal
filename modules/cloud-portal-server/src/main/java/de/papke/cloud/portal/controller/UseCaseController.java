@@ -407,7 +407,7 @@ public class UseCaseController extends ApplicationController {
 		for (File keyFile : keyFileList) {
 			
 			String keyFilePath = keyFile.getAbsolutePath();
-			if (keyFilePath.endsWith(Constants.KEY_FILE_SUFFIX)) {
+			if (keyFilePath.endsWith(Constants.KEY_FILE_PUBLIC_SUFFIX)) {
 				variableMap.put(VAR_NAME_PUBLIC_KEY_FILE, keyFile.getAbsolutePath());
 			}
 			else {

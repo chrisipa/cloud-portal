@@ -27,7 +27,7 @@ public class KeyPairService {
 		
 		try{
 			File privateKeyFile = File.createTempFile(Constants.KEY_FILE_PREFIX, Constants.CHAR_EMPTY);
-			File publicKeyFile = new File(privateKeyFile.getAbsolutePath() + Constants.KEY_FILE_SUFFIX);
+			File publicKeyFile = new File(privateKeyFile.getAbsolutePath() + Constants.KEY_FILE_PUBLIC_SUFFIX);
 			
 			KeyPair keyPair = KeyPair.genKeyPair(JSCH, KeyPair.RSA);
 			keyPair.writePrivateKey(privateKeyFile.getAbsolutePath());

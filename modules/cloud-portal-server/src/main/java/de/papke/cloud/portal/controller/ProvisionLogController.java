@@ -23,6 +23,7 @@ public class ProvisionLogController extends ApplicationController {
 	
 	private static final String PRIVATE_KEY_MIME_TYPE = "application/x-pem-file";
 	private static final String HEADER_CONTENT_DISPOSITION = "Content-Disposition";
+	private static final String HEADER_FILENAME = "inline; filename=\"%s\"";
 	private static final String PREFIX = "/provision-log";
 	
 	@Autowired
@@ -30,6 +31,16 @@ public class ProvisionLogController extends ApplicationController {
 	
 	@Autowired
 	private SessionUserService sessionUserService;
+
+	private String getPrivateKeyFileName(String id) {
+		
+		return new StringBuilder()
+				.append(Constants.KEY_FILE_PREFIX)
+				.append(Constants.CHAR_UNDERSCORE)
+				.append(id)
+				.append(Constants.KEY_FILE_PRIVATE_SUFFIX)
+				.toString();
+	}
 	
     @RequestMapping(value = PREFIX + "/private-key/{id}", method = RequestMethod.GET)
     public void downloadPrivateKey(HttpServletResponse response, @PathVariable("id") String id) throws IOException {
@@ -45,7 +56,7 @@ public class ProvisionLogController extends ApplicationController {
     		if(user.isAdmin() || username.equals(provisionLogUsername)) {
     			byte[] privateKey = provisionLog.getPrivateKey();
     			response.setContentType(PRIVATE_KEY_MIME_TYPE);
-    			response.setHeader(HEADER_CONTENT_DISPOSITION, String.format("inline; filename=\"%s\"", Constants.KEY_FILE_PREFIX));
+    			response.setHeader(HEADER_CONTENT_DISPOSITION, String.format(HEADER_FILENAME, getPrivateKeyFileName(id)));
     			response.setContentLength(privateKey.length);
     			IOUtils.copy(new ByteArrayInputStream(privateKey), response.getOutputStream());
     		}
