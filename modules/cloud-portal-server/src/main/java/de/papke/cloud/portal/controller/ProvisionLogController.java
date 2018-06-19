@@ -14,10 +14,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import de.papke.cloud.portal.constants.Constants;
 import de.papke.cloud.portal.pojo.ProvisionLog;
+import de.papke.cloud.portal.pojo.User;
 import de.papke.cloud.portal.service.ProvisionLogService;
+import de.papke.cloud.portal.service.SessionUserService;
 
 @Controller
-public class ProvisionLogController {
+public class ProvisionLogController extends ApplicationController {
 	
 	private static final String PRIVATE_KEY_MIME_TYPE = "application/x-pem-file";
 	private static final String HEADER_CONTENT_DISPOSITION = "Content-Disposition";
@@ -26,21 +28,33 @@ public class ProvisionLogController {
 	@Autowired
 	private ProvisionLogService provisionLogService;
 	
+	@Autowired
+	private SessionUserService sessionUserService;
+	
     @RequestMapping(value = PREFIX + "/private-key/{id}", method = RequestMethod.GET)
     public void downloadPrivateKey(HttpServletResponse response, @PathVariable("id") String id) throws IOException {
 
     	ProvisionLog provisionLog = provisionLogService.get(id);
     	
     	if (provisionLog != null) {
-    		byte[] privateKey = provisionLog.getPrivateKey();
-    		response.setContentType(PRIVATE_KEY_MIME_TYPE);
-    		response.setHeader(HEADER_CONTENT_DISPOSITION, String.format("inline; filename=\"%s\"", Constants.KEY_FILE_PREFIX));
-    		response.setContentLength(privateKey.length);
-    		IOUtils.copy(new ByteArrayInputStream(privateKey), response.getOutputStream());
+    		
+    		User user = sessionUserService.getUser();
+    		String username = user.getUsername();
+    		String provisionLogUsername = provisionLog.getUsername();
+    		
+    		if(user.isAdmin() || username.equals(provisionLogUsername)) {
+    			byte[] privateKey = provisionLog.getPrivateKey();
+    			response.setContentType(PRIVATE_KEY_MIME_TYPE);
+    			response.setHeader(HEADER_CONTENT_DISPOSITION, String.format("inline; filename=\"%s\"", Constants.KEY_FILE_PREFIX));
+    			response.setContentLength(privateKey.length);
+    			IOUtils.copy(new ByteArrayInputStream(privateKey), response.getOutputStream());
+    		}
+    		else {
+    			fail(String.format("You are not allowed to download the private key for the provision log with id '%s'", id), response);
+    		}
     	}
     	else {
-    		response.sendError(HttpServletResponse.SC_NOT_FOUND);
+    		fail(String.format("No private key found for provision log with id '%s'.", id), response);
     	}
     }
-
 }
