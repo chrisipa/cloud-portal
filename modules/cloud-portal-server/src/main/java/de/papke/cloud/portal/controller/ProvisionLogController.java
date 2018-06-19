@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import de.papke.cloud.portal.constants.Constants;
 import de.papke.cloud.portal.pojo.ProvisionLog;
-import de.papke.cloud.portal.pojo.User;
 import de.papke.cloud.portal.service.ProvisionLogService;
 import de.papke.cloud.portal.service.SessionUserService;
 
@@ -49,11 +48,8 @@ public class ProvisionLogController extends ApplicationController {
     	
     	if (provisionLog != null) {
     		
-    		User user = sessionUserService.getUser();
-    		String username = user.getUsername();
-    		String provisionLogUsername = provisionLog.getUsername();
-    		
-    		if(user.isAdmin() || username.equals(provisionLogUsername)) {
+    		if(sessionUserService.isAllowed(provisionLog)) {
+    			
     			byte[] privateKey = provisionLog.getPrivateKey();
     			response.setContentType(PRIVATE_KEY_MIME_TYPE);
     			response.setHeader(HEADER_CONTENT_DISPOSITION, String.format(HEADER_FILENAME, getPrivateKeyFileName(id)));

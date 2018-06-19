@@ -7,6 +7,7 @@ import javax.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import de.papke.cloud.portal.pojo.ProvisionLog;
 import de.papke.cloud.portal.pojo.User;
 
 @Service
@@ -31,6 +32,10 @@ public class SessionUserService {
 	
 	public boolean isAdmin() {
 		return getUser().isAdmin();
+	}
+	
+	public boolean isAllowed(ProvisionLog provisionLog) {
+		return isAdmin() || getUser().getGroups().contains(provisionLog.getGroup());
 	}
 	
 	public void setUser(User user) {

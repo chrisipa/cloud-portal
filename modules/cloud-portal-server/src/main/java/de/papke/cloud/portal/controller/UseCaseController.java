@@ -264,12 +264,8 @@ public class UseCaseController extends ApplicationController {
 				ProvisionLog provisionLog = provisionLogService.get(provisionLogId);
 				if (provisionLog != null) {
 					
-					// get group
-					String group = provisionLog.getGroup();
-					
 					// check if user is allowed to deprovision the vm
-					User user = sessionUserService.getUser();
-					if (user.isAdmin() || user.getGroups().contains(group)) {
+					if (sessionUserService.isAllowed(provisionLog)) {
 					
 						// get response output stream
 						OutputStream outputStream = response.getOutputStream();
