@@ -1,0 +1,110 @@
+variableGroups:
+
+  - title: System Generated
+    hidden: true
+    variables:
+    
+      - title: Application URL
+        name: application_url
+        description: The URL of the self service portal application
+        type: string
+        required: true
+        defaults: []    
+    
+      - title: Random ID
+        name: random_id
+        description: A generated random ID.
+        type: string
+        required: true
+        defaults: []  
+          
+      - title: Creation Date
+        name: creation_date
+        description: Current timestamp as date format
+        type: string
+        required: true
+        defaults: []  
+    
+      - title: Owner
+        name: owner
+        description: Owner of the vm
+        type: string
+        required: true
+        defaults: []  
+        
+      - title: Group
+        name: group
+        description: Group of the vm
+        type: string
+        required: true
+        defaults: []
+        
+  - title: Credentials
+    hidden: true
+    variables:
+      
+      - title: vCenter Hostname
+        name: vcenter_hostname
+        description: The hostname of the vcenter to use.
+        type: string
+        required: true
+        defaults: []    
+      
+      - title: vCenter Datacenter
+        name: vcenter_datacenter
+        description: The datacenter of the vcenter to use.
+        type: string
+        required: true
+        defaults: []    
+      
+      - title: vCenter Datastore
+        name: vcenter_datastore
+        description: The datastore of the vcenter to use.
+        type: string
+        required: true
+        defaults: []    
+      
+      - title: vCenter Resource Pool
+        name: vcenter_resource_pool
+        description: The resource pool of the vcenter to use.
+        type: string
+        required: true
+        defaults: []    
+      
+      - title: vCenter Network
+        name: vcenter_network
+        description: The network of the vcenter to use.
+        type: string
+        required: true
+        defaults: []    
+      
+      - title: vCenter Target Folder
+        name: vcenter_target_folder
+        description: The vcenter target folder where vms are created.
+        type: string
+        required: true
+        defaults: []
+      
+      - title: vCenter Username
+        name: vcenter_username
+        description: The vcenter username.
+        type: string
+        required: true
+        defaults: []
+        
+      - title: vCenter Password
+        name: vcenter_password
+        description: The vcenter password.
+        type: string
+        required: true
+        defaults: []
+
+  - title: General
+    variables:
+    
+    - title: Title
+      name: title
+      description: Title of the Jenkins virtual machine.
+      type: string   
+      required: true
+      defaults: []

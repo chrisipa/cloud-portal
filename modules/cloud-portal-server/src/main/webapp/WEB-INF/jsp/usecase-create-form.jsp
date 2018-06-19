@@ -16,7 +16,7 @@
 	                target="output" role="form" enctype="multipart/form-data">
 			<div class="row">
 			    <div class="col-lg-12">
-				    <h4 class="page-header">Create Virtual Machine</h4>
+				    <h4 class="page-header">Create Use Case</h4>
 				    <p>All fields with an asterisk(*) are required.</p>
 				</div>    
 			</div>	
