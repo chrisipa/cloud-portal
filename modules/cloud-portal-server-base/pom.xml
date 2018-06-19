@@ -72,6 +72,7 @@
                                     <!-- download and install terraform -->
                                     <run>wget -q https://releases.hashicorp.com/terraform/${terraform.version}/terraform_${terraform.version}_linux_amd64.zip</run>
                                     <run>unzip -q terraform_${terraform.version}_linux_amd64.zip -d /usr/local/bin</run>
+                                    <run>rm -f terraform_${terraform.version}_linux_amd64.zip</run>
                                     
                                     <!-- add ansible package repo -->                                    
                                     <run>echo "deb [arch=amd64] http://ppa.launchpad.net/ansible/ansible/ubuntu trusty main" >> /etc/apt/sources.list.d/ansible.list</run>
