@@ -33,8 +33,8 @@ docker run --rm \
 chrisipa/cloud-portal-client \
 -F 'title=my-title' \
 -F 'description=my-description' \
--F 'password=P@ssword1' \ 
--F 'password_repeat=P@ssword1' 
+-F 'password=P@ssword' \ 
+-F 'password_repeat=P@ssword' 
 ```
 
 * Execute creation of a vsphere virtual machine:
@@ -49,8 +49,8 @@ docker run --rm \
 chrisipa/cloud-portal-client \
 -F 'title=my-title' \
 -F 'description=my-description' \
--F 'password=P@ssword1' \ 
--F 'password_repeat=P@ssword1' 
+-F 'password=P@ssword' \ 
+-F 'password_repeat=P@ssword' 
 ```
 
 * Destroy a vsphere virtual machine:
