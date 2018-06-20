@@ -34,7 +34,7 @@
                                 <tags>
                                     <tag>${project.version}</tag>
                                 </tags>
-                                <from>${pull.registry}/${tenant}/tomcat-base:9.0.5</from>
+                                <from>${pull.registry}/${tenant}/tomcat-base:9</from>
                                 <optimise>true</optimise>
                                 <entryPoint>
                                     <exec>
@@ -56,7 +56,7 @@
                                     <run>apt-get install -y apt-transport-https</run>
 
                                     <!-- add azure cli package repo -->
-                                    <run>echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ wheezy main" >> /etc/apt/sources.list.d/azure-cli.list</run>
+                                    <run>echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ jessie main" >> /etc/apt/sources.list.d/azure-cli.list</run>
                                     <run>curl -s -L https://packages.microsoft.com/keys/microsoft.asc | apt-key add -</run>
 
                                     <!-- update package sources -->
@@ -64,6 +64,9 @@
 
                                     <!-- install azure cli -->
                                     <run>apt-get install -y --no-install-recommends azure-cli</run>
+
+                                    <!-- install python pip -->
+                                    <run>apt-get install -y --no-install-recommends python-pip</run>
 
                                     <!-- install aws cli -->
                                     <run>apt-get install -y --no-install-recommends python-pip</run>
