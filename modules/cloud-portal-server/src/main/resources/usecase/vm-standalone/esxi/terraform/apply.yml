@@ -108,8 +108,6 @@
     block:
     - name: Delete empty disk for new template
       shell: "rm -r /vmfs/volumes/{{ esxi_datastore }}/{{ random_id }}/{{ random_id }}*.vmdk"
-      args:
-        warn: false
      
     - name: Create disk from template
       shell: "vmkfstools -i /vmfs/volumes/{{ esxi_datastore }}/{{ vm_template_path }} /vmfs/volumes/{{ esxi_datastore }}/{{ random_id }}/{{ random_id }}.vmdk -d thin"
