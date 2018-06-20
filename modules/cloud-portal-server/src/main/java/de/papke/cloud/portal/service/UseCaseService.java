@@ -166,7 +166,7 @@ public class UseCaseService {
 		}
 	}
 	
-	@Scheduled(cron = "${application.expiration.cron.expression}")
+	@Scheduled(cron = "${APPLICATION_EXPIRATION_CRON_EXPRESSION}")
 	private void schedule() {
 		
 		List<ProvisionLog> provisionLogList = provisionLogService.getExpired();

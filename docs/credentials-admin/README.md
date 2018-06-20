@@ -8,8 +8,8 @@
 
 ## Admin Group
 
-* You can set the config property **application.admin.group** in the file **application.properties**
-* It is also possible to specify the **application.admin.group** as an environment variable of the Docker container  
+* You can set the config property **APPLICATION_ADMIN_GROUP** in the file **application.properties**
+* It is also possible to specify the **APPLICATION_ADMIN_GROUP** as an environment variable of the Docker container  
 
 ## User Interface
 

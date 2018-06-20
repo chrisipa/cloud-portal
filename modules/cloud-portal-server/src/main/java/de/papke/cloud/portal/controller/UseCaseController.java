@@ -65,10 +65,10 @@ public class UseCaseController extends ApplicationController {
 	private static final String VAR_NAME_APPLICATION_URL = "application_url";
 	private static final String EMPTY_SCRIPT_NAME = "empty";
 	
-	@Value("${application.date.format}")
+	@Value("${APPLICATION_DATE_FORMAT}")
 	private SimpleDateFormat dateFormat;
 	
-	@Value("${application.url}")
+	@Value("${APPLICATION_URL}")
 	private String applicationUrl;
 
 	@Autowired

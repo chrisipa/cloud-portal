@@ -13,7 +13,7 @@ public class UserService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(UserService.class);
 
-	@Value("${application.admin.group}")
+	@Value("${APPLICATION_ADMIN_GROUP}")
 	private String adminGroup;	
 
 	@Autowired

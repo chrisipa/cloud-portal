@@ -21,10 +21,10 @@ public class ApplicationController {
 	protected static final String REDIRECT_PREFIX = "redirect:";
 	protected static final String VIEW_NOT_ALLOWED = "not-allowed";
 
-	@Value("${application.title}")
+	@Value("${APPLICATION_TITLE}")
 	private String applicationTitle;
 	
-	@Value("${application.dev.mode}")
+	@Value("${APPLICATION_DEV_MODE}")
 	private boolean devMode;
 	
 	@Autowired

@@ -27,21 +27,21 @@ Self service web portal for different Cloud platforms like Azure, AWS and VMware
     volumes:
       - /opt/cloud-portal/logs:/opt/tomcat/logs
     environment:
-      - 'application.title=My Cloud Portal'
-      - 'application.admin.group=my-admin-group'
-      - 'encryptor.secret=my-encryptor-secret'
-      - 'ldap.base.dn=dc=my,dc=domain'
-      - 'ldap.group.attribute=memberOf'
-      - 'ldap.login.attribute=userPrincipalName'
-      - 'ldap.password=my-ldap-password'
-      - 'ldap.principal=cn=my-admin-user,ou=users,dc=my,dc=domain'
-      - 'ldap.url.string=ldap://my-ldap-server-1:389,ldap://my-ldap-server-2:389'
-      - 'ldap.user.search.filter=(objectClass=inetOrgPerson)'
-      - 'mail.from=no-reply@my-domain.com'
-      - 'mail.cc=my-cc-account@my-domain.com'
-      - 'mail.host=my-mail-server'
-      - 'mail.send=true'
-      - 'spring.data.mongodb.uri=mongodb://mongodb:27017/cloud-portal'
+      - 'APPLICATION_TITLE=My Cloud Portal'
+      - 'APPLICATION_ADMIN_GROUP=my-admin-group'
+      - 'ENCRYPTOR_SECRET=my-encryptor-secret'
+      - 'LDAP_BASE_DN=dc=my,dc=domain'
+      - 'LDAP_GROUP_ATTRIBUTE=memberOf'
+      - 'LDAP_LOGIN_ATTRIBUTE=userPrincipalName'
+      - 'LDAP_PASSWORD=my-ldap-password'
+      - 'LDAP_PRINCIPAL=cn=my-admin-user,ou=users,dc=my,dc=domain'
+      - 'LDAP_URL_STRING=ldap://my-ldap-server-1:389,ldap://my-ldap-server-2:389'
+      - 'LDAP_USER_SEARCH_FILTER=(objectClass=inetOrgPerson)'
+      - 'MAIL_FROM=no-reply@my-domain.com'
+      - 'MAIL_CC=my-cc-account@my-domain.com'
+      - 'MAIL_HOST=my-mail-server'
+      - 'MAIL_SEND=true'
+      - 'MONGO_DB_URI=mongodb://mongodb:27017/cloud-portal'
   ```
 
 * Run docker containers with docker compose:

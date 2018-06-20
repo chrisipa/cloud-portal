@@ -19,7 +19,7 @@ public class VelocityService {
 
     private static final Logger LOG = LoggerFactory.getLogger(VelocityService.class);
 
-    @Value("${velocity.encoding}")
+    @Value("${VELOCITY_ENCODING}")
     private String encoding;
 
     private VelocityEngine velocityEngine;

@@ -55,7 +55,7 @@ public class TerraformService extends ProvisionerService {
 	@Autowired
 	private FileService fileService;
 	
-	@Value("${terraform.path}")
+	@Value("${TERRAFORM_PATH}")
 	private String terraformPath;
 
 	private File pluginSourceFolder;

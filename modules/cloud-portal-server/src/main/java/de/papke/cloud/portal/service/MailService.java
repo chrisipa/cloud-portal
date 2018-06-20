@@ -24,37 +24,37 @@ public class MailService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(MailService.class);
 
-	@Value("${mail.protocol}")
+	@Value("${MAIL_PROTOCOL}")
 	private String protocol;
 
-	@Value("${mail.host}")
+	@Value("${MAIL_HOST}")
 	private String host;
 
-	@Value("${mail.port}")
+	@Value("${MAIL_PORT}")
 	private int port;
 
-	@Value("${mail.smtp.auth}")
+	@Value("${MAIL_SMTP_AUTH}")
 	private boolean auth;
 
-	@Value("${mail.smtp.starttls.enable}")
+	@Value("${MAIL_SMTP_START_TLS_ENABLE}")
 	private boolean starttls;
 	
-	@Value("${mail.smtp.timeout}")
+	@Value("${MAIL_SMTP_TIMEOUT}")
 	private int timeout;
 
-	@Value("${mail.from}")
+	@Value("${MAIL_FROM}")
 	private String from;
 	
-	@Value("${mail.cc}")
+	@Value("${MAIL_CC}")
 	private String cc;
 
-	@Value("${mail.username}")
+	@Value("${MAIL_USERNAME}")
 	private String username;
 
-	@Value("${mail.password}")
+	@Value("${MAIL_PASSWORD}")
 	private String password;
 
-	@Value("${mail.send}")
+	@Value("${MAIL_SEND}")
 	private boolean send;
 
 	private JavaMailSenderImpl mailSender;
@@ -83,7 +83,7 @@ public class MailService {
 		mailProperties.put("mail.smtp.auth", auth);
 		mailProperties.put("mail.smtp.starttls.enable", starttls);
 		mailProperties.put("mail.smtp.timeout", timeout);    
-		mailProperties.put("mail.smtp.connectiontimeout", timeout);  
+		mailProperties.put("mail.smtp.connectiontimeout", timeout);   
 
 		// set java mail properties
 		mailSender.setJavaMailProperties(mailProperties);

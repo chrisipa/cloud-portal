@@ -32,10 +32,10 @@ public class ProvisionLogService {
 	private static final String TMP_FILE_PREFIX = "provision-log";
 	private static final String TMP_FILE_SUFFIX = ".zip";
 
-	@Value("${application.dev.mode}")
+	@Value("${APPLICATION_DEV_MODE}")
 	private boolean devMode;	
 	
-	@Value("${application.expiration.auto.minutes}")
+	@Value("${APPLICATION_EXPIRATION_AUTO_MINUTES}")
 	private int expirationAutoMinutes;	
 
 	@Autowired

@@ -37,46 +37,46 @@ public class DirectoryService {
 	
 	private static final String SECURE_SCHEME = "ldaps";
 
-	@Value("${ldap.url.string}")
+	@Value("${LDAP_URL_STRING}")
 	private String urlString;
 
-	@Value("${ldap.base.dn}")
+	@Value("${LDAP_BASE_DN}")
 	private String baseDn;
 
-	@Value("${ldap.principal}")
+	@Value("${LDAP_PRINCIPAL}")
 	private String principal;
 
-	@Value("${ldap.password}")
+	@Value("${LDAP_PASSWORD}")
 	private String password;
 
-	@Value("${ldap.user.search.filter}")
+	@Value("${LDAP_USER_SEARCH_FILTER}")
 	private String userSearchFilter;
 
-	@Value("${ldap.login.attribute}")
+	@Value("${LDAP_LOGIN_ATTRIBUTE}")
 	private String loginAttribute;
 
-	@Value("${ldap.displayname.attribute}")
+	@Value("${LDAP_DISPLAYNAME_ATTRIBUTE}")
 	private String displayNameAttribute;
 	
-	@Value("${ldap.givenname.attribute}")
+	@Value("${LDAP_GIVENNAME_ATTRIBUTE}")
 	private String givenNameAttribute;
 
-	@Value("${ldap.surname.attribute}")
+	@Value("${LDAP_SURNAME_ATTRIBUTE}")
 	private String surNameAttribute;
 
-	@Value("${ldap.mail.attribute}")
+	@Value("${LDAP_MAIL_ATTRIBUTE}")
 	private String mailAttribute;
 
-	@Value("${ldap.group.attribute}")
+	@Value("${LDAP_GROUP_ATTRIBUTE}")
 	private String groupAttribute;
 	
-	@Value("${ldap.member.attribute}")
+	@Value("${LDAP_MEMBER_ATTRIBUTE}")
 	private String memberAttribute;
 
-	@Value("${ldap.timeout}")
+	@Value("${LDAP_TIMEOUT}")
 	private Integer timeout;
 
-	@Value("${ldap.page.size}")
+	@Value("${LDAP_PAGE_SIZE}")
 	private Integer pageSize;
 
 	private String[] urls;

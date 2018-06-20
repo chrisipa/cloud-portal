@@ -22,21 +22,21 @@ For testing purposes you can use the public LDAP server of the company [Forum Sy
 For this LDAP server the config in the [application.properties](../../modules/cloud-portal-server/src/main/resources/application.properties) file would look like this:
 
 ```bash
-application.admin.group=scientists
-ldap.url.string=ldap://ldap.forumsys.com:389
-ldap.base.dn=dc=example,dc=com
-ldap.principal=cn=read-only-admin,dc=example,dc=com
-ldap.password=password
-ldap.user.search.filter=(objectClass=inetOrgPerson)
-ldap.login.attribute=uid
-ldap.givenname.attribute=givenName
-ldap.surname.attribute=sn
-ldap.displayname.attribute=cn
-ldap.mail.attribute=mail
-ldap.group.attribute=
-ldap.member.attribute=uniqueMember
-ldap.timeout=3000
-ldap.page.size=1000
+APPLICATION_ADMIN_GROUP=scientists
+LDAP_URL_STRING=ldap://ldap.forumsys.com:389
+LDAP_BASE_DN=dc=example,dc=com
+LDAP_PRINCIPAL=cn=read-only-admin,dc=example,dc=com
+LDAP_PASSWORD=password
+LDAP_USER_SEARCH_FILTER=(objectClass=inetOrgPerson)
+LDAP_LOGIN_ATTRIBUTE=uid
+LDAP_GIVENNAME_ATTRIBUTE=givenName
+LDAP_SURNAME_ATTRIBUTE=sn
+LDAP_DISPLAYNAME_ATTRIBUTE=cn
+LDAP_MAIL_ATTRIBUTE=mail
+LDAP_GROUP_ATTRIBUTE=
+LDAP_MEMBER_ATTRIBUTE=uniqueMember
+LDAP_TIMEOUT=3000
+LDAP_PAGE_SIZE=1000
 ```
 
 Now you should be able to login to the cloud portal with these credentials:

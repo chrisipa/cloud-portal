@@ -8,7 +8,7 @@ import de.papke.cloud.portal.crypto.AES;
 @Service
 public class EncryptionService {
 	
-	@Value("${encryptor.secret}")
+	@Value("${ENCRYPTOR_SECRET}")
 	private String secret;
 	
 	public String encrypt(String text) {
