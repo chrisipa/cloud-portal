@@ -47,6 +47,10 @@
                                         <args>run</args>
                                     </exec>
                                 </cmd>
+                                <env>
+                                    <!-- hide all python warnings -->
+                                    <PYTHONWARNINGS>ignore</PYTHONWARNINGS>
+                                </env>
                                 <runCmds>
 
                                     <!-- update package sources -->
@@ -69,7 +73,6 @@
                                     <run>apt-get install -y --no-install-recommends python-pip</run>
 
                                     <!-- install aws cli -->
-                                    <run>apt-get install -y --no-install-recommends python-pip</run>
                                     <run>pip install awscli</run>
 
                                     <!-- download and install terraform -->
