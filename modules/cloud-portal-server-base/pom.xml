@@ -88,7 +88,7 @@
                                     <run>apt-get update</run>
                                     
                                     <!-- install ansible -->
-                                    <run>apt-get install -y --no-install-recommends ansible=2.5.4-1ppa~trusty</run>
+                                    <run>apt-get install -y --no-install-recommends ansible=2.5.5-1ppa~trusty</run>
                                     
                                     <!-- install ansible pysphere package -->
                                     <run>pip install pysphere</run>
