@@ -33,7 +33,7 @@
 									</td>
 									<td><c:out value="${cred.group}" /></td>
 									<td><c:out value="${cred.secretMap['access_key']}" /></td>
-									<td><c:out value="${cred.secretMap['secret_key']}" /></td>
+									<td><c:out value="****" /></td>
 								</tr>
 							</c:forEach>
 						</tbody>

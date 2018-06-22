@@ -37,7 +37,7 @@
                                     <td><c:out value="${cred.group}" /></td>
                                     <td><c:out value="${cred.secretMap['esxi_hostname']}" /></td>
                                     <td><c:out value="${cred.secretMap['esxi_username']}" /></td>
-                                    <td><c:out value="${cred.secretMap['esxi_password']}" /></td>
+                                    <td><c:out value="****" /></td>
                                     <td><c:out value="${cred.secretMap['esxi_datastore']}" /></td>
                                     <td><c:out value="${cred.secretMap['esxi_network']}" /></td>
                                 </tr>

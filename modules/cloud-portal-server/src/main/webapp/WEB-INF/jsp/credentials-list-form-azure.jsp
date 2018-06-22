@@ -37,7 +37,7 @@
 									<td><c:out value="${cred.secretMap['subscription_id']}" /></td>
 									<td><c:out value="${cred.secretMap['tenant_id']}" /></td>
 									<td><c:out value="${cred.secretMap['client_id']}" /></td>
-									<td><c:out value="${cred.secretMap['client_secret']}" /></td>
+									<td><c:out value="****" /></td>
 								</tr>
 							</c:forEach>
 						</tbody>

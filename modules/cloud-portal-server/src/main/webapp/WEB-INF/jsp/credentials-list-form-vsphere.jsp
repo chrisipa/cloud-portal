@@ -40,7 +40,7 @@
 									<td><c:out value="${cred.group}" /></td>
 									<td><c:out value="${cred.secretMap['vcenter_hostname']}" /></td>
 									<td><c:out value="${cred.secretMap['vcenter_username']}" /></td>
-									<td><c:out value="${cred.secretMap['vcenter_password']}" /></td>
+									<td><c:out value="****" /></td>
 									<td><c:out value="${cred.secretMap['vcenter_datacenter']}" /></td>
 									<td><c:out value="${cred.secretMap['vcenter_datastore']}" /></td>
 									<td><c:out value="${cred.secretMap['vcenter_resource_pool']}" /></td>
