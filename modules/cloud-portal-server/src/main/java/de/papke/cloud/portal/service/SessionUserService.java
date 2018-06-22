@@ -34,6 +34,10 @@ public class SessionUserService {
 		return getUser().isAdmin();
 	}
 	
+	public boolean isAllowed() {
+		return isAdmin();
+	}
+
 	public boolean isAllowed(ProvisionLog provisionLog) {
 		return isAdmin() || getUser().getGroups().contains(provisionLog.getGroup());
 	}

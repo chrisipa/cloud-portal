@@ -84,8 +84,8 @@ $(function() {
 								
 								var submit = true;
 								
-								if (buttonId.startsWith('delete')) {
-									submit = confirm('Do you really want to delete this item?');
+								if (buttonId.startsWith('unlink')) {
+									submit = confirm('Do you really want to unlink this item?');
 									if (submit) {
 										$('#myModal').modal('toggle');
 									}

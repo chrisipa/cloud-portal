@@ -33,10 +33,10 @@
                         <tbody>
                             <c:forEach items="${useCase.provisionLogs}" var="provisionLog">
                                 <tr>
-                                    <td>
+                                    <td width="140">
                                         <c:if test="${application.user.admin}">
-                                            <button id="delete/action/${useCase.id}/${provisionLog.id}" type="submit" class="btn btn-warning btn-circle" data-toggle="tooltip" title="Delete item">
-                                                <i class="fa fa-times"></i>
+                                            <button id="unlink/action/${useCase.id}/${provisionLog.id}" type="submit" class="btn btn-warning btn-circle" data-toggle="tooltip" title="Unlink item">
+                                                <i class="fa fa-unlink"></i>
                                             </button>
                                         </c:if>
                                         <c:if test="${provisionLog.success == true && provisionLog.command == 'apply'}">
@@ -49,6 +49,11 @@
                                                 <i class="fa fa-key"></i>
                                             </a>
                                         </c:if>                                            
+                                        <c:if test="${application.user.admin}">
+                                            <a href="<c:url value="/provision-log/result/${provisionLog.id}" />" class="btn btn-warning btn-circle" data-toggle="tooltip" title="Download result zip" target="_blank" role="button">
+                                                <i class="fa fa-download"></i>
+                                            </a>
+                                        </c:if>
                                     </td>
                                     <td data-order="<fmt:formatDate pattern="yyyy-MM-dd HH:mm" value="${provisionLog.date}"/>"><fmt:formatDate pattern="dd.MM.yyyy HH:mm:ss" value="${provisionLog.date}"/></td>
                                     <td><c:out value="${provisionLog.username}" /></td>

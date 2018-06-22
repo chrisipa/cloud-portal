@@ -34,6 +34,9 @@ public class Constants {
 	public static final String KEY_FILE_PUBLIC_SUFFIX = ".pub";
 	public static final String KEY_FILE_PRIVATE_SUFFIX = ".pem";
 	
+	public static final String RESULT_FILE_PREFIX = "result";
+	public static final String RESULT_FILE_SUFFIX = ".zip";
+	
 	public static final String TMP_FOLDER_PREFIX = System.getProperty("java.io.tmpdir") + "/tmp-";
 
 	public static final String FOLDER_CONSOLE = "console";

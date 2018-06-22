@@ -36,7 +36,7 @@ public class CredentialsController extends ApplicationController {
 		// fill model
 		fillModel(model, provider);		
 		
-		if (sessionUserService.isAdmin()) {
+		if (sessionUserService.isAllowed()) {
 
 			// get group
 			String group = variableMap.get(ATTRIBUTE_GROUP);
@@ -62,7 +62,7 @@ public class CredentialsController extends ApplicationController {
 		// fill model
 		fillModel(model, provider);		
 		
-		if (sessionUserService.isAdmin()) {
+		if (sessionUserService.isAllowed()) {
 			return "credentials-create-form-" + provider;
 		}
 		else {
@@ -77,7 +77,7 @@ public class CredentialsController extends ApplicationController {
 		// fill model
 		fillModel(model, provider);		
 		
-		if (sessionUserService.isAdmin()) {
+		if (sessionUserService.isAllowed()) {
 			return LIST_VIEW_PREFIX + provider;
 		}
 		else {
@@ -93,7 +93,7 @@ public class CredentialsController extends ApplicationController {
 		// fill model
 		fillModel(model, provider);		
 		
-		if (sessionUserService.isAdmin()) {
+		if (sessionUserService.isAllowed()) {
 		
 			// delete credentials
 			credentialsService.delete(id);

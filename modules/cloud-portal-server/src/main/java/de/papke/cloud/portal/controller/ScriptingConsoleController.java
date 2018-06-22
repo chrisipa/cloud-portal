@@ -55,7 +55,7 @@ public class ScriptingConsoleController extends ApplicationController {
 		fillModel(model);
 		
 		// check if user is allowed to see console
-		if (sessionUserService.isAdmin()) {
+		if (sessionUserService.isAllowed()) {
 			return VIEW_NAME;
 		}
 		else {
@@ -79,7 +79,7 @@ public class ScriptingConsoleController extends ApplicationController {
     	response.setContentType(Constants.RESPONSE_CONTENT_TYPE_TEXT_PLAIN);
     	
 		// check if user is allowed to execute script
-		if (sessionUserService.isAdmin()) {
+		if (sessionUserService.isAllowed()) {
     	
 	        // use script string as default
 	        String scriptToExecute = script;

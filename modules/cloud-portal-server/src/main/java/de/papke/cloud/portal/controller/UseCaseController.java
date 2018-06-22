@@ -196,8 +196,8 @@ public class UseCaseController extends ApplicationController {
 		}
 	}
 	
-	@GetMapping(path = PREFIX + "/delete/action/{useCaseId}/{provisionLogId}")
-	public void delete(Map<String, Object> model,
+	@GetMapping(path = PREFIX + "/unlink/action/{useCaseId}/{provisionLogId}")
+	public void unlink(Map<String, Object> model,
 			@PathVariable String useCaseId,
 			@PathVariable String provisionLogId,
 			HttpServletResponse response) {
@@ -221,14 +221,14 @@ public class UseCaseController extends ApplicationController {
 					provisionLogService.delete(provisionLogId);
 					
 					// print success message
-					success(String.format("Provision log entry with id '%s' was deleted successfully.", provisionLogId), response);
+					success(String.format("Provision log entry with id '%s' was unlinked successfully.", provisionLogId), response);
 				}
 				else {
 					fail(String.format("No provision log entry found for id '%s'.", provisionLogId), response);
 				}
 			}
 			else {
-				fail(String.format("You are not allowed to delete the entry with the id '%s'", provisionLogId), response);
+				fail(String.format("You are not allowed to unlink the entry with the id '%s'", provisionLogId), response);
 			}
 		}
 		catch(Exception e) {
