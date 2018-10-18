@@ -26,7 +26,7 @@ Self service web portal supporting multiple Cloud providers and use cases.
 * LDAP authentication & authorization
 * Use case provisioning with Hashicorp's Terraform 
 * Provisioning history
-* Automated deprovisioning with terraform destroy (expiration dates)
+* Automated deprovisioning with terraform destroy (by expiration dates)
 * Execute bootstrap scripts for automated server configuration
 * Send HTML emails with customizable velocity templates and Terraform log data as attachment
 * Responsive WebUI with generic variable rendering
