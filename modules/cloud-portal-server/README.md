@@ -9,7 +9,7 @@ Self service web portal for different Cloud platforms like Azure, AWS and VMware
 
 ## Usage
 
-* Create a underprivileged user on the host system:
+* Create an underprivileged user on the host system:
 
   ```bash
   sudo groupadd -g 1001 chrisipa
