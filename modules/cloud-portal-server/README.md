@@ -9,6 +9,13 @@ Self service web portal for different Cloud platforms like Azure, AWS and VMware
 
 ## Usage
 
+* Create a underprivileged user on the host system:
+
+  ```bash
+  sudo groupadd -g 1001 chrisipa
+  sudo useradd -u 1001 -g 1001 -m -s /usr/sbin/nologin chrisipa
+  ```
+
 * Create docker compose file `docker-compose.yml` with your configuration data:
 
   ```yml
