@@ -15,6 +15,13 @@ Self service web portal for different Cloud platforms like Azure, AWS and VMware
   sudo groupadd -g 1001 chrisipa
   sudo useradd -u 1001 -g 1001 -m -s /usr/sbin/nologin chrisipa
   ```
+  
+* Create cloud-portal log directory with correct permissions:
+
+  ```bash
+  sudo mkdir -p /opt/cloud-portal/logs
+  sudo chown chrisipa.chrisipa /opt/cloud-portal/logs
+  ```  
 
 * Create docker compose file `docker-compose.yml` with your configuration data:
 
