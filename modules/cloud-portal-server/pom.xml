@@ -192,7 +192,7 @@
                                     <port>${tomcat.https.port}:${tomcat.https.port}</port>
                                 </ports>
                                 <env>
-                                    <MONGO_DB_URI>mongodb://mongodb:27017/cloud-portal</MONGO_DB_URI>
+                                    <MONGO_DB_URI>mongodb://mongodb:27017</MONGO_DB_URI>
                                 </env>
                             </run>
                         </image>

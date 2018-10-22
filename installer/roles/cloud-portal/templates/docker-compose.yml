@@ -33,6 +33,7 @@ tomcat:
     - 'MAIL_HOST={{ mail_host }}'
     - 'MAIL_SEND={{ mail_send }}'
     - 'MONGO_DB_URI={{ mongo_db_uri }}'
+    - 'MONGO_DB_DATABASE={{ mongo_db_database }}'
 
 apache:
   image: 'chrisipa/apache:latest'

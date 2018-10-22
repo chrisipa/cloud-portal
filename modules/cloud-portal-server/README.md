@@ -48,7 +48,8 @@ Self service web portal for different Cloud platforms like Azure, AWS and VMware
       - 'MAIL_CC=my-cc-account@my-domain.com'
       - 'MAIL_HOST=my-mail-server'
       - 'MAIL_SEND=true'
-      - 'MONGO_DB_URI=mongodb://mongodb:27017/cloud-portal'
+      - 'MONGO_DB_URI=mongodb://mongodb:27017'
+      - 'MONGO_DB_DATABASE=cloud-portal'
   ```
 
 * Run docker containers with docker compose:
