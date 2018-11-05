@@ -159,7 +159,29 @@ resource "null_resource" "linuxprovisioning" {
     inline = [
       "echo '${var.password}' | sudo -S echo test",
       "bash '${local.linux_prepare_script_path}' '${var.random_id}'",
+    ]
+  } 
+  
+  provisioner "remote-exec" {
+    inline = [
+      "echo '${var.password}' | sudo -S echo test",
       "bash '${local.linux_user_script_path}'",
+    ]
+  }
+   
+  provisioner "local-exec" {
+    command = "ansible-galaxy install -c -r ${var.ansible_requirements_file}"
+    on_failure = "continue"
+  } 
+   
+  provisioner "local-exec" {
+    command = "ansible-playbook -i ${vsphere_virtual_machine.linux.guest_ip_addresses.0}, -e ansible_python_interpreter=/usr/bin/python3 -e \"@parameters.yml\" --key-file ${var.private_key_file} ${var.ansible_playbook_file}"
+    on_failure = "continue"
+  } 
+  
+  provisioner "remote-exec" {
+    inline = [
+      "echo '${var.password}' | sudo -S echo test",
       "bash '${local.linux_cleanup_script_path}'",
       "rm -rf ${local.linux_script_folder_path}"
     ]

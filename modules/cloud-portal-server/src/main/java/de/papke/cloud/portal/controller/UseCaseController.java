@@ -55,6 +55,8 @@ public class UseCaseController extends ApplicationController {
 	private static final String MODEL_VAR_NAME = "useCase";
 	private static final String VAR_TYPE_FILE = "file";
 	private static final String VAR_NAME_SCRIPT_FILE = "script_file";
+	private static final String VAR_NAME_ANSIBLE_REQUIREMENTS_FILE = "ansible_requirements_file";
+	private static final String VAR_NAME_ANSIBLE_PLAYBOOK_FILE = "ansible_playbook_file";
 	private static final String VAR_NAME_PRIVATE_KEY_FILE = "private_key_file";
 	private static final String VAR_NAME_PUBLIC_KEY_FILE = "public_key_file";
 	private static final String VAR_NAME_RANDOM_ID = "random_id";
@@ -303,7 +305,7 @@ public class UseCaseController extends ApplicationController {
 
 				String multipartFileName = multipartFile.getOriginalFilename();
 				String prefix = FilenameUtils.getBaseName(multipartFileName);
-				String suffix = FilenameUtils.getExtension(multipartFileName);
+				String suffix = Constants.CHAR_DOT + FilenameUtils.getExtension(multipartFileName);
 				file = File.createTempFile(prefix, suffix);
 
 				FileUtils.writeByteArrayToFile(file, multipartFile.getBytes());
@@ -380,7 +382,13 @@ public class UseCaseController extends ApplicationController {
 						privateKeyFile = generateKeyPair(variableMap, tempFileList);
 					}
 					else if (variableName.equals(VAR_NAME_SCRIPT_FILE)) {
-						addEmptyScriptFile(variableMap, tempFileList);
+						addEmptyScriptFile(variableMap, tempFileList, VAR_NAME_SCRIPT_FILE);
+					}
+					else if (variableName.equals(VAR_NAME_ANSIBLE_REQUIREMENTS_FILE)) {
+						addEmptyScriptFile(variableMap, tempFileList, VAR_NAME_ANSIBLE_REQUIREMENTS_FILE);
+					}
+					else if (variableName.equals(VAR_NAME_ANSIBLE_PLAYBOOK_FILE)) {
+						addEmptyScriptFile(variableMap, tempFileList, VAR_NAME_ANSIBLE_PLAYBOOK_FILE);
 					}
 				}
 			}
@@ -389,9 +397,9 @@ public class UseCaseController extends ApplicationController {
 		return privateKeyFile;
 	}
 
-	private void addEmptyScriptFile(Map<String, Object> variableMap, List<File> tempFileList) throws IOException {
+	private void addEmptyScriptFile(Map<String, Object> variableMap, List<File> tempFileList, String variableName) throws IOException {
 		File emptyScriptFile = File.createTempFile(EMPTY_SCRIPT_NAME, Constants.CHAR_EMPTY);
-		variableMap.put(VAR_NAME_SCRIPT_FILE, emptyScriptFile.getAbsolutePath());
+		variableMap.put(variableName, emptyScriptFile.getAbsolutePath());
 		tempFileList.add(emptyScriptFile);
 	}
 	

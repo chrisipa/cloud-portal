@@ -209,3 +209,15 @@ variableGroups:
       name: script_file
       description: Bootstrap script file to execute after vm has been created. 
       type: file   
+    
+    - title: Ansible Requirements
+      name: ansible_requirements_file
+      description: Requirements file specifying playbook dependencies to external roles. 
+      type: file
+      url: "https://docs.ansible.com/ansible/2.7/reference_appendices/galaxy.html#installing-multiple-roles-from-a-file"   
+    
+    - title: Ansible Playbook
+      name: ansible_playbook_file
+      description: Playbook file specifying roles which have to executed on the host. 
+      type: file
+      url: "https://docs.ansible.com/ansible/2.7/user_guide/playbooks.html"   

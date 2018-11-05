@@ -36,8 +36,11 @@ public class TerraformService extends ProvisionerService {
 
 	private static final String ANSIBLE_SSH_USER = "ansible_ssh_user";
 	private static final String ANSIBLE_SSH_PASS = "ansible_ssh_pass"; // NOSONAR
+	private static final String ANSIBLE_SUDO_PASS = "ansible_sudo_pass"; // NOSONAR
 	private static final String ESXI_USERNAME = "esxi_username";
 	private static final String ESXI_PASSWORD = "esxi_password"; // NOSONAR
+	private static final String USERNAME = "username"; 
+	private static final String PASSWORD = "password"; // NOSONAR
 	private static final String FLAG_NO_COLOR = "-no-color";
 	private static final String FLAG_VAR = "-var";
 	private static final String FLAG_FORCE = "-force";
@@ -114,23 +117,29 @@ public class TerraformService extends ProvisionerService {
 			parameterStringBuilder.append(Constants.CHAR_NEW_LINE);
 		}
 		
+		// create credentials map
+		Map<String, String> credentialsMap = new HashMap<>();
 		
 		// add ansible ssh user and password
 		if (useCase.getProvider().equals(Constants.PROVISIONER_ESXI)) {
-			
-			Map<String, String> credentialsMap = new HashMap<>();
 			credentialsMap.putAll(credentials.getSecretMap());
 			credentialsMap.put(ANSIBLE_SSH_USER, credentialsMap.get(ESXI_USERNAME));
 			credentialsMap.put(ANSIBLE_SSH_PASS, credentialsMap.get(ESXI_PASSWORD));
-			
-			for (Entry<String, String> entry : credentialsMap.entrySet()) {
-				parameterStringBuilder.append(entry.getKey());
-				parameterStringBuilder.append(Constants.CHAR_DOUBLE_DOT);
-				parameterStringBuilder.append(Constants.CHAR_WHITESPACE);
-				parameterStringBuilder.append(entry.getValue());
-				parameterStringBuilder.append(Constants.CHAR_NEW_LINE);	
-			}			
 		}
+		else {			
+			credentialsMap.put(ANSIBLE_SSH_USER, (String) variableMap.get(USERNAME));
+			credentialsMap.put(ANSIBLE_SSH_PASS, (String) variableMap.get(PASSWORD));
+			credentialsMap.put(ANSIBLE_SUDO_PASS, (String) variableMap.get(PASSWORD));
+		}
+		
+		// add credentials map entries to parameter string
+		for (Entry<String, String> entry : credentialsMap.entrySet()) {
+			parameterStringBuilder.append(entry.getKey());
+			parameterStringBuilder.append(Constants.CHAR_DOUBLE_DOT);
+			parameterStringBuilder.append(Constants.CHAR_WHITESPACE);
+			parameterStringBuilder.append(entry.getValue());
+			parameterStringBuilder.append(Constants.CHAR_NEW_LINE);	
+		}			
 		
 		// write parameter string to yaml file
 		fileService.createFile(parameterStringBuilder.toString(), getParameterFile(tmpFolder));
