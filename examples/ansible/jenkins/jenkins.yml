@@ -1,0 +1,8 @@
+- hosts: all
+  vars:
+    jenkins_hostname: "{{ inventory_hostname }}"
+  roles:
+    - role: geerlingguy.java
+      become: yes
+    - role: geerlingguy.jenkins
+      become: yes
