@@ -90,8 +90,11 @@
                                     <!-- install ansible -->
                                     <run>apt-get install -y --no-install-recommends ansible</run>
                                     
-                                    <!-- install ansible pysphere package -->
+                                    <!-- install ansible pysphere module -->
                                     <run>pip install pysphere</run>
+                                    
+                                    <!-- install ansible pywinrm module -->
+                                    <run>pip install pywinrm</run>
                                     
                                     <!-- clear apt cache -->
                                     <run>apt-get clean</run>

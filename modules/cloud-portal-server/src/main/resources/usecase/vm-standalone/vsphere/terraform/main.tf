@@ -265,12 +265,32 @@ resource "null_resource" "windowsprovisioning" {
   
   provisioner "remote-exec" {
     inline = [
-      "Powershell.exe -ExecutionPolicy Unrestricted -File ${local.windows_prepare_script_path} ${var.random_id}",      
-      "Powershell.exe -ExecutionPolicy Unrestricted -File ${local.windows_user_script_path}",
+      "Powershell.exe -ExecutionPolicy Unrestricted -File ${local.windows_prepare_script_path} ${var.random_id}"      
+    ]
+  } 
+  
+  provisioner "remote-exec" {
+    inline = [
+      "Powershell.exe -ExecutionPolicy Unrestricted -File ${local.windows_user_script_path}"
+    ]
+  } 
+  
+  provisioner "local-exec" {
+    command = "ansible-galaxy install -c -r ${var.ansible_requirements_file}"
+    on_failure = "continue"
+  } 
+   
+  provisioner "local-exec" {
+    command = "ansible-playbook -i ${vsphere_virtual_machine.windows.guest_ip_addresses.0}, -e ansible_port='5985' -e ansible_connection='winrm' -e \"@parameters.yml\" ${var.ansible_playbook_file}"
+    on_failure = "continue"
+  } 
+  
+  provisioner "remote-exec" {
+    inline = [
       "Powershell.exe -ExecutionPolicy Unrestricted -File ${local.windows_cleanup_script_path}",
       "Powershell.exe -ExecutionPolicy Unrestricted -Command Remove-Item ${local.windows_script_folder_path} -Force -Recurse"      
     ]
-  } 
+  }   
   
   depends_on = ["vsphere_virtual_machine.windows"]
 }

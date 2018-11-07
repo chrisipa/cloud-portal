@@ -34,6 +34,8 @@ public class TerraformService extends ProvisionerService {
 
 	public static final String PREFIX = "terraform";
 
+	private static final String ANSIBLE_USERNAME = "ansible_user";
+	private static final String ANSIBLE_PASSWORD = "ansible_password"; // NOSONAR
 	private static final String ANSIBLE_SSH_USER = "ansible_ssh_user";
 	private static final String ANSIBLE_SSH_PASS = "ansible_ssh_pass"; // NOSONAR
 	private static final String ANSIBLE_SUDO_PASS = "ansible_sudo_pass"; // NOSONAR
@@ -127,7 +129,9 @@ public class TerraformService extends ProvisionerService {
 			credentialsMap.put(ANSIBLE_SSH_PASS, credentialsMap.get(ESXI_PASSWORD));
 		}
 		else {			
+			credentialsMap.put(ANSIBLE_USERNAME, (String) variableMap.get(USERNAME));
 			credentialsMap.put(ANSIBLE_SSH_USER, (String) variableMap.get(USERNAME));
+			credentialsMap.put(ANSIBLE_PASSWORD, (String) variableMap.get(PASSWORD));
 			credentialsMap.put(ANSIBLE_SSH_PASS, (String) variableMap.get(PASSWORD));
 			credentialsMap.put(ANSIBLE_SUDO_PASS, (String) variableMap.get(PASSWORD));
 		}
