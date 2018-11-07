@@ -1,0 +1,6 @@
+- hosts: all
+  tasks:
+  - name: Create temp file
+    win_file:
+      path: C:\Temp\i-was-here.txt
+      state: touch
