@@ -35,7 +35,7 @@
                                     <tag>${project.version}</tag>
                                 </tags>
                                 <from>${pull.registry}/${tenant}/tomcat-base:9</from>
-                                <optimise>true</optimise>
+                                <optimise>false</optimise>
                                 <entryPoint>
                                     <exec>
                                         <args>/${project.artifactId}.sh</args>
@@ -71,9 +71,12 @@
 
                                     <!-- install python pip -->
                                     <run>apt-get install -y --no-install-recommends python-pip</run>
+                                    
+                                    <!-- upgrade python setuptools -->
+                                    <run>pip install --upgrade setuptools</run>
 
                                     <!-- install aws cli -->
-                                    <run>pip install awscli</run>
+                                    <run>easy_install awscli</run>
 
                                     <!-- download and install terraform -->
                                     <run>wget -q https://releases.hashicorp.com/terraform/${terraform.version}/terraform_${terraform.version}_linux_amd64.zip</run>
@@ -89,12 +92,12 @@
                                     
                                     <!-- install ansible -->
                                     <run>apt-get install -y --no-install-recommends ansible</run>
-                                    
+                                     
                                     <!-- install ansible pysphere module -->
-                                    <run>pip install pysphere</run>
+                                    <run>easy_install pysphere</run>
                                     
                                     <!-- install ansible pywinrm module -->
-                                    <run>pip install pywinrm</run>
+                                    <run>easy_install pywinrm</run>
                                     
                                     <!-- clear apt cache -->
                                     <run>apt-get clean</run>
