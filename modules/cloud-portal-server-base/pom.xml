@@ -72,6 +72,9 @@
                                     <!-- install python pip -->
                                     <run>apt-get install -y --no-install-recommends python-pip</run>
                                     
+                                    <!-- upgrade python pip -->
+                                    <run>pip install --upgrade pip</run>
+                                    
                                     <!-- upgrade python setuptools -->
                                     <run>pip install --upgrade setuptools</run>
 
